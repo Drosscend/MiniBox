@@ -1,8 +1,8 @@
 # INIT
 
 `````bash
-git clone https://github.com/Drosscend/IOT_reconnaissance_image
-cd IOT_reconnaissance_image
+git clone https://github.com/Drosscend/Mini-Box
+cd Mini-Box
 py -m venv Mémoire
 .mémoire\Scripts\activate
 git clone https://github.com/ultralytics/yolov5
