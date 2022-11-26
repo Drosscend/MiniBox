@@ -1,0 +1,10 @@
+# configuration pour le fichier detect.py
+project: "OUTPUT"
+name: "files"
+classes: 0
+source: 0
+view-img: true
+exist-ok: true
+save-txt: true
+save-crop: true
+conf: 0.25
