@@ -1,19 +1,9 @@
 import os
-import yaml
+import time
+
 import logging
-import argparse
 from CustomFormatter import CustomFormatter
-
-
-def readConfig(filepath):
-    with open(filepath, "r", encoding='utf-8') as f:
-        return yaml.safe_load(f)
-
-
-parser = argparse.ArgumentParser(prog='main.py', description='Main script')
-parser.add_argument('-c', '--config', dest="configPath", default="./config.yaml",
-                    help='Path to a custom config file')
-args = parser.parse_args()
+import cv2
 
 log = logging.getLogger("main")
 log.setLevel('DEBUG')
@@ -22,62 +12,69 @@ ch.setLevel('DEBUG')
 ch.setFormatter(CustomFormatter())
 log.addHandler(ch)
 
-###################################################
 
-project = "OUTPUT"
-name = "files"
-classes = "0"
-source = "0"
-viewimg = True
-existok = True
-savetxt = True
-savecrop = True
-conf = "0.25"
+def detect():
+    log.debug("Début de la détection")
 
-try:
-    config = readConfig(args.configPath)
-    log.info(f"Using configuration from: {args.configPath}")
-    if "project" in config:
-        project = config["project"]
-    if "name" in config:
-        name = config["name"]
-    if "classes" in config:
-        classes = config["classes"]
-    if "source" in config:
-        source = config["source"]
-    if "viewimg" in config:
-        viewimg = config["viewimg"]
-    if "existok" in config:
-        existok = config["existok"]
-    if "savetxt" in config:
-        savetxt = config["savetxt"]
-    if "savecrop" in config:
-        savecrop = config["savecrop"]
-    if "conf" in config:
-        conf = config["conf"]
-except FileNotFoundError:
-    log.warning("Configuration file not found. IGNORING...")
-except KeyError:
-    log.warning("Configuration file is missing mandatory entries. Using default values instead...")
-
-log.info("Lancement du programme")
-
-param = ""
-param += f" --project {project}"
-param += f" --name {name}"
-param += f" --classes {classes}"
-param += f" --source {source}"
-param += f" --conf {conf}"
-if viewimg:
-    param += " --view-img"
-if existok:
+    param = ""
+    param += f" --project OUTPUT"
+    param += f" --name files"
+    param += f" --classes 0" # 0 = personne, 1 = vélo
+    # param += f" --source {source}"
+    param += f" --source OUTPUT/photo.jpg"
+    param += f" --conf 0.25"
+    param += f" --vid-stride 1"
+    # param += " --view-img"
     param += " --exist-ok"
-if savetxt:
     param += " --save-txt"
-if savecrop:
-    param += " --save-crop"
+    # param += " --save-crop"
+    param += " --nosave"
 
-os.system(f"python yolov5/detect.py {param}")
+    os.system(f"python yolov5/detect.py {param}")
+    log.debug("Detection terminée")
 
-###################################################
 
+def takePhoto():
+    log.debug("Prise de photo")
+    s, img = cam.read()
+    cv2.imwrite("OUTPUT/photo.jpg", img)
+    log.debug("Photo prise")
+
+
+def addTime():
+    """
+    Ajoute l'heure dans le fichier txt
+    """
+    log.debug("Ajout de l'heure dans le fichier txt")
+    path = "OUTPUT/files/labels/photo.txt"
+
+    # si il n'y a pas de dossier oyu de fichier en créé un
+    if not os.path.exists(path):
+        os.makedirs(os.path.dirname(path), exist_ok=True)
+        open(path, 'a').close()
+
+    # ajoute l'heure dans le fichier en début de la dernière ligne si le fichier n'est pas vide et que la ligne
+    # commence par 0 ou 1
+
+    if os.stat(path).st_size != 0:
+        with open(path, "r+") as f:
+            lines = f.readlines()
+            if lines[-1].startswith("0") or lines[-1].startswith("1"):
+                lines[-1] = time.strftime("%H:%M:%S") + " " + lines[-1]
+                f.seek(0)
+                f.writelines(lines)
+                log.debug("Heure ajoutée")
+            else:
+                log.debug("Aucune heure ajoutée")
+    else:
+        log.debug("Aucune heure ajoutée")
+
+if __name__ == "__main__":
+    # take a photo every 2 seconds
+    cam = cv2.VideoCapture(0)
+    while True:
+        takePhoto()
+        detect()
+        addTime()
+        time.sleep(2)
+    cam.release()
