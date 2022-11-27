@@ -1,6 +1,5 @@
 import os
 import time
-
 import logging
 from CustomFormatter import CustomFormatter
 import cv2
@@ -14,12 +13,16 @@ log.addHandler(ch)
 
 
 def detect():
+    """
+    Lance le script detect.py et détecte la source de l'image
+    enregistre les informations de capture dans le fichier OUPUT/files/labels/photo.txt
+    """
     log.debug("Début de la détection")
 
     param = ""
     param += f" --project OUTPUT"
     param += f" --name files"
-    param += f" --classes 0" # 0 = personne, 1 = vélo
+    param += f" --classes 0"  # 0 = personne, 1 = vélo
     # param += f" --source {source}"
     param += f" --source OUTPUT/photo.jpg"
     param += f" --conf 0.25"
@@ -35,6 +38,9 @@ def detect():
 
 
 def takePhoto():
+    """
+    Prend une photo et la sauvegarde dans le dossier OUTPUT
+    """
     log.debug("Prise de photo")
     s, img = cam.read()
     cv2.imwrite("OUTPUT/photo.jpg", img)
@@ -68,6 +74,7 @@ def addTime():
                 log.debug("Aucune heure ajoutée")
     else:
         log.debug("Aucune heure ajoutée")
+
 
 if __name__ == "__main__":
     # take a photo every 2 seconds
