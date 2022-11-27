@@ -54,7 +54,7 @@ def addTime():
     log.debug("Ajout de l'heure dans le fichier txt")
     path = "OUTPUT/files/labels/photo.txt"
 
-    # si il n'y a pas de dossier oyu de fichier en créé un
+    # s'il n'y a pas de dossier ou de fichier en créé un
     if not os.path.exists(path):
         os.makedirs(os.path.dirname(path), exist_ok=True)
         open(path, 'a').close()
@@ -65,7 +65,7 @@ def addTime():
     if os.stat(path).st_size != 0:
         with open(path, "r+") as f:
             lines = f.readlines()
-            if lines[-1].startswith("0") or lines[-1].startswith("1"):
+            if lines[-1].startswith("0 ") or lines[-1].startswith("1 "):
                 lines[-1] = time.strftime("%H:%M:%S") + " " + lines[-1]
                 f.seek(0)
                 f.writelines(lines)
