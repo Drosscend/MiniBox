@@ -52,28 +52,36 @@ def addTime():
     Ajoute l'heure dans le fichier txt
     """
     log.debug("Ajout de l'heure dans le fichier txt")
-    path = "OUTPUT/files/labels/photo.txt"
+
+    pathToCopy = "OUTPUT/files/labels/photo.txt"
+    path = "OUTPUT/data.csv"
 
     # s'il n'y a pas de dossier ou de fichier en créé un
     if not os.path.exists(path):
         os.makedirs(os.path.dirname(path), exist_ok=True)
         open(path, 'a').close()
 
-    # ajoute l'heure dans le fichier en début de la dernière ligne si le fichier n'est pas vide et que la ligne
-    # commence par 0 ou 1
-
-    if os.stat(path).st_size != 0:
-        with open(path, "r+") as f:
-            lines = f.readlines()
-            if lines[-1].startswith("0 ") or lines[-1].startswith("1 "):
-                lines[-1] = time.strftime("%H:%M:%S") + " " + lines[-1]
-                f.seek(0)
-                f.writelines(lines)
-                log.debug("Heure ajoutée")
-            else:
-                log.debug("Aucune heure ajoutée")
+    if os.stat(pathToCopy).st_size != 0:
+        with open(pathToCopy, "r+") as f:
+            with open(path, "a") as f1:
+                for line in f:
+                    f1.write(time.strftime("%D %H:%M:%S") + ", " + line)
+        log.debug("Heure ajoutée")
     else:
         log.debug("Aucune heure ajoutée")
+
+
+def removeFile():
+    """
+    Supprime le fichier photo.txt
+    """
+    log.debug("Suppression du fichier photo.txt")
+    path = "OUTPUT/files/labels/photo.txt"
+    if os.path.exists(path):
+        os.remove(path)
+        log.debug("Fichier supprimé")
+    else:
+        log.debug("Fichier inexistant")
 
 
 if __name__ == "__main__":
@@ -81,7 +89,7 @@ if __name__ == "__main__":
     cam = cv2.VideoCapture(0)
     while True:
         takePhoto()
+        removeFile()
         detect()
         addTime()
-        time.sleep(2)
     cam.release()
