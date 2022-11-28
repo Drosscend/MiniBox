@@ -1,7 +1,7 @@
 import os
-import time
 import logging
 from CustomFormatter import CustomFormatter
+from Functions import utils
 import cv2
 
 log = logging.getLogger("main")
@@ -37,59 +37,14 @@ def detect():
     log.debug("Detection terminée")
 
 
-def takePhoto():
-    """
-    Prend une photo et la sauvegarde dans le dossier OUTPUT
-    """
-    log.debug("Prise de photo")
-    s, img = cam.read()
-    cv2.imwrite("OUTPUT/photo.jpg", img)
-    log.debug("Photo prise")
-
-
-def addTime():
-    """
-    Ajoute l'heure dans le fichier txt
-    """
-    log.debug("Ajout de l'heure dans le fichier txt")
-
-    pathToCopy = "OUTPUT/files/labels/photo.txt"
-    path = "OUTPUT/data.csv"
-
-    # s'il n'y a pas de dossier ou de fichier en créé un
-    if not os.path.exists(path):
-        os.makedirs(os.path.dirname(path), exist_ok=True)
-        open(path, 'a').close()
-
-    if os.stat(pathToCopy).st_size != 0:
-        with open(pathToCopy, "r+") as f:
-            with open(path, "a") as f1:
-                for line in f:
-                    f1.write(time.strftime("%D %H:%M:%S") + ", " + line)
-        log.debug("Heure ajoutée")
-    else:
-        log.debug("Aucune heure ajoutée")
-
-
-def removeFile():
-    """
-    Supprime le fichier photo.txt
-    """
-    log.debug("Suppression du fichier photo.txt")
-    path = "OUTPUT/files/labels/photo.txt"
-    if os.path.exists(path):
-        os.remove(path)
-        log.debug("Fichier supprimé")
-    else:
-        log.debug("Fichier inexistant")
-
-
 if __name__ == "__main__":
     # take a photo every 2 seconds
     cam = cv2.VideoCapture(0)
+    path_detect = "OUTPUT/files/labels/photo.txt"
+    path_output = "OUTPUT/files/labels/photo.txt"
     while True:
-        takePhoto()
-        removeFile()
+        utils.takePhoto(cam)
+        utils.removeFile(path_detect)
         detect()
-        addTime()
+        utils.addTime(path_detect, path_output)
     cam.release()
