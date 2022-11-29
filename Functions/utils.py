@@ -66,13 +66,6 @@ def takePhoto(cam):
     else:
         log.error("Photo non prise")
 
-"""
-date,type,position
-11/28/22 18:30:28,0,0.570312 0.602083 0.615625 0.791667
-11/28/22 18:30:33,0,0.546875 0.628125 0.571875 0.73125
-
-"""
-
 
 def csvToJson(path):
     """
