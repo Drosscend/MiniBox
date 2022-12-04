@@ -1,5 +1,6 @@
 import os
 import logging
+import time
 
 from CustomFormatter import CustomFormatter
 from Functions import utils
@@ -48,7 +49,7 @@ if __name__ == "__main__":
         utils.removeFile(path_detect)
         detect()
         utils.addTime(path_detect, path_output)
-        utils.removeFile(path_json)
-        utils.csvToJson(path_output)
+        # utils.removeFile(path_json)
+        # utils.csvToJson(path_output)
     cam.release()
 

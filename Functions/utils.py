@@ -32,24 +32,43 @@ def addTime(path_to_copy, path_to_paste):
     # si le fichier path_to_paste n'existe pas ou et vide on le crée avec une en-tête
     if os.stat(path_to_paste).st_size == 0:
         with open(path_to_paste, "w") as f:
-            f.write("date,occurence,type\n")
+            f.write("date,occurence,type,position\n")
 
-    # regrouper les lignes du fichier txt en une ligne en rajoutant en seconde position le nombre d'occurence
-    if os.stat(path_to_copy).st_size != 0:
-        with open(path_to_copy, "r+") as f:
-            with open(path_to_paste, "a") as f1:
-                occurence = len(f.readlines())
-                f.seek(0)
-                # récupérer la première ligne du fichier copy
-                line = f.readline()
-                # récupérer la date
-                date = time.strftime("%d/%m/%Y %H:%M:%S")
-                # récupérer le type
-                type = line.split(" ")[0]
-                # TODO récupérer la position
-                # écrire dans le fichier paste
-                f1.write(f"{date},{occurence},{type}\n")
-        log.debug("Heure ajoutée")
+    position = []
+
+    # construction du fichier si plusieurs occurence (1 ligne par occurence)
+    # 0 0.183594 0.778125 0.235938 0.439583\n
+    # 0 0.50625 0.764583 0.496875 0.466667\n
+    # la position est donc un tableau contenant toutes les positions ex: [[0.183594, 0.778125, 0.235938, 0.439583], [0.50625, 0.764583, 0.496875, 0.466667]]
+    with open(path_to_copy, "r") as f:
+        for line in f:
+            if line != "\n":
+                value = line.split(" ")[2:]
+                #suppresion du retour à la ligne
+                value[-1] = value[-1].replace("\n", "")
+                position.append(value)
+            else:
+                position.append(line)
+
+    # check if path_to_copy exist
+    if os.path.exists(path_to_copy):
+        # regrouper les lignes du fichier txt en une ligne en rajoutant en seconde position le nombre d'occurence
+        if os.stat(path_to_copy).st_size != 0:
+            with open(path_to_copy, "r+") as f:
+                with open(path_to_paste, "a") as f1:
+                    occurence = len(f.readlines())
+                    f.seek(0) # remettre le curseur au début du fichier
+                    # récupérer la première ligne du fichier copy
+                    line = f.readline()
+                    # récupérer la date
+                    date = time.strftime("%d/%m/%Y %H:%M:%S")
+                    # récupérer le type
+                    type = line.split(" ")[0]
+                    # écrire dans le fichier paste
+                    f1.write(date + "," + str(occurence) + "," + type + "," + str(position) + "\n")
+            log.debug("Heure ajoutée")
+        else:
+            log.error("Aucune heure ajoutée")
     else:
         log.error("Aucune heure ajoutée")
 
