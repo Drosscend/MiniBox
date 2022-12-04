@@ -18,9 +18,9 @@ def removeFile(path_to_remove):
         log.error("Fichier " + path_to_remove + " inexistant")
 
 
-def addTime(path_to_copy, path_to_paste):
+def createCSV(path_to_copy, path_to_paste):
     """
-    Ajoute l'heure dans le fichier txt
+    Créer un fichier csv à partir du fichier photo.txt
     """
     log.debug("Ajout de l'heure dans le fichier txt")
 
@@ -36,15 +36,14 @@ def addTime(path_to_copy, path_to_paste):
 
     position = []
 
-    # construction du fichier si plusieurs occurence (1 ligne par occurence)
-    # 0 0.183594 0.778125 0.235938 0.439583\n
-    # 0 0.50625 0.764583 0.496875 0.466667\n
-    # la position est donc un tableau contenant toutes les positions ex: [[0.183594, 0.778125, 0.235938, 0.439583], [0.50625, 0.764583, 0.496875, 0.466667]]
+    # construction du fichier si plusieurs occurence (1 ligne par occurence) 0 0.183594 0.778125 0.235938 0.439583\n
+    # 0 0.50625 0.764583 0.496875 0.466667\n la position est donc un tableau contenant toutes les positions
+    # ex: [[0.183594, 0.778125, 0.235938, 0.439583], [0.50625, 0.764583, 0.496875, 0.466667]]
     with open(path_to_copy, "r") as f:
         for line in f:
             if line != "\n":
-                value = line.split(" ")[2:]
-                #suppresion du retour à la ligne
+                value = line.split(" ")[1:]
+                # suppresion du retour à la ligne
                 value[-1] = value[-1].replace("\n", "")
                 position.append(value)
             else:
