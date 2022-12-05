@@ -64,4 +64,4 @@ python main.py
 
 # Copyright
 
-Ce projet est sous licence GPT3. Pour plus d'informations, veuillez consulter le fichier LICENSE.
+Ce projet est sous licence GPL3. Pour plus d'informations, veuillez consulter le fichier LICENSE.
