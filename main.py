@@ -44,10 +44,12 @@ if __name__ == "__main__":
     path_detect = "OUTPUT/files/labels/photo.txt"
     path_output = "OUTPUT/data.csv"
     path_json = "OUTPUT/data.json"
+    path_image = "OUTPUT/photo.jpg"
     while True:
         utils.takePhoto(cam)
         utils.removeFile(path_detect)
         detect()
+        utils.removeFile(path_image)
         utils.createCSV(path_detect, path_output)
         # utils.removeFile(path_json)
         # utils.csvToJson(path_output)

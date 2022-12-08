@@ -10,7 +10,7 @@ def removeFile(path_to_remove):
     """
     Supprime le fichier photo.txt
     """
-    log.debug("Suppression du fichier" + path_to_remove)
+    log.debug("Suppression du fichier " + path_to_remove)
     if os.path.exists(path_to_remove):
         os.remove(path_to_remove)
         log.debug("Fichier " + path_to_remove + " supprimé")
