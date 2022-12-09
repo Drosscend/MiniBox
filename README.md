@@ -18,7 +18,7 @@ Pour chaque personne, on essayera de récupérer les données suivantes :
 
 - sens de circulation
 
-- mode de transport (piéton, cycliste, trottinette, vélo couché…​)
+- mode de transport (piéton, cycliste, trottinette, vélo couché…)
 
 - le vélo est-il chargé ?
 
@@ -38,14 +38,21 @@ git clone https://github.com/ultralytics/yolov5
 cd yolov5
 pip install -r requirements.txt
 cd ..
+pip install -r requirements.txt
 ```
 
 # Run
 
-Pour lancer le programme, il faut lancer la commande suivante :
+Pour lancer le programme de détection, il faut lancer la commande suivante :
 
 ```python
 python main.py
+```
+
+Pour lancer le programme permettant d'afficher le diagramme, il faut lancer la commande suivante :
+
+```python
+python .\Functions\graph.py
 ```
 
 # Equipe
