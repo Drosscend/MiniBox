@@ -24,6 +24,22 @@ Pour chaque personne, on essayera de récupérer les données suivantes :
 
 - la personne porte-t-elle des équipements de protection ?
 
+# Prérequis
+
+Pour faire fonctionner ce projet, il faut avoir au maximum une version de python égale à 3.9.13. Pour vérifier la version de python installée, il faut lancer la commande suivante :
+
+```bash
+python --version
+```
+
+Lien pour l'installation de python : https://www.python.org/downloads/release/python-3913/
+
+Vous devez par ailleur si vous êtes sur windows autoriser l'installation de paquets non signés. Pour cela, il faut lancer la commande suivante dans un powershell en tant qu'administrateur :
+
+```bash
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+
 
 # INIT
 
