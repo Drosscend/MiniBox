@@ -24,6 +24,22 @@ Pour chaque personne, on essayera de récupérer les données suivantes :
 
 - la personne porte-t-elle des équipements de protection ?
 
+# Prérequis
+
+Pour faire fonctionner ce projet, il faut avoir au maximum une version de python égale à 3.9.13. Pour vérifier la version de python installée, il faut lancer la commande suivante :
+
+```bash
+python --version
+```
+
+Lien pour l'installation de python : https://www.python.org/downloads/release/python-3913/
+
+Vous devez par ailleur si vous êtes sur windows autoriser l'installation de paquets non signés. Pour cela, il faut lancer la commande suivante dans un powershell en tant qu'administrateur :
+
+```bash
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+```
+
 
 # INIT
 
@@ -35,9 +51,7 @@ cd MiniBox
 py -m venv .mémoire
 .mémoire\Scripts\activate
 git clone https://github.com/ultralytics/yolov5
-cd yolov5
-pip install -r requirements.txt
-cd ..
+pip install -r .\yolov5\requirements.txt
 pip install -r requirements.txt
 ```
 
