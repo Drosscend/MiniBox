@@ -51,9 +51,7 @@ cd MiniBox
 py -m venv .mémoire
 .mémoire\Scripts\activate
 git clone https://github.com/ultralytics/yolov5
-cd yolov5
-pip install -r requirements.txt
-cd ..
+pip install -r .\yolov5\requirements.txt
 pip install -r requirements.txt
 ```
 
