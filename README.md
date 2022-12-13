@@ -1,6 +1,9 @@
-## Projet de mémoire LP APSIO : Mini Box IOT
-
-### Description
+# <div align="center">Projet de mémoire LP APSIO : Mini Box IOT</div>
+![GitHub contributors](https://img.shields.io/github/contributors/Drosscend/MiniBox?label=Contributeurs)
+![GitHub](https://img.shields.io/github/license/Drosscend/MiniBox)
+![GitHub top language](https://img.shields.io/github/languages/top/Drosscend/MiniBox)
+![GitHub issues](https://img.shields.io/github/issues/Drosscend/MiniBox)
+## <div align="center">Description</div>
 
 Depuis quelques années, le trafic cycliste augmente grâce à de nombreux facteurs (pandémie, VAE (vélo à assistance électrique), amélioration des infrastructures) sans pour autant qu’il n’y ait d’étude étayée à ce sujet. L’objectif est de créer une borne de compteur cycliste miniature et autonome afin de déployer à moindre coût un grand nombre de ces appareils.
 
@@ -24,65 +27,83 @@ Pour chaque personne, on essayera de récupérer les données suivantes :
 
 - la personne porte-t-elle des équipements de protection ?
 
-# Prérequis
+## <div align="center">Documentation</div>
 
+<details open>
+<summary>Prérequis</summary>
 Pour faire fonctionner ce projet, il faut avoir au maximum une version de python égale à 3.9.13. Pour vérifier la version de python installée, il faut lancer la commande suivante :
 
 ```bash
 python --version
+# Python 3.9.13
 ```
 
-Lien pour l'installation de python : https://www.python.org/downloads/release/python-3913/
+Lien pour l'installation de python 3.9.13 : https://www.python.org/downloads/release/python-3913/
 
-Vous devez par ailleur si vous êtes sur windows autoriser l'installation de paquets non signés. Pour cela, il faut lancer la commande suivante dans un powershell en tant qu'administrateur :
+Vous devez par ailleurs si vous êtes sur windows autoriser l'installation de paquets non signés. Pour cela, il faut lancer la commande suivante dans un powershell en tant qu'administrateur :
 
 ```bash
 Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
 ```
+</details>
 
-
-# INIT
-
+<details open>
+<summary>Installation</summary>
 Dans un terminal, lancer la commande suivante :
 
 ```bash
-git clone https://github.com/Drosscend/MiniBox
+git clone https://github.com/Drosscend/MiniBox  # clone
 cd MiniBox
-py -m venv .mémoire
+py -m venv .mémoire # création de l'environnement virtuel
 .mémoire\Scripts\activate
-git clone https://github.com/ultralytics/yolov5
-pip install -r .\yolov5\requirements.txt
-pip install -r requirements.txt
+git clone https://github.com/ultralytics/yolov5  # clone
+pip install -r .\yolov5\requirements.txt  # installation des dépendances de yolov5
+pip install -r requirements.txt  # installation des dépendances du projet
 ```
+</details>
 
-# Run
 
+
+## <div align="center">Lancement</div>
+
+<details open>
+<summary>Main</summary>
 Pour lancer le programme de détection, il faut lancer la commande suivante :
 
 ```python
 python main.py
 ```
-
+</details>
+<details close>
+<summary>Graphique</summary>
 Pour lancer le programme permettant d'afficher le diagramme, il faut lancer la commande suivante :
 
 ```python
 python .\Functions\graph.py
 ```
+</details>
 
-# Equipe
+### <div align="center">Equipe</div>
 
-- Noémie Tandol
-- Kévin Véronési
+Etudiants de l'APSIO de l'Université de Toulouse :
+- Noémie Tandol @Drosscend
+- Kévin Véronési @NoemieT82
 
-# Encadrants
-
+Encadrants :
 - Yahn Formanczak
 
-# Technologies utilisées
-- Python
-- YOLOv5
-- OpenCV
+### <div align="center">License</div>
 
-# Copyright
+Le projet est sous licence **GPL-3.0 License**. Pour plus d'informations, veuillez consulter le fichier [LICENSE](LICENSE).
 
-Ce projet est sous licence GPL3. Pour plus d'informations, veuillez consulter le fichier LICENSE.
+### <div align="center">Contact</div>
+
+Pour faire remonter des bugs ou des demandes de fonctionnalités, veuillez consulter [GitHub Issues](https://github.com/Drosscend/MiniBox/issues).
+
+### <div align="center">Contributeurs</div>
+
+<a href = "https://github.com/Drosscend/MiniBox/graphs/contributors">
+  <img src = "https://contrib.rocks/image?repo=Drosscend/MiniBox"/>
+</a>
+
+Made with [contributors-img](https://contrib.rocks).
