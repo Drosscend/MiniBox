@@ -1,6 +1,8 @@
 # <div align="center">Projet de mémoire LP APSIO : Mini Box IOT</div>
-<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-<!-- ALL-CONTRIBUTORS-BADGE:END -->
+![GitHub contributors](https://img.shields.io/github/contributors/Drosscend/MiniBox?label=Contributeurs)
+![GitHub](https://img.shields.io/github/license/Drosscend/MiniBox)
+![GitHub top language](https://img.shields.io/github/languages/top/Drosscend/MiniBox)
+![GitHub issues](https://img.shields.io/github/issues/Drosscend/MiniBox)
 ## <div align="center">Description</div>
 
 Depuis quelques années, le trafic cycliste augmente grâce à de nombreux facteurs (pandémie, VAE (vélo à assistance électrique), amélioration des infrastructures) sans pour autant qu’il n’y ait d’étude étayée à ce sujet. L’objectif est de créer une borne de compteur cycliste miniature et autonome afin de déployer à moindre coût un grand nombre de ces appareils.
@@ -90,14 +92,11 @@ Etudiants de l'APSIO de l'Université de Toulouse :
 Encadrants :
 - Yahn Formanczak
 
-<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
-<!-- prettier-ignore-start -->
-<!-- markdownlint-disable -->
-<table>
-</table>
-<!-- markdownlint-restore -->
-<!-- prettier-ignore-end -->
-<!-- ALL-CONTRIBUTORS-LIST:END -->
+<a href = "https://github.com/Drosscend/MiniBox/graphs/contributors">
+  <img src = "https://contrib.rocks/image?repo=Drosscend/MiniBox"/>
+</a>
+
+Made with [contributors-img](https://contrib.rocks).
 
 ### <div align="center">License</div>
 
