@@ -3,6 +3,7 @@
 ![GitHub](https://img.shields.io/github/license/Drosscend/MiniBox)
 ![GitHub top language](https://img.shields.io/github/languages/top/Drosscend/MiniBox)
 ![GitHub issues](https://img.shields.io/github/issues/Drosscend/MiniBox)
+[![CodeFactor](https://www.codefactor.io/repository/github/drosscend/minibox/badge)](https://www.codefactor.io/repository/github/drosscend/minibox)
 ## <div align="center">Description</div>
 
 Depuis quelques années, le trafic cycliste augmente grâce à de nombreux facteurs (pandémie, VAE (vélo à assistance électrique), amélioration des infrastructures) sans pour autant qu’il n’y ait d’étude étayée à ce sujet. L’objectif est de créer une borne de compteur cycliste miniature et autonome afin de déployer à moindre coût un grand nombre de ces appareils.
