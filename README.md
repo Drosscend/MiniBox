@@ -92,12 +92,6 @@ Etudiants de l'APSIO de l'Université de Toulouse :
 Encadrants :
 - Yahn Formanczak
 
-<a href = "https://github.com/Drosscend/MiniBox/graphs/contributors">
-  <img src = "https://contrib.rocks/image?repo=Drosscend/MiniBox"/>
-</a>
-
-Made with [contributors-img](https://contrib.rocks).
-
 ### <div align="center">License</div>
 
 Le projet est sous licence **GPL-3.0 License**. Pour plus d'informations, veuillez consulter le fichier [LICENSE](LICENSE).
@@ -105,3 +99,11 @@ Le projet est sous licence **GPL-3.0 License**. Pour plus d'informations, veuill
 ### <div align="center">Contact</div>
 
 Pour faire remonter des bugs ou des demandes de fonctionnalités, veuillez consulter [GitHub Issues](https://github.com/Drosscend/MiniBox/issues).
+
+### <div align="center">Contributeurs</div>
+
+<a href = "https://github.com/Drosscend/MiniBox/graphs/contributors">
+  <img src = "https://contrib.rocks/image?repo=Drosscend/MiniBox"/>
+</a>
+
+Made with [contributors-img](https://contrib.rocks).
