@@ -2,4 +2,6 @@
 OUTPUT
 yolov5
 .mémoire
-__pycahche__/
+__pycache__
+yolov5s.pt
+.vscode
