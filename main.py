@@ -15,8 +15,8 @@ parser = argparse.ArgumentParser(prog='Mini Box', description='Projet de mémoir
 parser.add_argument('-w', '--webcam', type=int, default=0, help='Webcam à utiliser', required=False, choices=[0, 1])
 parser.add_argument('-c', '--classes', type=int, default=0, help='Type de détection (0: personnes, 1: vélos)',
                     required=False, choices=[0, 1])
-parser.add_argument('-s', '--show', help='Affichage de la détection (optionnel)', required=False, action='store_true')
-parser.add_argument('-d', '--debug', help='Mode debug (optionnel)', required=False, action='store_true')
+parser.add_argument('-s', '--show', help='Affichage de la détection', required=False, action='store_true')
+parser.add_argument('-d', '--debug', help='Mode debug', required=False, action='store_true')
 args = parser.parse_args()
 ###################################################
 

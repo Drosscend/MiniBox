@@ -69,6 +69,9 @@ pip install -r requirements.txt  # installation des dépendances du projet
 <details open>
 <summary>Main</summary>
 Pour lancer le programme de détection, il faut lancer la commande suivante :
+
+![Help](docs/help.png)
+
 Lancement du programme de détection avec paramètres par défaut :
 
 - source de la caméra = 0
