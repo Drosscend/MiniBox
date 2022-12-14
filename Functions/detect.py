@@ -17,9 +17,16 @@ def detect(source, type):
     log.debug("Début de la détection")
     # création du model
     model = torch.hub.load('ultralytics/yolov5', 'yolov5s')
-
+    
     # paramètres du model
     model.classes = type
+    model.conf = 0.25  # NMS confidence threshold
+    model.iou = 0.45  # NMS IoU threshold
+    model.agnostic = False  # NMS class-agnostic
+    model.multi_label = False  # NMS multiple labels per box
+    model.max_det = 1000  # maximum number of detections per image
+    model.amp = False  # Automatic Mixed Precision (AMP) inference  
+
 
     # si la source n'existe pas, on affiche un message d'erreur
     if not os.path.exists(source):
