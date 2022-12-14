@@ -56,9 +56,8 @@ Dans un terminal, lancer la commande suivante :
 git clone https://github.com/Drosscend/MiniBox  # clone
 cd MiniBox
 py -m venv .mémoire # création de l'environnement virtuel
-.mémoire\Scripts\activate
-git clone https://github.com/ultralytics/yolov5  # clone
-pip install -r .\yolov5\requirements.txt  # installation des dépendances de yolov5
+.mémoire\Scripts\activate # activation de l'environnement virtuel
+pip install -r https://raw.githubusercontent.com/ultralytics/yolov5/master/requirements.txt  # installation des dépendances de yolov5
 pip install -r requirements.txt  # installation des dépendances du projet
 ```
 </details>
