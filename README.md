@@ -69,10 +69,31 @@ pip install -r requirements.txt  # installation des dépendances du projet
 <details open>
 <summary>Main</summary>
 Pour lancer le programme de détection, il faut lancer la commande suivante :
+Lancement du programme de détection avec paramètres par défaut :
+
+- source de la caméra = 0
+- classes de détection = 0 (personne)
+- pas d'affichage = False
+- pas de débug = False
 
 ```python
 python main.py
 ```
+
+Lancement du programme de détection avec paramètres personnalisés :
+
+Options :
+
+- -h : Affiche de l'aide
+- -w : Source de la caméra (0 par défaut) (int) (ex : -s 0) (0 ou 1) (optionnel)
+- -c : Classes de détection (0 par défaut) (int) (ex : -c 0) (0 ou 1) (optionnel)
+- -s : Affichage de la sortie (False par défaut) (ex : -s) (optionnel)
+- -d : Affichage du debug (False par défaut) (ex : -d) (optionnel)
+
+```python
+python main.py -w 0 -c 1 -s -d
+```
+
 </details>
 <details close>
 <summary>Graphique</summary>
