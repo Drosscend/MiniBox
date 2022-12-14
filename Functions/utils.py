@@ -23,6 +23,11 @@ def takePhoto(cam):
     """
     log.debug("Prise de photo")
     s, img = cam.read()
+    # vérifie si le dossier OUTPUT existe, si non, le crée
+    if not os.path.exists("OUTPUT"):
+        log.error("Dossier OUTPUT inexistant, création du dossier")
+        os.makedirs("OUTPUT")
+        log.debug("Dossier OUTPUT créé")
     if s:
         cv2.imwrite("OUTPUT/photo.jpg", img)
         log.debug("Photo prise")
