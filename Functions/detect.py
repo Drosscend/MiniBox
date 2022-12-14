@@ -1,0 +1,47 @@
+import time
+import os
+import torch
+import logging
+
+log = logging.getLogger("main")
+
+def detect(source, type):
+    """
+    Fonction de détection
+    :param source: source de la photo
+    :param type: type de détection (0: personnes, 1: vélos)
+    :return: None
+    Enregistre les résultats dans un fichier csv avec comme entête:
+    date,occurence,type,positions
+    """
+    log.debug("Début de la détection")
+    # création du model
+    model = torch.hub.load('ultralytics/yolov5', 'yolov5s')
+
+    # paramètres du model
+    model.classes = type
+
+    # si la source n'existe pas, on affiche un message d'erreur
+    if not os.path.exists(source):
+        log.error("La source n'existe pas")
+        return
+
+    # detection
+    results = model(source) # 'OUTPUT/photo.jpg'
+    log.debug("Detection terminée")
+
+    log.debug("Traitement des résultats")
+    # enregistrement et traitement des résultats
+    data = results.pandas().xyxy[0]
+    data = data.drop(columns=['name', 'confidence', 'class'])
+    date = time.strftime("%d/%m/%Y %H:%M:%S", time.localtime())
+    tab_of_positions = data.values.tolist()
+    nb_personnes = len(tab_of_positions)
+
+    # enregistrement des données dans un fichier csv
+    with open('OUTPUT/data.csv', 'a') as f:
+        # si le fichier est vide, on écrit l'entête
+        if f.tell() == 0:
+            f.write("date,occurence,type,positions\n")
+        f.write(date + ',' + str(nb_personnes) + ',' + str(type) + ',' + str(tab_of_positions) + '\r')
+    log.debug("Résultats traités")
