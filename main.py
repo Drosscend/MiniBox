@@ -1,4 +1,3 @@
-import os
 import logging
 from CustomFormatter import CustomFormatter
 from Functions import utils
