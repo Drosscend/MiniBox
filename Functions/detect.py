@@ -27,12 +27,6 @@ def detect(source, type):
     model.max_det = 1000  # maximum number of detections per image
     model.amp = False  # Automatic Mixed Precision (AMP) inference  
 
-
-    # si la source n'existe pas, on affiche un message d'erreur
-    if not os.path.exists(source):
-        log.error("La source n'existe pas")
-        return
-
     # detection
     results = model(source) # 'OUTPUT/photo.jpg'
     log.debug("Detection terminée")

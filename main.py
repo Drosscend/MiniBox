@@ -14,9 +14,7 @@ log.addHandler(ch)
 
 if __name__ == "__main__":
     cam = cv2.VideoCapture(0)
-    path_photo = "OUTPUT/photo.jpg"
-    while True:
-        utils.takePhoto(cam, path_photo)
-        detect.detect(path_photo, 0)
+    while cam.isOpened():
+        ret, frame = cam.read()
+        detect.detect(frame, 0)
     # cam.release()
-
