@@ -53,6 +53,7 @@ def detect(webcam, classes, show=False):
 
 
 def generate_csv(results, classes):
+    log.debug("------------------------------------------")
     log.debug("Traitement des résultats")
     # enregistrement et traitement des résultats
     data = results.pandas().xyxy[0]
@@ -60,6 +61,7 @@ def generate_csv(results, classes):
     date = time.strftime("%d/%m/%Y %H:%M:%S", time.localtime())
     tab_of_positions = data.values.tolist()
     nb_personnes = len(tab_of_positions)
+    log.debug("Nombre de personnes détectées: " + str(nb_personnes))
     # enregistrement des données dans un fichier csv
     with open('OUTPUT/data.csv', 'a') as f:
         # si le fichier est vide, on écrit l'entête
@@ -67,3 +69,4 @@ def generate_csv(results, classes):
             f.write("date,occurence,type,positions\n")
         f.write(date + ',' + str(nb_personnes) + ',' + str(classes) + ',' + str(tab_of_positions) + '\r')
     log.debug("Résultats traités")
+    log.debug("------------------------------------------")
