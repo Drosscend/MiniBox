@@ -17,19 +17,22 @@ def removeFile(path_to_file_to_remove):
         log.error("Fichier " + path_to_file_to_remove + " inexistant")
 
 
-def takePhoto(cam):
+def takePhoto(cam, path_photo):
     """
     Prend une photo et la sauvegarde dans le dossier OUTPUT
+    : param cam: caméra
+    : param path_photo: chemin de la photo
     """
     log.debug("Prise de photo")
     s, img = cam.read()
-    # vérifie si le dossier OUTPUT existe, si non, le crée
-    if not os.path.exists("OUTPUT"):
-        log.error("Dossier OUTPUT inexistant, création du dossier")
-        os.makedirs("OUTPUT")
-        log.debug("Dossier OUTPUT créé")
+    # vérifie si le dossier de path_photo, si non, le crée
+    if not os.path.exists(os.path.dirname(path_photo)):
+        log.error("Le dossier " + os.path.dirname(path_photo) + " n'existe pas")
+        os.makedirs(os.path.dirname(path_photo))
+        log.debug("Le dossier " + os.path.dirname(path_photo) + " a été créé")
+
     if s:
-        cv2.imwrite("OUTPUT/photo.jpg", img)
+        cv2.imwrite(path_photo, img)
         log.debug("Photo prise")
     else:
         log.error("Photo non prise")
