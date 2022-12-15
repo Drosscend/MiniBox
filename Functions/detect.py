@@ -2,6 +2,7 @@ import logging
 import time
 import torch
 import cv2
+import os
 from Functions import utils
 from Functions.sort import Sort
 
@@ -84,6 +85,9 @@ def generate_csv(occurence, classes):
     # Si au moins une personne a été détectée, on enregistre les résultats dans le fichier CSV
     if occurence > 0:
         date = time.strftime("%d/%m/%Y %H:%M:%S", time.localtime())
+        # verifie que le dosser OUTPUT existe et le crée si ce n'est pas le cas
+        if not os.path.exists("OUTPUT"):
+            os.makedirs("OUTPUT")
         # enregistrement des données dans un fichier csv
         with open('OUTPUT/data.csv', 'a') as f:
             # si le fichier est vide, on écrit l'entête
