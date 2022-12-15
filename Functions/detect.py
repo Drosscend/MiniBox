@@ -7,7 +7,7 @@ import numpy as np
 log = logging.getLogger("main")
 
 
-def detect(webcam, classes, show=False):
+def detect(webcam, classes, show=False, debug=False):
     """
     Fonction de détection
     :param webcam: webcam à utiliser
@@ -25,7 +25,7 @@ def detect(webcam, classes, show=False):
     while cam.isOpened():
         ret, frame = cam.read()
         # création du model
-        model = torch.hub.load('ultralytics/yolov5', 'yolov5s')
+        model = torch.hub.load('ultralytics/yolov5', 'yolov5s', verbose=debug)
 
         # paramètres du model
         model.classes = classes

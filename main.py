@@ -37,4 +37,4 @@ if __name__ == "__main__":
         log.debug("Mode debug activé")
 
     # lancement de la détection
-    detect.detect(args.webcam, args.classes, args.show)
+    detect.detect(args.webcam, args.classes, args.show, args.debug)
