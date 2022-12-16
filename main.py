@@ -15,6 +15,7 @@ parser = argparse.ArgumentParser(prog='Mini Box', description='Projet de mémoir
 parser.add_argument('-w', '--webcam', type=int, default=0, help='Webcam à utiliser', required=False, choices=[0, 1])
 parser.add_argument('-c', '--classes', type=int, default=0, help='Type de détection (0: personnes, 1: vélos)',
                     required=False, choices=[0, 1])
+parser.add_argument('-i', '--interval', type=int, default=1, help='Intervalle entre chaque capture en secondes', required=False)
 parser.add_argument('-s', '--show', help='Affichage de la détection', required=False, action='store_true')
 parser.add_argument('-d', '--debug', help='Mode debug', required=False, action='store_true')
 args = parser.parse_args()
@@ -27,6 +28,7 @@ if __name__ == "__main__":
     log.info("Paramètres :")
     log.info("Webcam : " + str(args.webcam))
     log.info("Classes : " + str(args.classes))
+    log.info("Intervalle : " + str(args.interval) + " secondes")
     log.info("Affichage : " + str(args.show))
     log.info("Debug : " + str(args.debug))
 
@@ -37,4 +39,4 @@ if __name__ == "__main__":
         log.debug("Mode debug activé")
 
     # lancement de la détection
-    detect.detect(args.webcam, args.classes, args.show, args.debug)
+    detect.main(args.webcam, args.classes, args.interval, args.show, args.debug)
