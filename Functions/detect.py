@@ -42,7 +42,12 @@ def detect(video_capture, classes, interval=10, show=False, debug=False):
     while video_capture.isOpened():
         _, frame = video_capture.read()
 
-        results = model(frame)
+        # Pour vérifier que le modèle YOLOv5 est chargé et fonctionne correctement
+        try:
+            results = model(frame)
+        except Exception as e:
+            log.error("Erreur lors du traitement de l'image avec le modèle YOLOv5: " + str(e))
+            continue
 
         # Utilisation de la librairie Sort pour suivre les personnes détectées
         detections = np.array(results.xyxy[0][:, :4])
@@ -51,11 +56,17 @@ def detect(video_capture, classes, interval=10, show=False, debug=False):
         if len(detections) == 0:
             continue
 
-        track = model_sort.update(detections)
+        # Pour vérifier que la bibliothèque de suivi d'objets Sort fonctionne correctement
+        try:
+            track = model_sort.update(detections)
+        except Exception as e:
+            log.error("Erreur lors du suivi des objets avec la bibliothèque Sort: " + str(e))
+            continue
 
         # Détection des nouvelles personnes
         new_object_count = 0
         for j in range(len(track.tolist())):
+            log.debug("Liste des personnes détectées: " + str(tracked_object))
             coords = track.tolist()[j]
             name_idx = int(coords[4])
             # Si l'identifiant de la personne n'est pas déjà enregistré, c'est une nouvelle personne
@@ -68,8 +79,11 @@ def detect(video_capture, classes, interval=10, show=False, debug=False):
         # affichage des images
         if show:
             show_output(frame, track)
-            if cv2.waitKey(10) & 0xFF == ord('q'):
+            key = cv2.waitKey(10)
+            if key == ord('q'):
                 break
+            elif key == -1:
+                continue
 
         # Pause entre chaque détection
         if interval > 0:
@@ -98,11 +112,15 @@ def generate_csv(occurence, classes):
         if not os.path.exists("OUTPUT"):
             os.makedirs("OUTPUT")
         # enregistrement des données dans un fichier csv
-        with open('OUTPUT/data.csv', 'a') as f:
-            # si le fichier est vide, on écrit l'entête
-            if f.tell() == 0:
-                f.write("date,occurence,type\n")
-            f.write(date + ',' + str(occurence) + ',' + str(classes) + '\r')
+
+        try:
+            with open('OUTPUT/data.csv', 'a') as f:
+                # si le fichier est vide, on écrit l'entête
+                if f.tell() == 0:
+                    f.write("date,occurence,type\n")
+                f.write(date + ',' + str(occurence) + ',' + str(classes) + '\r')
+        except IOError as e:
+            log.error("Erreur lors de l'écriture dans le fichier CSV: " + str(e))
 
 
 def show_output(image, track):
@@ -138,10 +156,13 @@ def main(webcam, classes, interval, show, debug):
     # Initialisation de la caméra
     video_capture = cv2.VideoCapture(webcam)
 
+    if show:
+        log.info("Pour quitter l'application, appuyez sur la touche 'q'")
+
     # Vérification de l'ouverture de la caméra
     if not video_capture.isOpened():
         log.error("Impossible d'ouvrir la webcam")
-        exit()
+        return
 
     # Détection des personnes
     detect(video_capture, classes, interval, show, debug)

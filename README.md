@@ -78,7 +78,7 @@ Lancement du programme de détection avec paramètres personnalisés :
 Options :
 
 - -h : Affiche de l'aide
-- -w : Source de la caméra (0 par défaut) (int) (ex : -s 0) (0 ou 1) (optionnel)
+- -w : Source de la caméra (0 par défaut) (int) (ex : -s 0) (optionnel)
 - -c : Classes de détection (0 par défaut) (int) (ex : -c 0) (0 ou 1) (optionnel)
 - -i : Intervalle de détection (1 par défaut) (int) (ex : -i 1) (optionnel)
 - -s : Affichage de la sortie (False par défaut) (ex : -s) (optionnel)

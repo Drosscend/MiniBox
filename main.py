@@ -12,7 +12,7 @@ log.addHandler(ch)  # add console handler to logger
 
 ###################################################
 parser = argparse.ArgumentParser(prog='Mini Box', description='Projet de mémoire LP APSIO : Mini Box IOT')
-parser.add_argument('-w', '--webcam', type=int, default=0, help='Webcam à utiliser', required=False, choices=[0, 1])
+parser.add_argument('-w', '--webcam', type=int, default=0, help='Webcam à utiliser', required=False)
 parser.add_argument('-c', '--classes', type=int, default=0, help='Type de détection (0: personnes, 1: vélos)',
                     required=False, choices=[0, 1])
 parser.add_argument('-i', '--interval', type=int, default=1, help='Intervalle entre chaque capture en secondes', required=False)
