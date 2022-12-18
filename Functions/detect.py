@@ -38,6 +38,7 @@ def detect(video_capture, classes, interval=10, show=False, debug=False):
     model.multi_label = True
     model.max_det = 20
     model.amp = True
+
     while video_capture.isOpened():
         _, frame = video_capture.read()
 
@@ -71,8 +72,9 @@ def detect(video_capture, classes, interval=10, show=False, debug=False):
                 break
 
         # Pause entre chaque détection
-        log.debug("Pause de " + str(interval) + " secondes")
-        time.sleep(interval)
+        if interval > 0:
+            log.debug("Pause de " + str(interval) + " secondes")
+            time.sleep(interval)
 
     video_capture.release()
     cv2.destroyAllWindows()

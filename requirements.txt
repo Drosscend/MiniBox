@@ -18,5 +18,6 @@ tqdm>=4.64.0
 tensorboard>=2.4.1
 pandas>=1.1.4
 seaborn>=0.11.0
-scikit-image==0.19.3
-filterpy==1.4.5
+
+scikit-image==0.19.3 # sort
+filterpy==1.4.5 # sort
