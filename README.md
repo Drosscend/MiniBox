@@ -64,7 +64,7 @@ pip install -r requirements.txt  # installation des dépendances du projet
 
 
 
-## <div align="center">Lancement</div>
+## <div align="center">Lancement de la détection</div>
 
 <details open>
 <summary>Main</summary>
@@ -106,6 +106,16 @@ Pour lancer le programme permettant d'afficher le diagramme, il faut lancer la c
 python .\Functions\graph.py
 ```
 </details>
+
+## <div align="center">Lancement du site (framework Django)</div>
+
+Le site MiniBox WebGraphique permet de passer dans un formulaire un fichier .csv des données de détection, et d'afficher un graphique grâce à ces données.
+Pour lancer le site, il faut lancer la commande suivante :
+```bash
+python www/WebGraph/manage.py runserver
+```
+
+Le site est donc lancé en local et vous pouvez l'ouvrir avec l'URL suivante : [http://127.0.0.1:8000/](http://127.0.0.1:8000/)
 
 ### <div align="center">Equipe</div>
 

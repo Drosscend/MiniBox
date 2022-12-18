@@ -5,3 +5,4 @@ yolov5
 __pycache__
 yolov5s.pt
 .vscode
+www/WebGraph/files
