@@ -1,8 +1,8 @@
+import os
 import logging
 import time
 import torch
 import cv2
-import os
 import numpy as np
 from Functions import utils
 from Functions import sort
