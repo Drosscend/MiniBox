@@ -9,6 +9,8 @@ from Functions import sort
 
 log = logging.getLogger("main")
 
+CSV_FILE = 'OUTPUT/data.csv'
+
 # Dictionnaire pour stocker les identifiants des personnes suivies
 tracked_object = {}
 
@@ -19,7 +21,7 @@ model_sort = sort.Sort()
 def detect(video_capture, classes, interval=10, show=False, debug=False):
     """
     Fonction de détection
-    Enregistre les résultats dans un fichier csv avec comme entête:
+    Enregistre les résultats dans un fichier csv avec comme entête :
     date,occurence,type,positions
 
     :param video_capture: objet cv2.VideoCapture pour la caméra
@@ -114,7 +116,7 @@ def generate_csv(occurence, classes):
         # enregistrement des données dans un fichier csv
 
         try:
-            with open('OUTPUT/data.csv', 'a') as f:
+            with open(CSV_FILE, 'a') as f:
                 # si le fichier est vide, on écrit l'entête
                 if f.tell() == 0:
                     f.write("date,occurence,type\n")
