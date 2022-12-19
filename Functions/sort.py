@@ -169,11 +169,11 @@ def associate_detections_to_trackers(detections, trackers, iou_threshold=0.3):
         matched_indices = np.empty(shape=(0, 2))
 
     unmatched_detections = []
-    for d, det in enumerate(detections):
+    for d, _ in enumerate(detections):
         if d not in matched_indices[:, 0]:
             unmatched_detections.append(d)
     unmatched_trackers = []
-    for t, trk in enumerate(trackers):
+    for t, _ in enumerate(trackers):
         if t not in matched_indices[:, 1]:
             unmatched_trackers.append(t)
 
@@ -225,7 +225,7 @@ class Sort(object):
         trks = np.ma.compress_rows(np.ma.masked_invalid(trks))
         for t in reversed(to_del):
             self.trackers.pop(t)
-        matched, unmatched_dets, unmatched_trks = associate_detections_to_trackers(dets, trks, self.iou_threshold)
+        matched, unmatched_dets, _ = associate_detections_to_trackers(dets, trks, self.iou_threshold)
 
         # update matched trackers with assigned detections
         for m in matched:
