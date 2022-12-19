@@ -3,7 +3,6 @@
 ![GitHub](https://img.shields.io/github/license/Drosscend/MiniBox)
 ![GitHub top language](https://img.shields.io/github/languages/top/Drosscend/MiniBox)
 ![GitHub issues](https://img.shields.io/github/issues/Drosscend/MiniBox)
-[![CodeFactor](https://www.codefactor.io/repository/github/drosscend/minibox/badge)](https://www.codefactor.io/repository/github/drosscend/minibox)
 
 
 ## <h2 align="center">Description</h2>
