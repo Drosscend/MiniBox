@@ -3,7 +3,7 @@
 ![GitHub](https://img.shields.io/github/license/Drosscend/MiniBox)
 ![GitHub top language](https://img.shields.io/github/languages/top/Drosscend/MiniBox)
 ![GitHub issues](https://img.shields.io/github/issues/Drosscend/MiniBox)
-
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/f9d116c1661340d796c6d8feb08fd7c6)](https://www.codacy.com/gh/Drosscend/MiniBox/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=Drosscend/MiniBox&amp;utm_campaign=Badge_Grade)
 
 ## <h2 align="center">Description</h2>
 
