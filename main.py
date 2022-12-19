@@ -1,6 +1,6 @@
 import logging
 import argparse
-from CustomFormatter import CustomFormatter
+from Functions.CustomFormatter import CustomFormatter
 from Functions import detect
 
 log = logging.getLogger("main")  # Get the logger for this module
