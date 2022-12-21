@@ -71,7 +71,7 @@ def show_output(image, track):
     cv2.imshow('YOLO', image)
 
 
-def detect(video_capture, classes, interval=1, show=False, debug=False):
+def detect(video_capture, classes, interval, show, debug):
     """
     Fonction de détection
     Enregistre les résultats dans un fichier csv avec comme entête :
@@ -130,6 +130,11 @@ def detect(video_capture, classes, interval=1, show=False, debug=False):
             log.debug("Nouvelle objet détecté " + str(new_object_count) + " fois" + " de type " + str(classes))
             generate_csv(new_object_count, classes)
 
+        # Pause entre chaque détection
+        if interval > 0:
+            log.debug("Pause de " + str(interval) + " secondes")
+            time.sleep(interval)
+
         # affichage des images
         if show:
             show_output(frame, track)
@@ -138,11 +143,6 @@ def detect(video_capture, classes, interval=1, show=False, debug=False):
                 break
             elif key == -1:
                 continue
-
-        # Pause entre chaque détection
-        if interval > 0:
-            log.debug("Pause de " + str(interval) + " secondes")
-            time.sleep(interval)
 
     video_capture.release()
     cv2.destroyAllWindows()
