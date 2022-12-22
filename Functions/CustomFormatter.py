@@ -8,14 +8,14 @@ class CustomFormatter(logging.Formatter):
     bold_red = "\x1b[31;1m"
     green = "\x1b[32m"
     reset = "\x1b[0m"
-    format = "%(levelname)s: %(asctime)s - %(message)s"
+    log_format = "%(levelname)s: %(asctime)s - %(message)s"
 
     FORMATS = {
-        logging.DEBUG: green + format + reset,
-        logging.INFO: grey + format + reset,
-        logging.WARNING: yellow + format + reset,
-        logging.ERROR: red + format + reset,
-        logging.CRITICAL: bold_red + format + reset
+        logging.DEBUG: green + log_format + reset,
+        logging.INFO: grey + log_format + reset,
+        logging.WARNING: yellow + log_format + reset,
+        logging.ERROR: red + log_format + reset,
+        logging.CRITICAL: bold_red + log_format + reset
     }
 
     def format(self, record):

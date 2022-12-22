@@ -1,57 +1,42 @@
-import os
 import logging
-import time
+import argparse
+from Functions.CustomFormatter import CustomFormatter
+from Functions import detect
 
-from CustomFormatter import CustomFormatter
-from Functions import utils
-import cv2
+log = logging.getLogger("main")  # Get the logger for this module
+log.setLevel('INFO')  # Set the logging level to INFO
+ch = logging.StreamHandler()  # console handler
+ch.setLevel('INFO')  # set level to INFO
+ch.setFormatter(CustomFormatter())  # set custom formatter
+log.addHandler(ch)  # add console handler to logger
 
-log = logging.getLogger("main")
-log.setLevel('DEBUG')
-ch = logging.StreamHandler()
-ch.setLevel('DEBUG')
-ch.setFormatter(CustomFormatter())
-log.addHandler(ch)
-
-
-def detect():
-    """
-    Lance le script detect.py et détecte la source de l'image
-    enregistre les informations de capture dans le fichier OUPUT/files/labels/photo.txt
-    """
-    log.debug("Début de la détection")
-
-    param = ""
-    param += f" --project OUTPUT"
-    param += f" --name files"
-    param += f" --classes 0"  # 0 = personne, 1 = vélo
-    # param += f" --source {source}"
-    param += f" --source OUTPUT/photo.jpg"
-    param += f" --conf 0.25"
-    param += f" --vid-stride 1"
-    # param += " --view-img"
-    param += " --exist-ok"
-    param += " --save-txt"
-    # param += " --save-crop"
-    param += " --nosave"
-
-    os.system(f"python yolov5/detect.py {param}")
-    log.debug("Detection terminée")
+###################################################
+parser = argparse.ArgumentParser(prog='Mini Box', description='Projet de mémoire LP APSIO : Mini Box IOT')
+parser.add_argument('-w', '--webcam', type=int, default=0, help='Webcam à utiliser', required=False)
+parser.add_argument('-c', '--classes', type=int, default=0, help='Type de détection (0: personnes, 1: vélos)',
+                    required=False, choices=[0, 1])
+parser.add_argument('-i', '--interval', type=int, default=1, help='Intervalle entre chaque capture en secondes', required=False)
+parser.add_argument('-s', '--show', help='Affichage de la détection', required=False, action='store_true')
+parser.add_argument('-d', '--debug', help='Mode debug', required=False, action='store_true')
+args = parser.parse_args()
+###################################################
 
 
 if __name__ == "__main__":
-    cam = cv2.VideoCapture(0)
-    path_detect = "OUTPUT/files/labels/photo.txt"
-    path_output = "OUTPUT/data.csv"
-    path_json = "OUTPUT/data.json"
-    path_image = "OUTPUT/photo.jpg"
-    while True:
-        utils.takePhoto(cam)
-        utils.removeFile(path_detect)
-        detect()
-        utils.removeFile(path_image)
-        utils.createCSV(path_detect, path_output)
-        # utils.removeFile(path_json)
-        # utils.csvToJson(path_output)
-    cam.release()
+    log.info("Début du programme")
+    # afficahge des paramètres
+    log.info("Paramètres :")
+    log.info("Webcam : " + str(args.webcam))
+    log.info("Classes : " + str(args.classes))
+    log.info("Intervalle : " + str(args.interval) + " secondes")
+    log.info("Affichage : " + str(args.show))
+    log.info("Debug : " + str(args.debug))
 
+    # si debug = Ture, on passe le niveau de log à DEBUG
+    if args.debug:
+        log.setLevel('DEBUG')
+        ch.setLevel('DEBUG')
+        log.debug("Mode debug activé")
+
+    # lancement de la détection
+    detect.main(args.webcam, args.classes, args.interval, args.show, args.debug)

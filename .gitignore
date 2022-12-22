@@ -1,5 +1,8 @@
 .idea
-OUTPUT
-yolov5
+.vscode
 .mémoire
-__pycahche__/
+
+__pycache__
+
+OUTPUT
+yolov5s.pt
