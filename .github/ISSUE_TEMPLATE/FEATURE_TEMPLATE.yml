@@ -1,0 +1,28 @@
+---
+name: Fonctionnalité
+about: Template pour suggérer une nouvelle fonctionnalité pour le projet
+title: ''
+labels: enhancement
+assignees: ''
+
+---
+
+## Description
+
+Veuillez fournir une description détaillée de la fonctionnalité que vous suggérez.
+
+## Contexte
+
+Comment cette fonctionnalité s'inscrit-elle dans le contexte du projet? Pourquoi cette fonctionnalité est-elle importante?
+
+## Exemple
+
+Veuillez fournir un exemple de la façon dont cette fonctionnalité pourrait être utilisée.
+
+## Informations supplémentaires
+
+Veuillez fournir toute autre information qui pourrait être utile pour évaluer et mettre en œuvre cette fonctionnalité.
+
+## Références
+
+Avez-vous fait référence à un ticket de suivi ou à une autre issue? Si oui, veuillez les inclure ici.
