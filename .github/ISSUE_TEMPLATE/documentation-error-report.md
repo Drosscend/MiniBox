@@ -1,0 +1,23 @@
+---
+name: Documentation error report
+about: Signaler un problème ou une amélioration possible de la documentation du projet
+title: ''
+labels: ''
+assignees: ''
+
+---
+
+**Description**
+Veuillez fournir une description détaillée du problème ou de l'amélioration de la documentation que vous suggérez.
+
+**Contexte**
+Où avez-vous rencontré ce problème ou cette amélioration? Quel est le contexte dans lequel cela se produit?
+
+**Problème**
+Veuillez décrire en détail le problème que vous avez rencontré dans la documentation.
+
+**Solution proposée**
+Veuillez décrire comment vous suggérez de résoudre ce problème ou comment améliorer la documentation.
+
+**Informations supplémentaires**
+Veuillez fournir toute autre information qui pourrait être utile pour évaluer et mettre en œuvre cette modification de la documentation.
