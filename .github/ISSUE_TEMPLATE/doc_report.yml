@@ -1,0 +1,38 @@
+name: 📜 Documentation
+description: Créez un rapport pour signaler une erreur dans la documentation
+title: "[DOC] <title>"
+labels: ["documentation"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Merci de prendre le temps pour écrire cette issue.
+  - type: input
+    id: contact
+    attributes:
+      label: Détail de contact
+      description: Comment pouvons-nous vous contacter si nous avons besoin de plus d'informations?
+      placeholder: ex. pseudonyme Discord, etc.
+    validations:
+      required: false
+  - type: textarea
+    id: Où est-ce que ça se passe?
+    attributes:
+      label: Où est-ce que ça se passe?
+      description: Où avez-vous trouvé cette erreur?
+      placeholder: ex. Dans le README.md...
+    validations:
+      required: true
+  - type: textarea
+    id: Que devrait-il y avoir?
+    attributes:
+      label: Que devrait-il y avoir?
+      description: Qu'est-ce qui devrait être écrit à la place?
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      description: Veuillez lire et accepter le Code de conduite avant de soumettre votre issue.
+      options:
+        - label: J'ai lu et j'accepte le Code de conduite.
+          required: true

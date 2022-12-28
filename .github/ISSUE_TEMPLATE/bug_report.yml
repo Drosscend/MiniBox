@@ -1,0 +1,58 @@
+name: 🐛 Bug
+description: Créez un rapport pour signaler un bug
+title: "[BUG] <title>"
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Merci de prendre le temps pour écrire cette issue.
+  - type: input
+    id: contact
+    attributes:
+      label: Détail de contact
+      description: Comment pouvons-nous vous contacter si nous avons besoin de plus d'informations?
+      placeholder: ex. pseudonyme Discord, etc.
+    validations:
+      required: false
+  - type: textarea
+    id: Que s'est-il passé?
+    attributes:
+      label: Qu'est-ce qui s'est passé?
+      description: Une description claire et concise de ce qu'est le problème.
+      placeholder: ex. Je suis toujours bloqué à l'étape 1...
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: Système d'exploitation
+      multiple: false
+      options:
+        - Windows
+        - macOS
+        - Linux
+        - Autre
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: Veuillez fournir les logs de votre console si possible.
+      render: shell
+  - type: textarea
+    attributes:
+      label: Autres informations
+      description: |
+        Si vous avez d'autres informations à ajouter, veuillez les ajouter ici.
+    validations:
+      required: false
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      description: Veuillez lire et accepter le Code de conduite avant de soumettre votre issue.
+      options:
+        - label: J'ai lu et j'accepte le Code de conduite.
+          required: true
