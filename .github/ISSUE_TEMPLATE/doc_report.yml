@@ -16,7 +16,7 @@ body:
     validations:
       required: false
   - type: textarea
-    id: Où est-ce que ça se passe?
+    id: textarea1
     attributes:
       label: Où est-ce que ça se passe?
       description: Où avez-vous trouvé cette erreur?
@@ -24,7 +24,7 @@ body:
     validations:
       required: true
   - type: textarea
-    id: Que devrait-il y avoir?
+    id: textarea2
     attributes:
       label: Que devrait-il y avoir?
       description: Qu'est-ce qui devrait être écrit à la place?
