@@ -1,0 +1,40 @@
+name: 🚀 Fonctionnalité
+description: Créez une issue pour suggérer une nouvelle fonctionnalité pour le projet
+title: "[FEATURE] <title>"
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Merci de prendre le temps pour écrire cette issue.
+  - type: input
+    id: contact
+    attributes:
+      label: Détail de contact
+      description: Comment pouvons-nous vous contacter si nous avons besoin de plus d'informations?
+      placeholder: ex. pseudonyme Discord, etc.
+    validations:
+      required: false
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Une description claire et concise de la fonctionnalité que vous suggérez.
+      placeholder: ex. J'aimerais ajouter une option pour...
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Autres informations
+      description: |
+        Si vous avez d'autres informations à ajouter, veuillez les ajouter ici.
+    validations:
+      required: false
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Code of Conduct
+      description: Veuillez lire et accepter le Code de conduite avant de soumettre votre issue.
+      options:
+        - label: J'ai lu et j'accepte le Code de conduite.
+          required: true
