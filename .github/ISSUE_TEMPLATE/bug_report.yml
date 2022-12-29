@@ -16,7 +16,7 @@ body:
     validations:
       required: false
   - type: textarea
-    id: Que s'est-il passé?
+    id: textarea1
     attributes:
       label: Qu'est-ce qui s'est passé?
       description: Une description claire et concise de ce qu'est le problème.
