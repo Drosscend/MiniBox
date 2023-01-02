@@ -67,6 +67,7 @@ Lancement du programme de détection avec paramètres par défaut :
 - intervalle de détection = 1
 - pas d'affichage = False
 - pas de débug = False
+- enregistrement des données si nouvelle personne = False
 
 ```python
 python main.py
@@ -82,9 +83,10 @@ Options :
 - -i : Intervalle de détection (1 par défaut) (int) (ex : -i 1) (optionnel)
 - -s : Affichage de la sortie (False par défaut) (ex : -s) (optionnel)
 - -d : Affichage du debug (False par défaut) (ex : -d) (optionnel)
+- -n : Enregistrement des données si nouvelle personne (False par défaut) (ex : -n) (optionnel)
 
 ```python
-python main.py -w 0 -c 1 -i 5 -s -d
+python main.py -w 0 -c 1 -i 5 -s -d -n
 ```
 
 </details>
