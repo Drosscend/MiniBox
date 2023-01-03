@@ -112,6 +112,7 @@ def detect(video_capture, classes, interval, show, debug, only_new):
 
         # Détection des nouvelles personnes
         current = []
+        new_detected = False
         for j in range(len(track.tolist())):
             # Récupère les informations sur l'objet
             coords = track.tolist()[j]
@@ -127,6 +128,7 @@ def detect(video_capture, classes, interval, show, debug, only_new):
             if name_idx not in tracked_objects:
                 color = utils.random_color(name_idx)
                 tracked_objects[name_idx] = (x1, y1, x2, y2, color)
+                new_detected = True
                 log.debug("Nouvel objet détecté: " + str(name_idx))
             else:
                 tracked_objects[name_idx] = (x1, y1, x2, y2, tracked_objects[name_idx][4])
@@ -134,8 +136,9 @@ def detect(video_capture, classes, interval, show, debug, only_new):
         log.debug("Liste des personnes détectées: " + str(tracked_objects))
 
         # Enregistrement des résultats dans un fichier csv si une nouvelle personne est détectée
-        if len(current) > 0 and not only_new:
-            generate_csv(current, classes)
+        if only_new:
+            if new_detected:
+                generate_csv(current, classes)
         else:
             generate_csv(current, classes)
 
