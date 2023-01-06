@@ -9,13 +9,14 @@ class TestTrackedObjects(unittest.TestCase):
         objs = TrackedObjects()
 
         # Add a tracked object with name_idx 0
-        objs.add(0, 0, 0, 0, 0, "red")
+        objs.add(0, 0, 0, 0, 0, 0, "red")
         self.assertEqual(len(objs.tracked_objects), 1)
 
         # Get the tracked object with name_idx 0
         obj = objs.get(0)
         self.assertIsNotNone(obj)
-        self.assertEqual(obj.name_idx, 0)
+        self.assertEqual(obj.obj_id, 0)
+        self.assertEqual(obj.confidence, 0)
         self.assertEqual(obj.x1, 0)
         self.assertEqual(obj.y1, 0)
         self.assertEqual(obj.x2, 0)
@@ -31,8 +32,8 @@ class TestTrackedObjects(unittest.TestCase):
         objs = TrackedObjects()
 
         # Add two tracked objects with name_idx 0 and 1
-        objs.add(0, 0, 0, 0, 0, "red")
-        objs.add(1, 0, 0, 0, 0, "blue")
+        objs.add(0, 0, 0, 0, 0, 0, "red")
+        objs.add(1, 0, 0, 0, 0, 0, "blue")
         self.assertEqual(len(objs.tracked_objects), 2)
 
         # Remove the tracked object with name_idx 0
@@ -52,13 +53,13 @@ class TestTrackedObjects(unittest.TestCase):
         objs = TrackedObjects()
 
         # Add two tracked objects
-        objs.add(0, 0, 0, 0, 0, "red")
-        objs.add(1, 0, 0, 0, 0, "blue")
+        objs.add(0, 0, 0, 0, 0, 0, "red")
+        objs.add(1, 0, 0, 0, 0, 0, "blue")
         self.assertEqual(len(objs.tracked_objects), 2)
 
         # Purge tracked objects
         objs.purge()
         self.assertEqual(len(objs.tracked_objects), 0)
-        
+
 if __name__ == "__main__":
     unittest.main()
