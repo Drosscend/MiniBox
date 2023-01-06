@@ -1,12 +1,14 @@
-import os
 import logging
+import os
 import time
-import torch
+
 import cv2 as cv
 import numpy as np
-from Functions import utils
-from Functions import sort
+import torch
+
 from Functions import TrackedObjects
+from Functions import sort
+from Functions import utils
 
 log = logging.getLogger("main")
 
@@ -58,7 +60,8 @@ def generate_csv(current):
             # si le fichier est vide, on écrit l'entête
             if f.tell() == 0:
                 f.write("date,occurence,top-left,top-right,bottom-left,bottom-right\n")
-            f.write(date + ',' + str(len(current)) + ',' + str(top_left) + ',' + str(top_right) + ',' + str(bottom_left) + ',' + str(bottom_right) + '\n')
+            f.write(date + ',' + str(len(current)) + ',' + str(top_left) + ',' + str(top_right) + ',' + str(
+                bottom_left) + ',' + str(bottom_right) + '\n')
     except IOError as e:
         log.warning("Erreur lors de l'écriture dans le fichier CSV: " + str(e))
 

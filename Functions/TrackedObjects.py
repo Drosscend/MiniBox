@@ -14,10 +14,12 @@ Si la vitesse est inférieure au seuil, `None` est retourné.
 
 import logging
 import math
+
 log = logging.getLogger("main")
 
-CALCUL_DIRECTION_NB_POSITIONS = 10 # Nombre de positions à prendre en compte pour calculer la direction
-SPEED_THRESHOLD = 10 # Vitesse minimale pour que la direction soit prise en compte
+CALCUL_DIRECTION_NB_POSITIONS = 10  # Nombre de positions à prendre en compte pour calculer la direction
+SPEED_THRESHOLD = 10  # Vitesse minimale pour que la direction soit prise en compte
+
 
 def calculate_direction(positions, relative_value):
     if len(positions) < CALCUL_DIRECTION_NB_POSITIONS:
@@ -27,11 +29,11 @@ def calculate_direction(positions, relative_value):
     total_dx = 0
     total_dy = 0
     for i in range(1, CALCUL_DIRECTION_NB_POSITIONS):
-        x1, y1, _, _ = positions[-i-1]
+        x1, y1, _, _ = positions[-i - 1]
         x2, y2, _, _ = positions[-i]
         dx = x2 - x1
         dy = y2 - y1
-        distance = math.sqrt(dx**2 + dy**2)
+        distance = math.sqrt(dx ** 2 + dy ** 2)
         total_distance += distance
         total_dx += dx
         total_dy += dy

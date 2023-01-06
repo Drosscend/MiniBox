@@ -1,7 +1,9 @@
 import unittest
+
 from Functions import TrackedObjects
 
 TrackedObjects = TrackedObjects.TrackedObjects
+
 
 class TestTrackedObjects(unittest.TestCase):
     def test_add_and_get(self):
@@ -60,6 +62,7 @@ class TestTrackedObjects(unittest.TestCase):
         # Purge tracked objects
         objs.purge()
         self.assertEqual(len(objs.tracked_objects), 0)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -1,6 +1,7 @@
 import csv
-import matplotlib.pyplot as plt
 import time
+
+import matplotlib.pyplot as plt
 
 
 def createGraph(path):
