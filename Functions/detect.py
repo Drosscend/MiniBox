@@ -19,26 +19,44 @@ tracked_objects = TrackedObjects.TrackedObjects()
 model_sort = sort.Sort()
 
 
-def generate_csv(current, classes):
+def generate_csv(current):
     """
     Enregistre les résultats de la détection dans un fichier CSV.
 
     :param current: liste des identifiants des personnes détectées
-    :param classes: type de détection (0: personnes, 1: vélos)
     :return: None
     """
     date = time.strftime("%d/%m/%Y %H:%M:%S", time.localtime())
+
     # verifie que le dosser OUTPUT existe et le crée si ce n'est pas le cas
     if not os.path.exists("OUTPUT"):
         os.makedirs("OUTPUT")
+
+    # Initialisation des compteurs pour chaque direction
+    top_left = 0
+    top_right = 0
+    bottom_left = 0
+    bottom_right = 0
+
+    # Parcours de la liste des identifiants d'objets
+    for name_idx in current:
+        obj = tracked_objects.get(name_idx)
+        if obj.direction == "top-left":
+            top_left += 1
+        elif obj.direction == "top-right":
+            top_right += 1
+        elif obj.direction == "bottom-left":
+            bottom_left += 1
+        elif obj.direction == "bottom-right":
+            bottom_right += 1
 
     # enregistrement des données dans un fichier csv
     try:
         with open(CSV_FILE, 'a') as f:
             # si le fichier est vide, on écrit l'entête
             if f.tell() == 0:
-                f.write("date,occurence,type\n")
-            f.write(date + ',' + str(len(current)) + ',' + str(classes) + '\r')
+                f.write("date,occurence,top-left,top-right,bottom-left,bottom-right\n")
+            f.write(date + ',' + str(len(current)) + ',' + str(top_left) + ',' + str(top_right) + ',' + str(bottom_left) + ',' + str(bottom_right) + '\n')
     except IOError as e:
         log.error("Erreur lors de l'écriture dans le fichier CSV: " + str(e))
 
@@ -148,9 +166,9 @@ def detect(video_capture, classes, interval, show, debug, only_new):
         # Enregistrement des résultats dans un fichier csv si une nouvelle personne est détectée
         if only_new:
             if new_detected:
-                generate_csv(current, classes)
+                generate_csv(current)
         else:
-            generate_csv(current, classes)
+            generate_csv(current)
 
         # Pause entre chaque détection
         if interval > 0:
