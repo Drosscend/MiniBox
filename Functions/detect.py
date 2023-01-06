@@ -165,22 +165,23 @@ def detect(video_capture, classes, interval, show, debug, only_new):
 
             current.append(obj_id)
 
-            if current:
-                # Si l'objet n'a pas encore été suivi, c'est un nouvel objet
-                found = False
-                for tracked_object in tracked_objects.tracked_objects:
-                    if tracked_object.obj_id == obj_id:
-                        found = True
-                        tracked_object.update_position(conf, x1, y1, x2, y2)
-                        break
-                if not found:
-                    color = utils.random_color(obj_id)
-                    tracked_objects.add(obj_id, conf, x1, y1, x2, y2, color)
-                    new_detected = True
-                    log.debug("Nouvel objet détecté: " + str(obj_id))
-                log.debug("Objets détectés: " + str(current))
-            else:
-                log.debug("Aucun objet détecté")
+            # Si l'objet n'a pas encore été suivi, c'est un nouvel objet
+            found = False
+            for tracked_object in tracked_objects.tracked_objects:
+                if tracked_object.obj_id == obj_id:
+                    found = True
+                    tracked_object.update_position(conf, x1, y1, x2, y2)
+                    break
+            if not found:
+                color = utils.random_color(obj_id)
+                tracked_objects.add(obj_id, conf, x1, y1, x2, y2, color)
+                new_detected = True
+                log.debug("Nouvel objet détecté: " + str(obj_id))
+
+        if current:
+            log.debug("Objets détectés: " + str(current))
+        else:
+            log.debug("Aucun objet détecté")
 
         # Enregistrement des résultats dans un fichier csv si une nouvelle personne est détectée
         if only_new:
