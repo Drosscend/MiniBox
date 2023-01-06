@@ -126,7 +126,11 @@ def detect(video_capture, classes, interval, show, debug, only_new):
     model.amp = True
 
     while video_capture.isOpened():
-        _, frame = video_capture.read()
+        success, frame = video_capture.read()
+
+        # Si le frame n'a pas pu être récupéré ou si la vidéo est terminée, quitte la boucle
+        if not success:
+            break
 
         # Pour vérifier que le modèle YOLOv5 est chargé et fonctionne correctement
         try:
@@ -203,13 +207,13 @@ def detect(video_capture, classes, interval, show, debug, only_new):
     log.debug("Detection terminée")
 
 
-def main(webcam, classes, interval, show, debug, only_new):
+def main(source, classes, interval, show, debug, only_new):
     # Initialisation de la caméra
-    video_capture = cv.VideoCapture(webcam)
+    video_capture = cv.VideoCapture(source)
 
     # Vérification de l'ouverture de la caméra
     if not video_capture.isOpened():
-        log.error("Impossible d'ouvrir la webcam")
+        log.error("Impossible d'ouvrir la source")
         return
 
     if show:
