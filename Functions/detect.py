@@ -2,7 +2,7 @@ import os
 import logging
 import time
 import torch
-import cv2
+import cv2 as cv
 import numpy as np
 from Functions import utils
 from Functions import sort
@@ -58,7 +58,7 @@ def generate_csv(current):
                 f.write("date,occurence,top-left,top-right,bottom-left,bottom-right\n")
             f.write(date + ',' + str(len(current)) + ',' + str(top_left) + ',' + str(top_right) + ',' + str(bottom_left) + ',' + str(bottom_right) + '\n')
     except IOError as e:
-        log.error("Erreur lors de l'écriture dans le fichier CSV: " + str(e))
+        log.warning("Erreur lors de l'écriture dans le fichier CSV: " + str(e))
 
 
 def show_output(image, current):
@@ -72,7 +72,7 @@ def show_output(image, current):
     # Si aucun objet n'a été détecté
     if not current:
         # Affiche un message à l'écran
-        cv2.putText(image, "Aucun objet detecte", (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+        cv.putText(image, "Aucun objet detecte", (10, 50), cv.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
     else:
         # Pour chaque objet détecté, dessine un rectangle autour de l'objet et affiche son identifiant et sa direction
         for obj_id in current:
@@ -87,15 +87,15 @@ def show_output(image, current):
             direction = obj.direction
 
             # Dessine un rectangle autour de l'objet
-            cv2.rectangle(image, (x1, y1), (x2, y2), color, 2)
+            cv.rectangle(image, (x1, y1), (x2, y2), color, 2)
             # Affiche l'identifiant et la direction de l'objet près de l'objet
             text = f"{obj_id} - {conf}"
             if direction:
                 text += f" - ({direction})"
-            cv2.putText(image, text, (x1, y1), cv2.FONT_HERSHEY_SIMPLEX, 1, color, 2)
+            cv.putText(image, text, (x1, y1), cv.FONT_HERSHEY_SIMPLEX, 1, color, 2)
 
     # Affiche l'image modifiée à l'écran
-    cv2.imshow('Video', image)
+    cv.imshow('Video', image)
 
 
 def detect(video_capture, classes, interval, show, debug, only_new):
@@ -187,20 +187,20 @@ def detect(video_capture, classes, interval, show, debug, only_new):
         # affichage des images
         if show:
             show_output(frame, current)
-            key = cv2.waitKey(10)
+            key = cv.waitKey(10)
             if key == ord('q'):
                 break
             elif key == -1:
                 continue
 
     video_capture.release()
-    cv2.destroyAllWindows()
+    cv.destroyAllWindows()
     log.debug("Detection terminée")
 
 
 def main(webcam, classes, interval, show, debug, only_new):
     # Initialisation de la caméra
-    video_capture = cv2.VideoCapture(webcam)
+    video_capture = cv.VideoCapture(webcam)
 
     # Vérification de l'ouverture de la caméra
     if not video_capture.isOpened():
