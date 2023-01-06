@@ -1,33 +1,44 @@
 import logging
+import math
 log = logging.getLogger("main")
 
-CALCUL_DIRECTION_NB_POSITIONS = 10
+CALCUL_DIRECTION_NB_POSITIONS = 10 # Nombre de positions à prendre en compte pour calculer la direction
+SPEED_THRESHOLD = 10 # Vitesse minimale pour que la direction soit prise en compte
 
-def calculate_direction(positions):
+def calculate_direction(positions, relative_value):
     if len(positions) < CALCUL_DIRECTION_NB_POSITIONS:
         return None
 
-    dx_total = 0
-    dy_total = 0
+    total_distance = 0
+    total_dx = 0
+    total_dy = 0
     for i in range(1, CALCUL_DIRECTION_NB_POSITIONS):
         x1, y1, _, _ = positions[-i-1]
         x2, y2, _, _ = positions[-i]
         dx = x2 - x1
         dy = y2 - y1
-        dx_total += dx
-        dy_total += dy
+        distance = math.sqrt(dx**2 + dy**2)
+        total_distance += distance
+        total_dx += dx
+        total_dy += dy
 
-    dx_mean = dx_total / CALCUL_DIRECTION_NB_POSITIONS
-    dy_mean = dy_total / CALCUL_DIRECTION_NB_POSITIONS
+    mean_dx = total_dx / CALCUL_DIRECTION_NB_POSITIONS
+    mean_dy = total_dy / CALCUL_DIRECTION_NB_POSITIONS
+    mean_distance = total_distance / CALCUL_DIRECTION_NB_POSITIONS
+    mean_speed = mean_distance / relative_value
 
-    if dx_mean > 0 and dy_mean > 0:
-        return "bottom-right"
-    elif dx_mean > 0 and dy_mean < 0:
-        return "top-right"
-    elif dx_mean < 0 and dy_mean > 0:
-        return "bottom-left"
-    elif dx_mean < 0 and dy_mean < 0:
-        return "top-left"
+    if mean_dx > 0 and mean_dy > 0:
+        if mean_speed > SPEED_THRESHOLD:
+            return "bottom-right"
+    elif mean_dx > 0 and mean_dy < 0:
+        if mean_speed > SPEED_THRESHOLD:
+            return "top-right"
+    elif mean_dx < 0 and mean_dy > 0:
+        if mean_speed > SPEED_THRESHOLD:
+            return "bottom-left"
+    elif mean_dx < 0 and mean_dy < 0:
+        if mean_speed > SPEED_THRESHOLD:
+            return "top-left"
     else:
         return None
 
@@ -54,7 +65,7 @@ class TrackedObject:
             self.positions.pop(0)
 
     def get_direction(self):
-        direction = calculate_direction(self.positions)
+        direction = calculate_direction(self.positions, 0.1)
         self.direction = direction
 
     def __str__(self):
