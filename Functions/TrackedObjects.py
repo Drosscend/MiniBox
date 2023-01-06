@@ -1,3 +1,17 @@
+"""
+Ce code implémente une classe `TrackedObject` représentant un objet suivi dans une vidéo,
+ainsi qu'une classe `TrackedObjects` gérant un ensemble d'objets suivis.
+
+Chaque objet suivi est caractérisé par un identifiant unique, des coordonnées (x1, y1) et (x2, y2)
+définissant un rectangle englobant l'objet, ainsi qu'une couleur.
+Des méthodes sont fournies pour mettre à jour la position de l'objet et obtenir sa direction.
+
+La direction de l'objet est calculée en utilisant les `CALCUL_DIRECTION_NB_POSITIONS` dernières positions enregistrées.
+La vitesse de l'objet est également prise en compte, en comparant la distance parcourue à un seuil de vitesse minimal (`SPEED_THRESHOLD`).
+Si la vitesse est supérieure au seuil, la direction de l'objet est déterminée en fonction de la moyenne des déplacements sur l'axe des x et des y.
+Si la vitesse est inférieure au seuil, `None` est retourné.
+"""
+
 import logging
 import math
 log = logging.getLogger("main")
@@ -60,11 +74,11 @@ class TrackedObject:
         self.x2 = x2
         self.y2 = y2
         self.positions.append((x1, y1, x2, y2))
-        self.get_direction()
+        self.set_direction()
         if len(self.positions) > CALCUL_DIRECTION_NB_POSITIONS:
             self.positions.pop(0)
 
-    def get_direction(self):
+    def set_direction(self):
         direction = calculate_direction(self.positions, 0.1)
         self.direction = direction
 
