@@ -69,30 +69,33 @@ def show_output(image, current):
     :return: None
     """
 
-    # Pour chaque objet détecté, dessine un rectangle autour de l'objet et affiche son identifiant et sa direction
-    for obj_id in current:
-        # Récupère les informations sur l'objet
-        obj = tracked_objects.get(obj_id)  # Objet suivi
-        conf = format(obj.confidence, ".2f")  # Confiance de l'objet
-        x1 = obj.x1
-        y1 = obj.y1
-        x2 = obj.x2
-        y2 = obj.y2
-        color = obj.color  # Coordonnées et couleur de l'objet
-        direction = obj.direction  # Direction de l'objet
+    # Si aucun objet n'a été détecté
+    if not current:
+        # Affiche un message à l'écran
+        cv2.putText(image, "Aucun objet detecte", (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+    else:
+        # Pour chaque objet détecté, dessine un rectangle autour de l'objet et affiche son identifiant et sa direction
+        for obj_id in current:
+            # Récupère les informations sur l'objet
+            obj = tracked_objects.get(obj_id)  # Objet suivi
+            conf = format(obj.confidence, ".2f")
+            x1 = obj.x1
+            y1 = obj.y1
+            x2 = obj.x2
+            y2 = obj.y2
+            color = obj.color
+            direction = obj.direction
 
-        # Dessine un rectangle autour de l'objet
-        cv2.rectangle(image, (x1, y1), (x2, y2), color, 2)
-        # Affiche l'identifiant et la direction de l'objet près de l'objet
-        text = f"{obj_id} - {conf}"
-        if direction:
-            text += f" - ({direction})"
-        cv2.putText(image, text, (x1, y1), cv2.FONT_HERSHEY_SIMPLEX, 1, color, 2)
+            # Dessine un rectangle autour de l'objet
+            cv2.rectangle(image, (x1, y1), (x2, y2), color, 2)
+            # Affiche l'identifiant et la direction de l'objet près de l'objet
+            text = f"{obj_id} - {conf}"
+            if direction:
+                text += f" - ({direction})"
+            cv2.putText(image, text, (x1, y1), cv2.FONT_HERSHEY_SIMPLEX, 1, color, 2)
 
     # Affiche l'image modifiée à l'écran
     cv2.imshow('Video', image)
-
-
 
 
 def detect(video_capture, classes, interval, show, debug, only_new):
@@ -152,20 +155,22 @@ def detect(video_capture, classes, interval, show, debug, only_new):
 
             current.append(obj_id)
 
-        # Si l'objet n'a pas encore été suivi, c'est un nouvel objet
-        found = False
-        for tracked_object in tracked_objects.tracked_objects:
-            if tracked_object.obj_id == obj_id:
-                found = True
-                tracked_object.update_position(conf, x1, y1, x2, y2)
-                break
-        if not found:
-            color = utils.random_color(obj_id)
-            tracked_objects.add(obj_id, conf, x1, y1, x2, y2, color)
-            new_detected = True
-            log.debug("Nouvel objet détecté: " + str(obj_id))
-
-        log.debug("Objets détectés: " + str(current))
+        if current:
+            # Si l'objet n'a pas encore été suivi, c'est un nouvel objet
+            found = False
+            for tracked_object in tracked_objects.tracked_objects:
+                if tracked_object.obj_id == obj_id:
+                    found = True
+                    tracked_object.update_position(conf, x1, y1, x2, y2)
+                    break
+            if not found:
+                color = utils.random_color(obj_id)
+                tracked_objects.add(obj_id, conf, x1, y1, x2, y2, color)
+                new_detected = True
+                log.debug("Nouvel objet détecté: " + str(obj_id))
+            log.debug("Objets détectés: " + str(current))
+        else:
+            log.debug("Aucun objet détecté")
 
         # Enregistrement des résultats dans un fichier csv si une nouvelle personne est détectée
         if only_new:
