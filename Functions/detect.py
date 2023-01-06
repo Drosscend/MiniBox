@@ -97,7 +97,8 @@ def show_output(image, current):
             text = f"{obj_id} - {conf}"
             if direction:
                 text += f" - ({direction})"
-            cv.putText(image, text, (x1, y1), cv.FONT_HERSHEY_SIMPLEX, 1, color, 2)
+
+            cv.putText(image, text, (x1, y1 - 5), cv.FONT_HERSHEY_SIMPLEX, 0.7, color, 2)
 
     # Affiche l'image modifiée à l'écran
     cv.imshow('Video', image)
