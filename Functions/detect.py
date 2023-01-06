@@ -6,13 +6,14 @@ import cv2
 import numpy as np
 from Functions import utils
 from Functions import sort
+from Functions import TrackedObjects
 
 log = logging.getLogger("main")
 
 CSV_FILE = 'OUTPUT/data.csv'
 
-# Dictionnaire pour stocker les identifiants des personnes suivies
-tracked_objects = {}
+# Initialisation de la collection d'objets suivis
+tracked_objects = TrackedObjects.TrackedObjects()
 
 # Initialisation de la librairie Sort pour suivre les personnes détectées
 model_sort = sort.Sort()
@@ -44,33 +45,38 @@ def generate_csv(current, classes):
 
 def show_output(image, current):
     """
-    Affiche une image avec des rectangles entourant les personnes détectées et en affichant leur identifiant près de chaque personne.
-
+    Affiche une image avec des rectangles entourant les objets détectés et en affichant leur identifiant et leur direction près de chaque objet.
     :param image: image à afficher
-    :param current: liste des identifiants des personnes détectées
+    :param current: liste des identifiants des objets détectés
     :return: None
     """
 
-    # Pour chaque personne détectée, dessine un rectangle autour de la personne et affiche son identifiant
-    for i in range(len(current)):
-        # Récupère les informations sur la personne
-        name_idx = current[i]
-        x1, y1, x2, y2, color = tracked_objects[name_idx]  # Coordonnées et couleur de la personne
+    # Pour chaque objet détecté, dessine un rectangle autour de l'objet et affiche son identifiant et sa direction
+    for name_idx in current:
+        # Récupère les informations sur l'objet
+        obj = tracked_objects.get(name_idx)  # Objet suivi
+        x1 = obj.x1
+        y1 = obj.y1
+        x2 = obj.x2
+        y2 = obj.y2
+        color = obj.color  # Coordonnées et couleur de l'objet
+        direction = obj.direction  # Direction de l'objet
 
-        # Dessine un rectangle autour de la personne
+        # Dessine un rectangle autour de l'objet
         cv2.rectangle(image, (x1, y1), (x2, y2), color, 2)
-        # Affiche l'identifiant de la personne près de la personne
-        cv2.putText(image, str(name_idx), (x1, y1), cv2.FONT_HERSHEY_SIMPLEX, 1, color, 2)
+        # Affiche l'identifiant et la direction de l'objet près de l'objet
+        text = f"{name_idx} ({direction})" if direction else str(name_idx)
+        cv2.putText(image, text, (x1, y1), cv2.FONT_HERSHEY_SIMPLEX, 1, color, 2)
 
     # Affiche l'image modifiée à l'écran
-    cv2.imshow('YOLO', image)
+    cv2.imshow('Video', image)
+
+
 
 
 def detect(video_capture, classes, interval, show, debug, only_new):
     """
     Fonction de détection
-    Enregistre les résultats dans un fichier csv avec comme entête :
-    date,occurence,type,positions
 
     :param video_capture: objet cv2.VideoCapture pour la caméra
     :param classes: type de détection (0: personnes, 1: vélos) ou liste de types
@@ -125,15 +131,17 @@ def detect(video_capture, classes, interval, show, debug, only_new):
             current.append(name_idx)
 
             # Si l'objet n'a pas encore été suivi, c'est un nouvel objet
-            if name_idx not in tracked_objects:
+            if name_idx not in tracked_objects.tracked_objects:
                 color = utils.random_color(name_idx)
-                tracked_objects[name_idx] = (x1, y1, x2, y2, color)
+                tracked_objects.add(name_idx, x1, y1, x2, y2, color)
                 new_detected = True
                 log.debug("Nouvel objet détecté: " + str(name_idx))
             else:
-                tracked_objects[name_idx] = (x1, y1, x2, y2, tracked_objects[name_idx][4])
+                tracked_objects.update(name_idx, x1, y1, x2, y2)
 
-        log.debug("Liste des personnes détectées: " + str(tracked_objects))
+        log.debug("Objets détectés: " + str(current))
+        log.debug("Objets suivis: ")
+        tracked_objects.showDict()
 
         # Enregistrement des résultats dans un fichier csv si une nouvelle personne est détectée
         if only_new:
