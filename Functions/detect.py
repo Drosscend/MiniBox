@@ -39,8 +39,8 @@ def generate_csv(current):
     bottom_right = 0
 
     # Parcours de la liste des identifiants d'objets
-    for name_idx in current:
-        obj = tracked_objects.get(name_idx)
+    for obj_id in current:
+        obj = tracked_objects.get(obj_id)
         if obj.direction == "top-left":
             top_left += 1
         elif obj.direction == "top-right":
@@ -70,9 +70,10 @@ def show_output(image, current):
     """
 
     # Pour chaque objet détecté, dessine un rectangle autour de l'objet et affiche son identifiant et sa direction
-    for name_idx in current:
+    for obj_id in current:
         # Récupère les informations sur l'objet
-        obj = tracked_objects.get(name_idx)  # Objet suivi
+        obj = tracked_objects.get(obj_id)  # Objet suivi
+        conf = format(obj.confidence, ".2f")  # Confiance de l'objet
         x1 = obj.x1
         y1 = obj.y1
         x2 = obj.x2
@@ -83,7 +84,9 @@ def show_output(image, current):
         # Dessine un rectangle autour de l'objet
         cv2.rectangle(image, (x1, y1), (x2, y2), color, 2)
         # Affiche l'identifiant et la direction de l'objet près de l'objet
-        text = f"{name_idx} ({direction})" if direction else str(name_idx)
+        text = f"{obj_id} - {conf}"
+        if direction:
+            text += f" - ({direction})"
         cv2.putText(image, text, (x1, y1), cv2.FONT_HERSHEY_SIMPLEX, 1, color, 2)
 
     # Affiche l'image modifiée à l'écran
@@ -140,26 +143,27 @@ def detect(video_capture, classes, interval, show, debug, only_new):
         for j in range(len(track.tolist())):
             # Récupère les informations sur l'objet
             coords = track.tolist()[j]
-            name_idx = int(coords[4])  # Identifiant de l'objet
+            obj_id = int(coords[4])  # Identifiant de l'objet
+            conf = results.xyxy[0][j][4]  # Confiance de l'objet
             x1 = int(coords[0])
             y1 = int(coords[1])
             x2 = int(coords[2])
             y2 = int(coords[3])
 
-            current.append(name_idx)
+            current.append(obj_id)
 
         # Si l'objet n'a pas encore été suivi, c'est un nouvel objet
         found = False
         for tracked_object in tracked_objects.tracked_objects:
-            if tracked_object.name_idx == name_idx:
+            if tracked_object.obj_id == obj_id:
                 found = True
-                tracked_object.update_position(x1, y1, x2, y2)
+                tracked_object.update_position(conf, x1, y1, x2, y2)
                 break
         if not found:
-            color = utils.random_color(name_idx)
-            tracked_objects.add(name_idx, x1, y1, x2, y2, color)
+            color = utils.random_color(obj_id)
+            tracked_objects.add(obj_id, conf, x1, y1, x2, y2, color)
             new_detected = True
-            log.debug("Nouvel objet détecté: " + str(name_idx))
+            log.debug("Nouvel objet détecté: " + str(obj_id))
 
         log.debug("Objets détectés: " + str(current))
 

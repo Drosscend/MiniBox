@@ -58,8 +58,9 @@ def calculate_direction(positions, relative_value):
 
 
 class TrackedObject:
-    def __init__(self, name_idx, x1, y1, x2, y2, color):
-        self.name_idx = name_idx
+    def __init__(self, obj_id, confidence, x1, y1, x2, y2, color):
+        self.obj_id = obj_id
+        self.confidence = confidence
         self.x1 = x1
         self.y1 = y1
         self.x2 = x2
@@ -68,7 +69,8 @@ class TrackedObject:
         self.positions = [(x1, y1, x2, y2)]
         self.direction = None
 
-    def update_position(self, x1, y1, x2, y2):
+    def update_position(self, confidence, x1, y1, x2, y2):
+        self.confidence = confidence
         self.x1 = x1
         self.y1 = y1
         self.x2 = x2
@@ -84,7 +86,7 @@ class TrackedObject:
 
     def __str__(self):
         direction = self.direction
-        text = f"\n id: {self.name_idx},\n positions: {self.x1}, {self.y1}, {self.x2}, {self.y2},\n couleur: {self.color}"
+        text = f"\n id: {self.obj_id},\n Confidence: {self.confidence},\n positions: {self.x1}, {self.y1}, {self.x2}, {self.y2},\n couleur: {self.color}"
         if direction:
             text += f",\n direction: {direction}"
         return text
@@ -94,19 +96,19 @@ class TrackedObjects:
     def __init__(self):
         self.tracked_objects = []
 
-    def add(self, name_idx, x1, y1, x2, y2, color):
-        tracked_object = TrackedObject(name_idx, x1, y1, x2, y2, color)
+    def add(self, obj_id, confidence, x1, y1, x2, y2, color):
+        tracked_object = TrackedObject(obj_id, confidence, x1, y1, x2, y2, color)
         self.tracked_objects.append(tracked_object)
 
-    def get(self, name_idx):
+    def get(self, obj_id):
         for tracked_object in self.tracked_objects:
-            if tracked_object.name_idx == name_idx:
+            if tracked_object.obj_id == obj_id:
                 return tracked_object
         return None
 
-    def remove(self, name_idx):
+    def remove(self, obj_id):
         for i, tracked_object in enumerate(self.tracked_objects):
-            if tracked_object.name_idx == name_idx:
+            if tracked_object.obj_id == obj_id:
                 del self.tracked_objects[i]
                 break
 
