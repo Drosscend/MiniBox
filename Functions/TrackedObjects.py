@@ -6,11 +6,11 @@ Chaque objet suivi est caractérisé par un identifiant unique, des coordonnées
 définissant un rectangle englobant l'objet, ainsi qu'une couleur.
 Des méthodes sont fournies pour mettre à jour la position de l'objet et obtenir sa direction.
 
-La direction de l'objet est calculée en utilisant les `CALCUL_DIRECTION_NB_POSITIONS` dernières positions enregistrées.
-La vitesse de l'objet est également prise en compte, en comparant la distance parcourue à un seuil de vitesse minimal (`SPEED_THRESHOLD`).
-Si la vitesse est supérieure au seuil, la direction de l'objet est déterminée en fonction de la moyenne des déplacements sur l'axe des x et des y.
-Si la vitesse est inférieure au seuil, `None` est retourné.
-"""
+La direction de l'objet est calculée en utilisant les `CALCUL_DIRECTION_NB_POSITIONS` dernières positions
+enregistrées. La vitesse de l'objet est également prise en compte, en comparant la distance parcourue à un seuil de
+vitesse minimal ('SPEED_THRESHOLD`). Si la vitesse est supérieure au seuil, la direction de l'objet est déterminée en
+fonction de la moyenne des déplacements sur l'axe des x et des y. Si la vitesse est inférieure au seuil, `None` est
+retourné."""
 
 import logging
 import math
@@ -46,10 +46,10 @@ def calculate_direction(positions, relative_value):
     if mean_dx > 0 and mean_dy > 0:
         if mean_speed > SPEED_THRESHOLD:
             return "bottom-right"
-    elif mean_dx > 0 and mean_dy < 0:
+    elif mean_dx > 0 > mean_dy:
         if mean_speed > SPEED_THRESHOLD:
             return "top-right"
-    elif mean_dx < 0 and mean_dy > 0:
+    elif mean_dx < 0 < mean_dy:
         if mean_speed > SPEED_THRESHOLD:
             return "bottom-left"
     elif mean_dx < 0 and mean_dy < 0:
@@ -88,7 +88,8 @@ class TrackedObject:
 
     def __str__(self):
         direction = self.direction
-        text = f"\n id: {self.obj_id},\n Confidence: {self.confidence},\n positions: {self.x1}, {self.y1}, {self.x2}, {self.y2},\n couleur: {self.color}"
+        text = f"\n id: {self.obj_id},\n Confidence: {self.confidence},\n positions: {self.x1}, {self.y1}, " \
+               f"{self.x2}, {self.y2},\n couleur: {self.color}"
         if direction:
             text += f",\n direction: {direction}"
         return text

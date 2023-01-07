@@ -68,7 +68,9 @@ def generate_csv(current):
 
 def show_output(image, current):
     """
-    Affiche une image avec des rectangles entourant les objets détectés et en affichant leur identifiant et leur direction près de chaque objet.
+    Affiche une image avec des rectangles entourant les objets détectés et en affichant leur identifiant et leur
+    direction près de chaque objet.
+
     :param image: image à afficher
     :param current: liste des identifiants des objets détectés
     :return: None
