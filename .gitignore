@@ -6,3 +6,4 @@ __pycache__
 yolov5s.pt
 .vscode
 www/WebGraph/files
+www/WebGraph/db.sqlite3

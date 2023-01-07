@@ -1,4 +1,4 @@
-{% extends '../bootstrap/index.html' %}
+{% extends './bootstrap/index.html' %}
 
 {% block content %}
     <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
@@ -14,9 +14,11 @@
             </div>
         </form>
     </div>
-    {% if send %}
+    {% if file %}
     <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
-        Form send
+        {% for line in lines%}
+            {{ line }}<br>
+        {% endfor %}
     </div>
     {% endif %}
 {% endblock %}
