@@ -62,11 +62,12 @@ Pour lancer le programme de détection, il faut lancer la commande suivante :
 
 Lancement du programme de détection avec paramètres par défaut :
 
-- source de la caméra = 0
+- source = 0
 - classes de détection = 0 (personne)
 - intervalle de détection = 1
 - pas d'affichage = False
 - pas de débug = False
+- enregistrement des données si nouvelle personne = False
 
 ```python
 python main.py
@@ -77,14 +78,15 @@ Lancement du programme de détection avec paramètres personnalisés :
 Options :
 
 - -h : Affiche de l'aide
-- -w : Source de la caméra (0 par défaut) (int) (ex : -s 0) (optionnel)
+- --source : Source à utiliser (0 par défaut) (string) (ex : --source 0 ou --source video.mp4) (optionnel)
 - -c : Classes de détection (0 par défaut) (int) (ex : -c 0) (0 ou 1) (optionnel)
 - -i : Intervalle de détection (1 par défaut) (int) (ex : -i 1) (optionnel)
 - -s : Affichage de la sortie (False par défaut) (ex : -s) (optionnel)
 - -d : Affichage du debug (False par défaut) (ex : -d) (optionnel)
+- --only_new : Enregistrement des données si nouvelle personne (False par défaut) (ex : -n) (optionnel)
 
 ```python
-python main.py -w 0 -c 1 -i 5 -s -d
+python main.py --source 0 -c 1 -i 5 -s -d --only_new
 ```
 
 </details>
