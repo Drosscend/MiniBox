@@ -17,14 +17,11 @@ import math
 
 log = logging.getLogger("main")
 
-CALCUL_DIRECTION_NB_POSITIONS = 10  # Nombre de positions à prendre en compte pour calculer la direction
+CALCUL_DIRECTION_NB_POSITIONS = 4  # Nombre de positions à prendre en compte pour calculer la direction
 SPEED_THRESHOLD = 10  # Vitesse minimale pour que la direction soit prise en compte
 
 
-def calculate_direction(positions, relative_value):
-    if len(positions) < CALCUL_DIRECTION_NB_POSITIONS:
-        return None
-
+def calculate_direction(positions):
     total_distance = 0
     total_dx = 0
     total_dy = 0
@@ -41,19 +38,18 @@ def calculate_direction(positions, relative_value):
     mean_dx = total_dx / CALCUL_DIRECTION_NB_POSITIONS
     mean_dy = total_dy / CALCUL_DIRECTION_NB_POSITIONS
     mean_distance = total_distance / CALCUL_DIRECTION_NB_POSITIONS
-    mean_speed = mean_distance / relative_value
 
     if mean_dx > 0 and mean_dy > 0:
-        if mean_speed > SPEED_THRESHOLD:
+        if mean_distance > SPEED_THRESHOLD:
             return "bottom-right"
     elif mean_dx > 0 > mean_dy:
-        if mean_speed > SPEED_THRESHOLD:
+        if mean_distance > SPEED_THRESHOLD:
             return "top-right"
     elif mean_dx < 0 < mean_dy:
-        if mean_speed > SPEED_THRESHOLD:
+        if mean_distance > SPEED_THRESHOLD:
             return "bottom-left"
     elif mean_dx < 0 and mean_dy < 0:
-        if mean_speed > SPEED_THRESHOLD:
+        if mean_distance > SPEED_THRESHOLD:
             return "top-left"
     else:
         return None
@@ -78,12 +74,12 @@ class TrackedObject:
         self.x2 = x2
         self.y2 = y2
         self.positions.append((x1, y1, x2, y2))
-        self.set_direction()
         if len(self.positions) > CALCUL_DIRECTION_NB_POSITIONS:
             self.positions.pop(0)
+            self.set_direction()
 
     def set_direction(self):
-        direction = calculate_direction(self.positions, 0.1)
+        direction = calculate_direction(self.positions)
         self.direction = direction
 
     def __str__(self):
