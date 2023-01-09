@@ -15,11 +15,11 @@ Ces compteurs sont un projet open source, et seront à destination :
 - Ou encore à but commercial sur les itinéraires longues distances tels que les voies EuroVelo afin d’inciter des commerçants à se lancer dans le tourisme cycliste
 
 Pour chaque personne, on essayera de récupérer les données suivantes :
-- heure de passage
-- sens de circulation
-- mode de transport (piéton, cycliste, trottinette, vélo couché…)
-- le vélo est-il chargé ?
-- la personne porte-t-elle des équipements de protection ?
+- [x] heure de passage
+- [x] sens de circulation
+- [ ] mode de transport (piéton, cycliste, trottinette, vélo couché…)
+- [ ] le vélo est-il chargé ?
+- [ ] la personne porte-t-elle des équipements de protection ?
 
 ## <h2 align="center">Documentation</h2>
 
