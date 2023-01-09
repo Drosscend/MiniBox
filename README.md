@@ -93,14 +93,6 @@ python main.py --source 0 -c 1 -i 5 -s -d --only_new
 ```
 
 </details>
-<details close>
-<summary>Graphique</summary>
-Pour lancer le programme permettant d'afficher le diagramme, il faut lancer la commande suivante :
-
-```python
-python .\Functions\graph.py
-```
-</details>
 
 ### <h2 align="center">Equipe</h2>
 
