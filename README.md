@@ -15,13 +15,16 @@ Ces compteurs sont un projet open source, et seront à destination :
 - Ou encore à but commercial sur les itinéraires longues distances tels que les voies EuroVelo afin d’inciter des commerçants à se lancer dans le tourisme cycliste
 
 Pour chaque personne, on essayera de récupérer les données suivantes :
-- heure de passage
-- sens de circulation
-- mode de transport (piéton, cycliste, trottinette, vélo couché…)
-- le vélo est-il chargé ?
-- la personne porte-t-elle des équipements de protection ?
+- [x] heure de passage
+- [x] sens de circulation
+- [ ] mode de transport (piéton, cycliste, trottinette, vélo couché…)
+- [ ] le vélo est-il chargé ?
+- [ ] la personne porte-t-elle des équipements de protection ?
 
 ## <h2 align="center">Documentation</h2>
+
+### Maquette du programme principal :
+![Programme principal](/docs/maquette_main.svg)
 
 <details open>
 <summary>Prérequis</summary>
@@ -89,14 +92,6 @@ Options :
 python main.py --source 0 -c 1 -i 5 -s -d --only_new
 ```
 
-</details>
-<details close>
-<summary>Graphique</summary>
-Pour lancer le programme permettant d'afficher le diagramme, il faut lancer la commande suivante :
-
-```python
-python .\Functions\graph.py
-```
 </details>
 
 ### <h2 align="center">Equipe</h2>
