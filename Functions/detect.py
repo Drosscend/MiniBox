@@ -182,10 +182,12 @@ def detect(video_capture, classes, interval, show, debug, only_new):
 
         if current:
             log.debug("Nombre d'objets détectés: " + str(len(current)))
-            log.debug("Suppression de " + str(len(tracked_objects.tracked_objects) - len(current)) + " objets non détectés")
-            for tracked_object in tracked_objects.tracked_objects:
-                if tracked_object.obj_id not in current:
-                    tracked_objects.remove(tracked_object.obj_id)
+            # Suppression des éléments qui ne sont plus détectés par le programme.
+            if len(tracked_objects.tracked_objects) > len(current):
+                log.debug("Suppression de " + str(len(tracked_objects.tracked_objects) - len(current)) + " objets non détectés")
+                for tracked_object in tracked_objects.tracked_objects:
+                    if tracked_object.obj_id not in current:
+                        tracked_objects.remove(tracked_object.obj_id)
         else:
             log.debug("Aucun objet détecté")
 
