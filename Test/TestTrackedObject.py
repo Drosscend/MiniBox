@@ -27,29 +27,30 @@ class TestTrackedObject(unittest.TestCase):
         self.assertIsNone(obj.direction)
 
     def test_calculate_direction(self):
-        # Test direction bottom-right with high speed
-        positions = [(0, 0, 0, 0), (1, 1, 1, 1), (2, 2, 2, 2), (3, 3, 3, 3), (4, 4, 4, 4),
-                     (5, 5, 5, 5), (6, 6, 6, 6), (7, 7, 7, 7), (8, 8, 8, 8), (9, 9, 9, 9)]
-        direction = TrackedObjects.calculate_direction(positions, 0.1)
+        # Test lorsque la personne ne bouge pas
+        positions = [(0, 0, 0, 0), (0, 0, 0, 0), (0, 0, 0, 0), (0, 0, 0, 0), (0, 0, 0, 0), (0, 0, 0, 0), (0, 0, 0, 0)]
+        direction = TrackedObjects.calculate_direction(positions)
+        self.assertIsNone(direction)
+
+        # Test lorsque la personne bouge vers en bas à gauche
+        positions = [(221, 273, 481, 480), (219, 272, 481, 480), (218, 272, 481, 480), (168, 274, 481, 480)]
+        direction = TrackedObjects.calculate_direction(positions)
+        self.assertEqual(direction, "bottom-left")
+
+        # Test lorsque la personne bouge vers en bas à droite
+        positions = [(221, 273, 481, 480), (219, 272, 481, 480), (218, 272, 481, 480), (268, 274, 481, 480)]
+        direction = TrackedObjects.calculate_direction(positions)
         self.assertEqual(direction, "bottom-right")
 
-        # Test direction bottom-left with low speed
-        positions = [(0, 0, 0, 0), (1, 1, 1, 1), (1, 1, 1, 1), (1, 1, 1, 1), (1, 1, 1, 1),
-                     (1, 1, 1, 1), (1, 1, 1, 1), (1, 1, 1, 1), (1, 1, 1, 1), (1, 1, 1, 1)]
-        direction = TrackedObjects.calculate_direction(positions, 0.1)
-        self.assertIsNone(direction)
-
-        # Test direction top-left with high speed
-        positions = [(9, 9, 9, 9), (8, 8, 8, 8), (7, 7, 7, 7), (6, 6, 6, 6), (5, 5, 5, 5),
-                     (4, 4, 4, 4), (3, 3, 3, 3), (2, 2, 2, 2), (1, 1, 1, 1), (0, 0, 0, 0)]
-        direction = TrackedObjects.calculate_direction(positions, 0.1)
+        # Test lorsque la personne bouge vers le haut à gauche
+        positions = [(221, 273, 481, 480), (219, 272, 481, 480), (218, 272, 481, 480), (168, 174, 481, 480)]
+        direction = TrackedObjects.calculate_direction(positions)
         self.assertEqual(direction, "top-left")
 
-        # Test direction top-right with low speed
-        positions = [(1, 1, 1, 1), (1, 1, 1, 1), (1, 1, 1, 1), (1, 1, 1, 1), (1, 1, 1, 1),
-                     (1, 1, 1, 1), (1, 1, 1, 1), (1, 1, 1, 1), (1, 1, 1, 1), (1, 1, 1, 1)]
-        direction = TrackedObjects.calculate_direction(positions, 0.1)
-        self.assertIsNone(direction)
+        # Test lorsque la personne bouge vers le haut à droite
+        positions = [(221, 273, 481, 480), (219, 272, 481, 480), (218, 272, 481, 480), (268, 174, 481, 480)]
+        direction = TrackedObjects.calculate_direction(positions)
+        self.assertEqual(direction, "top-right")
 
 
 if __name__ == "__main__":
