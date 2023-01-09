@@ -45,7 +45,7 @@ except ValueError:
     log.error("La valeur de l'interval doit être un nombre")
     exit(1)
 
-show = config['OPTIONS']['show']
+show = config['DEFAULT']['show']
 if show == '':
     show = False
     log.warning("Pas de valeur pour le paramètre show défini, on prend 'False' par défaut")
@@ -57,7 +57,7 @@ else:
     log.error("La valeur de show doit être 'True' ou 'False'")
     exit(1)
 
-debug = config['OPTIONS']['debug']
+debug = config['DEFAULT']['debug']
 if debug == '':
     debug = False
     log.warning("Pas de valeur pour le paramètre debug défini, on prend 'False' par défaut")
