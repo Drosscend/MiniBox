@@ -25,16 +25,27 @@ args = parser.parse_args()
 config = configparser.ConfigParser()
 config.read(args.config)
 
-# Récupérer les valeurs à partir du fichier de configuration
-source = config.get('DEFAULT', 'source')
+# Vérifier que le fichier de configuration est valide
+expected_sections = ['PARAMS']
+expected_options = {'PARAMS': ['source', 'classes', 'interval', 'show', 'debug']}
+for section in expected_sections:
+    if not config.has_section(section):
+        log.error("Erreur : section {} attendue dans le fichier de configuration".format(section))
+        exit(1)
+    for option in expected_options[section]:
+        if not config.has_option(section, option):
+            log.error("Erreur : option {} attendue dans la section {} du fichier de configuration".format(option, section))
+            exit(1)
+
+source = config.get('PARAMS', 'source')
 if source.isdigit():  # Vérifier si la valeur est un entier ou non
     source = int(source)  # Utiliser la valeur comme indice de la webcam
 else:
     source = source  # Utiliser la valeur comme chemin vers un fichier vidéo
-classes = config.getint('DEFAULT', 'classes')
-interval = config.getfloat('DEFAULT', 'interval')
-show = config.getboolean('DEFAULT', 'show')
-debug = config.getboolean('DEFAULT', 'debug')
+classes = config.getint('PARAMS', 'classes')
+interval = config.getfloat('PARAMS', 'interval')
+show = config.getboolean('PARAMS', 'show')
+debug = config.getboolean('PARAMS', 'debug')
 
 ####################################
 

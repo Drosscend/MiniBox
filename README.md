@@ -76,7 +76,7 @@ Le programme sera lancé avec les paramètres par défaut.
 
 Pour lancer le programme avec des paramètres personnalisés, modifier le fichier config.ini
 ```ini
-[DEFAULT]
+[PARAMS]
 # La valeur par défaut est 0, si vous voulez passez une vidéo, mettez nom_de_la_video.mp4
 source = 0
 # La valeur par défaut est 0 (personne)
