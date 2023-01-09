@@ -1,5 +1,6 @@
 import logging
 import configparser
+import argparse
 from Functions.CustomFormatter import CustomFormatter
 from Functions import detect
 
@@ -15,59 +16,25 @@ config.read('config.ini')
 
 ####################################
 
-# affichage des paramètres
-log.info("Paramètres :")
+# Créer un parseur d'arguments
+parser = argparse.ArgumentParser(prog='Mini Box', description='Projet de mémoire LP APSIO : Mini Box IOT')
+parser.add_argument('-c', '--config', type=str, default='config.ini', help='Fichier de configuration à utiliser')
+args = parser.parse_args()
 
-source = config['DEFAULT']['source']
-if source == '':
-    source = 0
-    log.warning("Pas de valeur pour le paramètre source définie, on prend la webcam par défaut (0)")
-if source.isdigit():
-    source = int(source)
+# Lire le fichier de configuration
+config = configparser.ConfigParser()
+config.read(args.config)
 
-classes = config['DEFAULT']['classes']
-if classes == '':
-    classes = 0
-    log.warning("Pas de valeur pour le paramètre classes définie, on prend '0' par défaut")
-try:
-    classes = int(classes)
-except ValueError:
-    log.error("La valeur de classes doit être un entier")
-    exit(1)
-
-interval = config['DEFAULT']['interval']
-if interval == '':
-    interval = 1
-    log.warning("Pas de valeur pour le paramètre interval défini, on prend '1' par défaut")
-try:
-    interval = float(interval)
-except ValueError:
-    log.error("La valeur de l'interval doit être un nombre")
-    exit(1)
-
-show = config['DEFAULT']['show']
-if show == '':
-    show = False
-    log.warning("Pas de valeur pour le paramètre show défini, on prend 'False' par défaut")
-if show.lower() == 'true':
-    show = True
-elif show.lower() == 'false':
-    show = False
+# Récupérer les valeurs à partir du fichier de configuration
+source = config.get('DEFAULT', 'source')
+if source.isdigit():  # Vérifier si la valeur est un entier ou non
+    source = int(source)  # Utiliser la valeur comme indice de la webcam
 else:
-    log.error("La valeur de show doit être 'True' ou 'False'")
-    exit(1)
-
-debug = config['DEFAULT']['debug']
-if debug == '':
-    debug = False
-    log.warning("Pas de valeur pour le paramètre debug défini, on prend 'False' par défaut")
-if debug.lower() == 'true':
-    debug = True
-elif debug.lower() == 'false':
-    debug = False
-else:
-    log.error("La valeur de debug doit être 'True' ou 'False'")
-    exit(1)
+    source = source  # Utiliser la valeur comme chemin vers un fichier vidéo
+classes = config.getint('DEFAULT', 'classes')
+interval = config.getfloat('DEFAULT', 'interval')
+show = config.getboolean('DEFAULT', 'show')
+debug = config.getboolean('DEFAULT', 'debug')
 
 ####################################
 
