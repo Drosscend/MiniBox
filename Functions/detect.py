@@ -106,7 +106,7 @@ def show_output(image, current):
     cv.imshow('Video', image)
 
 
-def detect(video_capture, classes, interval, show, debug, only_new):
+def detect(video_capture, classes, interval, show, debug):
     """
     Fonction de détection
 
@@ -115,10 +115,9 @@ def detect(video_capture, classes, interval, show, debug, only_new):
     :param interval: intervalle de temps entre chaque détection
     :param show: affichage de la détection (True/False) (optionnel)
     :param debug: affichage des logs de débug (True/False) (optionnel)
-    :param only_new: enregistre uniquement les nouvelles personnes détectées (True/False) (optionnel)
     :return: None
     """
-    log.debug("Début de la détection")
+    log.info("Début de la détection")
     model = torch.hub.load('ultralytics/yolov5', 'yolov5s', verbose=debug)
     model.classes = classes
     model.conf = 0.25
@@ -191,12 +190,7 @@ def detect(video_capture, classes, interval, show, debug, only_new):
         else:
             log.debug("Aucun objet détecté")
 
-        # Enregistrement des résultats dans un fichier csv si une nouvelle personne est détectée
-        if only_new:
-            if new_detected:
-                generate_csv(current)
-        else:
-            generate_csv(current)
+        generate_csv(current)
 
         # Pause entre chaque détection
         if interval > 0:
@@ -214,20 +208,20 @@ def detect(video_capture, classes, interval, show, debug, only_new):
 
     video_capture.release()
     cv.destroyAllWindows()
-    log.debug("Detection terminée")
+    log.info("Detection terminée")
 
 
-def main(source, classes, interval, show, debug, only_new):
+def main(source, classes, interval, show, debug):
     # Initialisation de la caméra
     video_capture = cv.VideoCapture(source)
 
     # Vérification de l'ouverture de la caméra
     if not video_capture.isOpened():
-        log.error("Impossible d'ouvrir la source")
+        log.error("Impossible d'ouvrir la source, verifier le fichier de configuration")
         return
 
     if show:
         log.info("Pour quitter l'application, appuyez sur la touche 'q'")
 
     # Détection des personnes
-    detect(video_capture, classes, interval, show, debug, only_new)
+    detect(video_capture, classes, interval, show, debug)

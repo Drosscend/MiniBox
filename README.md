@@ -61,35 +61,37 @@ pip install -r requirements.txt  # installation des dépendances du projet
 
 <details open>
 <summary>Main</summary>
+
 Pour lancer le programme de détection, il faut lancer la commande suivante :
-
-Lancement du programme de détection avec paramètres par défaut :
-
-- source = 0
-- classes de détection = 0 (personne)
-- intervalle de détection = 1
-- pas d'affichage = False
-- pas de débug = False
-- enregistrement des données si nouvelle personne = False
-
-```python
+```bash
 python main.py
 ```
 
-Lancement du programme de détection avec paramètres personnalisés :
+Le programme sera lancé avec les paramètres par défaut.
+- source = 0
+- classes de détection = 0 (personne)
+- intervalle de détection = 0.5
+- affichage = False
+- débug = False
 
-Options :
+Pour lancer le programme avec des paramètres personnalisés, modifiez le fichier config.ini
+```ini
+[PARAMS]
+# La valeur par défaut est 0, si vous voulez passez une vidéo, mettez nom_de_la_video.mp4
+source = 0
+# La valeur par défaut est 0 (personne)
+classes = 0
+# La valeur par défaut est 0.5, si vous voulez augmenter le temps entre chaque prise, augmentez la valeur
+interval = 0.5
+# La valeur par défaut est False, si vous voulez activer l'affichage graphique, mettez True
+show = True
+# La valeur par défaut est False, si vous voulez activer l'affichage des messages, mettez True
+debug = False
+```
 
-- -h : Affiche de l'aide
-- --source : Source à utiliser (0 par défaut) (string) (ex : --source 0 ou --source video.mp4) (optionnel)
-- -c : Classes de détection (0 par défaut) (int) (ex : -c 0) (0 ou 1) (optionnel)
-- -i : Intervalle de détection (1 par défaut) (int) (ex : -i 1) (optionnel)
-- -s : Affichage de la sortie (False par défaut) (ex : -s) (optionnel)
-- -d : Affichage du debug (False par défaut) (ex : -d) (optionnel)
-- --only_new : Enregistrement des données si nouvelle personne (False par défaut) (ex : -n) (optionnel)
-
-```python
-python main.py --source 0 -c 1 -i 5 -s -d --only_new
+Vous pouvez fournir un fichier de configuration personnalisé en utilisant l'option -c ou --config :
+```bash
+python main.py -c config.ini
 ```
 
 </details>
