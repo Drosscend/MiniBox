@@ -74,18 +74,18 @@ Le programme sera lancé avec les paramètres par défaut.
 - affichage = False
 - débug = False
 
-Pour lancer le programme avec des paramètres personnalisés, modifier le fichier config.ini
+Pour lancer le programme avec des paramètres personnalisés, modifiez le fichier config.ini
 ```ini
 [PARAMS]
 # La valeur par défaut est 0, si vous voulez passez une vidéo, mettez nom_de_la_video.mp4
 source = 0
 # La valeur par défaut est 0 (personne)
 classes = 0
-# La valeur par défaut est 0.5, si vous voulez augmenter la temps entre chaque prise augmenter la valeur
+# La valeur par défaut est 0.5, si vous voulez augmenter le temps entre chaque prise, augmentez la valeur
 interval = 0.5
-# La valeur par défaut est False, si vous voulez activer l'affichage graphique mettez True
+# La valeur par défaut est False, si vous voulez activer l'affichage graphique, mettez True
 show = True
-# La valeur par défaut est False, si vous voulez activer l'affichage des messages mettez True
+# La valeur par défaut est False, si vous voulez activer l'affichage des messages, mettez True
 debug = False
 ```
 
