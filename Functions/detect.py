@@ -117,7 +117,7 @@ def detect(video_capture, classes, interval, show, debug):
     :param debug: affichage des logs de débug (True/False) (optionnel)
     :return: None
     """
-    log.debug("Début de la détection")
+    log.info("Début de la détection")
     model = torch.hub.load('ultralytics/yolov5', 'yolov5s', verbose=debug)
     model.classes = classes
     model.conf = 0.25
@@ -208,7 +208,7 @@ def detect(video_capture, classes, interval, show, debug):
 
     video_capture.release()
     cv.destroyAllWindows()
-    log.debug("Detection terminée")
+    log.info("Detection terminée")
 
 
 def main(source, classes, interval, show, debug):
@@ -217,7 +217,7 @@ def main(source, classes, interval, show, debug):
 
     # Vérification de l'ouverture de la caméra
     if not video_capture.isOpened():
-        log.error("Impossible d'ouvrir la source")
+        log.error("Impossible d'ouvrir la source, verifier le fichier de configuration")
         return
 
     if show:

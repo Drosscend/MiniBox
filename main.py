@@ -38,14 +38,34 @@ for section in expected_sections:
             exit(1)
 
 source = config.get('PARAMS', 'source')
-if source.isdigit():  # Vérifier si la valeur est un entier ou non
-    source = int(source)  # Utiliser la valeur comme indice de la webcam
-else:
-    source = source  # Utiliser la valeur comme chemin vers un fichier vidéo
-classes = config.getint('PARAMS', 'classes')
-interval = config.getfloat('PARAMS', 'interval')
-show = config.getboolean('PARAMS', 'show')
-debug = config.getboolean('PARAMS', 'debug')
+try:
+    source = int(source)
+except ValueError:
+    source = source
+
+try:
+    classes = config.getint('PARAMS', 'classes')
+except ValueError:
+    log.error("Erreur : la valeur de l'option classes doit être un entier, verifier le fichier de configuration")
+    exit(1)
+
+try:
+    interval = config.getfloat('PARAMS', 'interval')
+except ValueError:
+    log.error("Erreur : la valeur de l'option interval doit être un double, verifier le fichier de configuration")
+    exit(1)
+
+try:
+    show = config.getboolean('PARAMS', 'show')
+except ValueError:
+    log.error("Erreur : la valeur de l'option show doit être un boolean, verifier le fichier de configuration")
+    exit(1)
+
+try:
+    debug = config.getboolean('PARAMS', 'debug')
+except ValueError:
+    log.error("Erreur : la valeur de l'option debug doit être un boolean, verifier le fichier de configuration")
+    exit(1)
 
 ####################################
 
@@ -66,4 +86,8 @@ if __name__ == "__main__":
         log.debug("Mode debug activé")
 
     # lancement de la détection
-    detect.main(source, classes, interval, show, debug)
+    try:
+        detect.main(source, classes, interval, show, debug)
+    except KeyboardInterrupt:
+        log.info("Detection terminée")
+        exit(0)
