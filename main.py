@@ -79,7 +79,7 @@ if __name__ == "__main__":
     log.info("Affichage : " + str(show))
     log.info("Debug : " + str(debug))
 
-    # si debug = Ture, on passe le niveau de log à DEBUG
+    # si debug = True, on passe le niveau de log à DEBUG
     if debug:
         log.setLevel('DEBUG')
         ch.setLevel('DEBUG')
