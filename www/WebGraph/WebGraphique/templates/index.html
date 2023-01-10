@@ -14,9 +14,9 @@
             </div>
         </form>
     </div>
-    {% if file %}
+    {% if lines %}
     <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
-        {% for line in lines%}
+        {% for line in lines %}
             {{ line }}<br>
         {% endfor %}
     </div>

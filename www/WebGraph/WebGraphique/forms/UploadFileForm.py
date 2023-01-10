@@ -1,7 +1,4 @@
-from django.forms import ModelForm
-from WebGraphique.models import CSVFile
+from django import forms
 
-class UploadFileForm(ModelForm):
-    class Meta:
-        model = CSVFile
-        fields = ['file']
+class UploadFileForm(forms.Form):
+    fichier = forms.FileField()
