@@ -2,9 +2,9 @@ import logging
 import os
 import time
 
-import cv2 as cv
+import yolov5
 import numpy as np
-import torch
+import cv2 as cv
 
 from Functions import TrackedObjects
 from Functions import sort
@@ -106,7 +106,7 @@ def show_output(image, current):
     cv.imshow('Video', image)
 
 
-def detect(video_capture, classes, interval, show, debug):
+def detect(video_capture, classes, interval, show):
     """
     Fonction de détection
 
@@ -114,11 +114,10 @@ def detect(video_capture, classes, interval, show, debug):
     :param classes: type de détection (0: personnes, 1: vélos) ou liste de types
     :param interval: intervalle de temps entre chaque détection
     :param show: affichage de la détection (True/False) (optionnel)
-    :param debug: affichage des logs de débug (True/False) (optionnel)
     :return: None
     """
     log.info("Début de la détection")
-    model = torch.hub.load('ultralytics/yolov5', 'yolov5s', verbose=debug)
+    model = yolov5.load('yolov5s.pt')
     model.classes = classes
     model.conf = 0.25
     model.iou = 0.45
@@ -142,11 +141,11 @@ def detect(video_capture, classes, interval, show, debug):
             continue
 
         # Utilisation de la librairie Sort pour suivre les personnes détectées
-        detections = np.array(results.xyxy[0][:, :4])
+        predictions = np.array(results.xyxy[0][:, :4])
 
         # Pour vérifier que la bibliothèque de suivi d'objets Sort fonctionne correctement
         try:
-            track = model_sort.update(detections)
+            track = model_sort.update(predictions)
         except Exception as e:
             log.error("Erreur lors du suivi des objets avec la bibliothèque Sort: " + str(e))
             continue
@@ -211,7 +210,7 @@ def detect(video_capture, classes, interval, show, debug):
     log.info("Detection terminée")
 
 
-def main(source, classes, interval, show, debug):
+def main(source, classes, interval, show):
     # Initialisation de la caméra
     video_capture = cv.VideoCapture(source)
 
@@ -224,4 +223,4 @@ def main(source, classes, interval, show, debug):
         log.info("Pour quitter l'application, appuyez sur la touche 'q'")
 
     # Détection des personnes
-    detect(video_capture, classes, interval, show, debug)
+    detect(video_capture, classes, interval, show)

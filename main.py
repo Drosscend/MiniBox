@@ -87,7 +87,7 @@ if __name__ == "__main__":
 
     # lancement de la détection
     try:
-        detect.main(source, classes, interval, show, debug)
+        detect.main(source, classes, interval, show)
     except KeyboardInterrupt:
         log.info("Detection terminée")
         exit(0)

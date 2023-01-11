@@ -1,17 +1,6 @@
 # MiniBox 🎯 requirements
 # Usage: pip install -r requirements.txt
 
-gitpython
-ipython
-opencv-python>=4.1.1
-psutil
-PyYAML>=5.3.1
-requests>=2.23.0
-scipy>=1.4.1
-torch>=1.7.0
-torchvision>=0.8.1
-tqdm>=4.64.0
-pandas>=1.1.4
-seaborn>=0.11.0
 filterpy==1.4.5
 pytest
+yolov5>=7.0.7
