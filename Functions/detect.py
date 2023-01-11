@@ -5,6 +5,7 @@ import time
 import yolov5
 import numpy as np
 import cv2 as cv
+from deep_sort_realtime.deepsort_tracker import DeepSort
 
 from Functions import TrackedObjects
 from Functions import sort
@@ -18,7 +19,7 @@ CSV_FILE = 'OUTPUT/data.csv'
 tracked_objects = TrackedObjects.TrackedObjects()
 
 # Initialisation de la librairie Sort pour suivre les personnes détectées
-model_sort = sort.Sort()
+tracker = DeepSort(max_age=5)
 
 
 def generate_csv(current):
@@ -117,7 +118,7 @@ def detect(video_capture, classes, interval, show):
     :return: None
     """
     log.info("Début de la détection")
-    model = yolov5.load('yolov5l.pt')
+    model = yolov5.load('yolov5s.pt')
     model.classes = classes
     model.conf = 0.25
     model.iou = 0.45
@@ -140,36 +141,39 @@ def detect(video_capture, classes, interval, show):
             log.error("Erreur lors du traitement de l'image avec le modèle YOLOv5: " + str(e))
             continue
 
-        # Utilisation de la librairie Sort pour suivre les personnes détectées
-        # predictions = np.array(results.xyxy[0][:, :4])
-
         predictions = results.pred[0]
-        boxes = predictions[:, :4] # x1, y1, x2, y2
-        print(boxes)
-        scores = predictions[:, 4]
-        print(scores)
-        categories = predictions[:, 5]
-        print(categories)
 
         # Pour vérifier que la bibliothèque de suivi d'objets Sort fonctionne correctement
+        bbs = []
         try:
-            track = model_sort.update(predictions)
+            boxes = predictions[:, :4]  # tensor([[271.36926, 171.34053, 606.02740, 479.60883]])
+            scores = predictions[:, 4]  # tensor([0.89304])
+            categories = predictions[:, 5]  # tensor([0.])
+            for i in range(len(boxes)):
+                bbs += [(boxes[i].tolist(), scores[i].tolist(), categories[i].tolist())]
+            tracks = tracker.update_tracks(bbs, frame=frame)
         except Exception as e:
-            log.error("Erreur lors du suivi des objets avec la bibliothèque Sort: " + str(e))
+            log.error("Erreur lors de la récupération des informations de l'image: " + str(e))
             continue
+
+        for track in tracks:
+            if not track.is_confirmed():
+                continue
+            track_id = track.track_id
+            ltrb = track.to_ltrb()
 
         # Détection des nouvelles personnes
         current = []
         new_detected = False
-        for j in range(len(track.tolist())):
+        for j in range(len(tracks)):
             # Récupère les informations sur l'objet
-            coords = track.tolist()[j]
-            obj_id = int(coords[4])  # Identifiant de l'objet
-            conf = results.xyxy[0][j][4]  # Confiance de l'objet
+            coords = tracks[j].to_tlbr()
             x1 = int(coords[0])
             y1 = int(coords[1])
             x2 = int(coords[2])
             y2 = int(coords[3])
+            obj_id = tracks[j].track_id
+            conf = scores[j]
 
             current.append(obj_id)
 
@@ -212,6 +216,10 @@ def detect(video_capture, classes, interval, show):
                 break
             elif key == -1:
                 continue
+
+        # except Exception as e:
+        #     log.error("Erreur lors du suivi des objets avec la bibliothèque Sort: " + str(e))
+        #     continue
 
     video_capture.release()
     cv.destroyAllWindows()
