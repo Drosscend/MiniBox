@@ -37,11 +37,12 @@ for section in expected_sections:
             log.error("Erreur : option {} attendue dans la section {} du fichier de configuration".format(option, section))
             exit(1)
 
-source = config.get('PARAMS', 'source')
+
 try:
-    source = int(source)
+    source = config.getint('PARAMS', 'source')
 except ValueError:
-    source = source
+    log.error("Erreur : la valeur de source doit être un entier, verifier le fichier de configuration")
+    exit(1)
 
 try:
     classes = config.getint('PARAMS', 'classes')
