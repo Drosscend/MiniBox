@@ -117,7 +117,7 @@ def detect(video_capture, classes, interval, show):
     :return: None
     """
     log.info("Début de la détection")
-    model = yolov5.load('yolov5s.pt')
+    model = yolov5.load('yolov5l.pt')
     model.classes = classes
     model.conf = 0.25
     model.iou = 0.45
@@ -141,7 +141,15 @@ def detect(video_capture, classes, interval, show):
             continue
 
         # Utilisation de la librairie Sort pour suivre les personnes détectées
-        predictions = np.array(results.xyxy[0][:, :4])
+        # predictions = np.array(results.xyxy[0][:, :4])
+
+        predictions = results.pred[0]
+        boxes = predictions[:, :4] # x1, y1, x2, y2
+        print(boxes)
+        scores = predictions[:, 4]
+        print(scores)
+        categories = predictions[:, 5]
+        print(categories)
 
         # Pour vérifier que la bibliothèque de suivi d'objets Sort fonctionne correctement
         try:

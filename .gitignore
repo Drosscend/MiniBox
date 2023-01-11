@@ -5,4 +5,4 @@
 __pycache__
 
 OUTPUT
-yolov5s.pt
+yolov5*.pt
