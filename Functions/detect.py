@@ -2,6 +2,8 @@ import logging
 import os
 import random
 import time
+import csv
+from datetime import datetime
 
 import cv2
 import torch
@@ -11,10 +13,11 @@ from Functions import sort
 
 log = logging.getLogger("main")
 
-CSV_FILE = 'OUTPUT/data.csv'
+CSV_FILE_NAME = 'OUTPUT/data.csv'
 
 # Initialisation de la collection d'objets suivis
 tracked_objects = TrackedObjects.TrackedObjects()
+
 
 def generate_csv(current):
     """
@@ -23,54 +26,53 @@ def generate_csv(current):
     :param current: Liste des identifiants des personnes détectées
     :return: None
     """
-    date = time.strftime("%d/%m/%Y %H:%M:%S", time.localtime())
 
     # verifie que le dosser OUTPUT existe et le crée si ce n'est pas le cas
     if not os.path.exists("OUTPUT"):
         os.makedirs("OUTPUT")
 
+    date = datetime.now()
+
     # Initialisation des compteurs pour chaque direction
-    top_left = 0
-    top_right = 0
-    bottom_left = 0
-    bottom_right = 0
+    counts = {
+        "top-left": 0,
+        "top-right": 0,
+        "bottom-left": 0,
+        "bottom-right": 0
+    }
 
     # Parcours de la liste des identifiants d'objets
     for obj_id in current:
         obj = tracked_objects.get(obj_id)
         if obj is not None:
-            if obj.direction == "top-left":
-                top_left += 1
-            elif obj.direction == "top-right":
-                top_right += 1
-            elif obj.direction == "bottom-left":
-                bottom_left += 1
-            elif obj.direction == "bottom-right":
-                bottom_right += 1
+            # Incrémentation du compteur de la direction de l'objet s'il existe
+            if obj.direction is not None:
+                counts[obj.direction] += 1
 
     # enregistrement des données dans un fichier csv
     try:
-        with open(CSV_FILE, 'a') as f:
+        with open(CSV_FILE_NAME, 'a', newline='') as f:
+            writer = csv.writer(f)
             # si le fichier est vide, on écrit l'entête
-            if f.tell() == 0:
-                f.write("date,occurence,top-left,top-right,bottom-left,bottom-right\n")
-            f.write(date + ',' + str(len(current)) + ',' + str(top_left) + ',' + str(top_right) + ',' + str(
-                bottom_left) + ',' + str(bottom_right) + '\n')
+            if os.path.getsize(CSV_FILE_NAME) == 0:
+                writer.writerow(["date", "occurence", "top-left", "top-right", "bottom-left", "bottom-right"])
+            writer.writerow([date.strftime("%d/%m/%Y %H:%M:%S"), len(current), counts["top-left"], counts["top-right"],
+                             counts["bottom-left"], counts["bottom-right"]])
     except IOError as e:
         log.warning("Erreur lors de l'écriture dans le fichier CSV: " + str(e))
 
 
 def draw_bounding_boxes(image, objects):
     """
-    Draws bounding boxes around detected objects and displays their IDs and directions.
+    Dessine des boîtes englobantes autour des objets détectés et affiche leurs ID, leurs confidence et leurs directions
 
-    :param image: Image to display
-    :param objects: List of detected object IDs
+    :param image: Image à afficher
+    :param objects: Liste des objets détectés
     """
 
     # Si aucun objet n'a été détecté
     if not objects:
-        cv2.putText(image, "No objects detected", (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+        cv2.putText(image, "Aucun objet detecte", (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
     else:
         for object_id in objects:
             object_info = tracked_objects.get(object_id)
@@ -91,8 +93,6 @@ def draw_bounding_boxes(image, objects):
                 cv2.putText(image, text, (x1, y1 - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.7, color, 2)
 
     cv2.imshow("Video", image)
-
-
 
 
 def get_random_color(name_idx):
@@ -120,7 +120,7 @@ def detect(video_capture, classes, interval, show):
     """
     log.info("Début de la détection")
     model = torch.hub.load('ultralytics/yolov5', 'yolov5s')
-    model.classes = classes
+    model.classes = 0
     model.conf = 0.25
     model.iou = 0.45
     model.agnostic = False
