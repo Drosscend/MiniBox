@@ -27,7 +27,7 @@ config.read(args.config)
 
 # Vérifier que le fichier de configuration est valide
 expected_sections = ['PARAMS']
-expected_options = {'PARAMS': ['source', 'classes', 'interval', 'show', 'debug']}
+expected_options = {'PARAMS': ['source', 'classes', 'interval', 'display_detection', 'debug']}
 for section in expected_sections:
     if not config.has_section(section):
         log.error("Erreur : section {} attendue dans le fichier de configuration".format(section))
@@ -37,11 +37,12 @@ for section in expected_sections:
             log.error("Erreur : option {} attendue dans la section {} du fichier de configuration".format(option, section))
             exit(1)
 
-source = config.get('PARAMS', 'source')
+
 try:
-    source = int(source)
+    source = config.getint('PARAMS', 'source')
 except ValueError:
-    source = source
+    log.error("Erreur : la valeur de source doit être un entier, verifier le fichier de configuration")
+    exit(1)
 
 try:
     classes = config.getint('PARAMS', 'classes')
@@ -56,9 +57,9 @@ except ValueError:
     exit(1)
 
 try:
-    show = config.getboolean('PARAMS', 'show')
+    display_detection = config.getboolean('PARAMS', 'display_detection')
 except ValueError:
-    log.error("Erreur : la valeur de l'option show doit être un boolean, verifier le fichier de configuration")
+    log.error("Erreur : la valeur de l'option display_detection doit être un boolean, verifier le fichier de configuration")
     exit(1)
 
 try:
@@ -76,7 +77,7 @@ if __name__ == "__main__":
     log.info("Source : " + str(source))
     log.info("Classes : " + str(classes))
     log.info("Intervalle : " + str(interval) + " seconde(s)")
-    log.info("Affichage : " + str(show))
+    log.info("Affichage : " + str(display_detection))
     log.info("Debug : " + str(debug))
 
     # si debug = True, on passe le niveau de log à DEBUG
@@ -87,7 +88,7 @@ if __name__ == "__main__":
 
     # lancement de la détection
     try:
-        detect.main(source, classes, interval, show, debug)
+        detect.main(source, classes, interval, display_detection)
     except KeyboardInterrupt:
         log.info("Detection terminée")
         exit(0)
