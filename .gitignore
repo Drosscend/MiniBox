@@ -6,3 +6,4 @@ __pycache__
 
 OUTPUT
 yolov5*.pt
+custom_config.ini
