@@ -3,7 +3,7 @@ import os
 import time
 import random
 import yolov5
-import cv2 as cv
+import cv2
 
 from Functions import TrackedObjects
 from Functions import sort
@@ -76,7 +76,7 @@ def show_output(image, current):
     # Si aucun objet n'a été détecté
     if not current:
         # Affiche un message à l'écran
-        cv.putText(image, "Aucun objet detecte", (10, 50), cv.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+        cv2.putText(image, "Aucun objet detecte", (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
     else:
         # Pour chaque objet détecté, dessine un rectangle autour de l'objet et affiche son identifiant et sa direction
         for obj_id in current:
@@ -92,16 +92,16 @@ def show_output(image, current):
                 direction = obj.direction
 
                 # Dessine un rectangle autour de l'objet
-                cv.rectangle(image, (x1, y1), (x2, y2), color, 2)
+                cv2.rectangle(image, (x1, y1), (x2, y2), color, 2)
                 # Affiche l'identifiant et la direction de l'objet près de l'objet
                 text = f"{obj_id} - {conf}"
                 if direction:
                     text += f" - ({direction})"
 
-                cv.putText(image, text, (x1, y1 - 5), cv.FONT_HERSHEY_SIMPLEX, 0.7, color, 2)
+                cv2.putText(image, text, (x1, y1 - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.7, color, 2)
 
     # Affiche l'image modifiée à l'écran
-    cv.imshow('Video', image)
+    cv2.imshow("Video", image)
 
 
 def get_random_color(name_idx):
@@ -208,24 +208,20 @@ def detect(video_capture, classes, interval, show):
         # affichage des images
         if show:
             show_output(frame, current)
-            key = cv.waitKey(10)
+            key = cv2.waitKey(10)
             if key == ord('q'):
                 break
             elif key == -1:
                 continue
 
-        # except Exception as e:
-        #     log.error("Erreur lors du suivi des objets avec la bibliothèque Sort: " + str(e))
-        #     continue
-
     video_capture.release()
-    cv.destroyAllWindows()
+    cv2.destroyAllWindows()
     log.info("Detection terminée")
 
 
 def main(source, classes, interval, show):
     # Initialisation de la caméra
-    video_capture = cv.VideoCapture(source)
+    video_capture = cv2.VideoCapture(source)
 
     # Vérification de l'ouverture de la caméra
     if not video_capture.isOpened():
