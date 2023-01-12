@@ -1,9 +1,10 @@
 import logging
 import os
-import time
 import random
-import yolov5
+import time
+
 import cv2
+import torch
 
 from Functions import TrackedObjects
 from Functions import sort
@@ -15,15 +16,11 @@ CSV_FILE = 'OUTPUT/data.csv'
 # Initialisation de la collection d'objets suivis
 tracked_objects = TrackedObjects.TrackedObjects()
 
-# Initialisation de la librairie Sort pour suivre les personnes détectées
-model_sort = sort.Sort()
-
-
 def generate_csv(current):
     """
     Enregistre les résultats de la détection dans un fichier CSV.
 
-    :param current: liste des identifiants des personnes détectées
+    :param current: Liste des identifiants des personnes détectées
     :return: None
     """
     date = time.strftime("%d/%m/%Y %H:%M:%S", time.localtime())
@@ -63,45 +60,39 @@ def generate_csv(current):
         log.warning("Erreur lors de l'écriture dans le fichier CSV: " + str(e))
 
 
-def show_output(image, current):
+def draw_bounding_boxes(image, objects):
     """
-    Affiche une image avec des rectangles entourant les objets détectés et en affichant leur identifiant et leur
-    direction près de chaque objet.
+    Draws bounding boxes around detected objects and displays their IDs and directions.
 
-    :param image: image à afficher
-    :param current: liste des identifiants des objets détectés
-    :return: None
+    :param image: Image to display
+    :param objects: List of detected object IDs
     """
 
     # Si aucun objet n'a été détecté
-    if not current:
-        # Affiche un message à l'écran
-        cv2.putText(image, "Aucun objet detecte", (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+    if not objects:
+        cv2.putText(image, "No objects detected", (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
     else:
-        # Pour chaque objet détecté, dessine un rectangle autour de l'objet et affiche son identifiant et sa direction
-        for obj_id in current:
-            # Récupère les informations sur l'objet
-            obj = tracked_objects.get(obj_id)  # Objet suivi
-            if obj is not None:
-                conf = format(obj.confidence, ".2f")
-                x1 = obj.x1
-                y1 = obj.y1
-                x2 = obj.x2
-                y2 = obj.y2
-                color = obj.color
-                direction = obj.direction
+        for object_id in objects:
+            object_info = tracked_objects.get(object_id)
+            if object_info is not None:
+                confidence = format(object_info.confidence, ".2f")
+                x1 = object_info.x1
+                y1 = object_info.y1
+                x2 = object_info.x2
+                y2 = object_info.y2
+                color = object_info.color
+                direction = object_info.direction
 
-                # Dessine un rectangle autour de l'objet
                 cv2.rectangle(image, (x1, y1), (x2, y2), color, 2)
-                # Affiche l'identifiant et la direction de l'objet près de l'objet
-                text = f"{obj_id} - {conf}"
+                text = f"{object_id} - {confidence}"
                 if direction:
                     text += f" - ({direction})"
 
                 cv2.putText(image, text, (x1, y1 - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.7, color, 2)
 
-    # Affiche l'image modifiée à l'écran
     cv2.imshow("Video", image)
+
+
 
 
 def get_random_color(name_idx):
@@ -121,14 +112,14 @@ def detect(video_capture, classes, interval, show):
     """
     Fonction de détection
 
-    :param video_capture: objet cv2.VideoCapture pour la caméra
+    :param video_capture: Objet VideoCapture pour la caméra
     :param classes: type de détection (0: personnes, 1: vélos) ou liste de types
     :param interval: intervalle de temps entre chaque détection
     :param show: affichage de la détection (True/False) (optionnel)
     :return: None
     """
     log.info("Début de la détection")
-    model = yolov5.load('yolov5s.pt')
+    model = torch.hub.load('ultralytics/yolov5', 'yolov5s')
     model.classes = classes
     model.conf = 0.25
     model.iou = 0.45
@@ -136,6 +127,9 @@ def detect(video_capture, classes, interval, show):
     model.multi_label = True
     model.max_det = 20
     model.amp = True
+
+    # Initialisation de la librairie Sort pour suivre les personnes détectées
+    model_sort = sort.Sort()
 
     while video_capture.isOpened():
         success, frame = video_capture.read()
@@ -190,7 +184,8 @@ def detect(video_capture, classes, interval, show):
             log.debug("Nombre d'objets détectés: " + str(len(current)))
             # Suppression des éléments qui ne sont plus détectés par le programme.
             if len(tracked_objects.tracked_objects) > len(current):
-                log.debug("Suppression de " + str(len(tracked_objects.tracked_objects) - len(current)) + " objets non détectés")
+                log.debug("Suppression de " + str(
+                    len(tracked_objects.tracked_objects) - len(current)) + " objets non détectés")
                 for tracked_object in tracked_objects.tracked_objects:
                     if tracked_object.obj_id not in current:
                         tracked_objects.remove(tracked_object.obj_id)
@@ -207,7 +202,7 @@ def detect(video_capture, classes, interval, show):
 
         # affichage des images
         if show:
-            show_output(frame, current)
+            draw_bounding_boxes(frame, current)
             key = cv2.waitKey(10)
             if key == ord('q'):
                 break

@@ -70,7 +70,7 @@ python main.py
 Le programme sera lancé avec les paramètres par défaut.
 - source = 0
 - classes de détection = 0 (personne)
-- intervalle de détection = 0.2
+- intervalle de détection = 1
 - affichage = False
 - débug = False
 
@@ -81,8 +81,8 @@ Pour lancer le programme avec des paramètres personnalisés, modifiez le fichie
 source = 0
 # La valeur par défaut est 0 (personne)
 classes = 0
-# La valeur par défaut est 0.2, si vous voulez augmenter le temps entre chaque prise, augmentez la valeur
-interval = 0.2
+# La valeur par défaut est 1, si vous voulez augmenter le temps entre chaque prise, augmentez la valeur
+interval = 1
 # La valeur par défaut est False, si vous voulez activer l'affichage graphique, mettez True
 show = False
 # La valeur par défaut est False, si vous voulez activer l'affichage des messages, mettez True
