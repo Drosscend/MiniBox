@@ -141,12 +141,12 @@ def detect(video_capture, classes, interval, show):
 
         predictions = results.pred[0]
 
-        # Pour vérifier que la bibliothèque de suivi d'objets Sort fonctionne correctement
+        tracks = []
         try:
             # Utilisation de la librairie Sort pour suivre les personnes détectées
             track = model_sort.update(predictions)
         except Exception as e:
-            log.error("Erreur lors du suivi des objets avec la bibliothèque Sort: " + str(e))
+            log.error("Erreur lors du suivie des objets: " + str(e))
             continue
 
         # Enregistre les objets détectés
@@ -202,6 +202,10 @@ def detect(video_capture, classes, interval, show):
                 break
             elif key == -1:
                 continue
+
+        # except Exception as e:
+        #     log.error("Erreur lors du suivi des objets avec la bibliothèque Sort: " + str(e))
+        #     continue
 
     video_capture.release()
     cv.destroyAllWindows()
