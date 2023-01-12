@@ -3,7 +3,6 @@ import os
 import time
 
 import yolov5
-import numpy as np
 import cv2 as cv
 
 from Functions import TrackedObjects
@@ -140,27 +139,18 @@ def detect(video_capture, classes, interval, show):
             log.error("Erreur lors du traitement de l'image avec le modèle YOLOv5: " + str(e))
             continue
 
-        # Utilisation de la librairie Sort pour suivre les personnes détectées
-        # predictions = np.array(results.xyxy[0][:, :4])
-
         predictions = results.pred[0]
-        boxes = predictions[:, :4] # x1, y1, x2, y2
-        print(boxes)
-        scores = predictions[:, 4]
-        print(scores)
-        categories = predictions[:, 5]
-        print(categories)
 
         # Pour vérifier que la bibliothèque de suivi d'objets Sort fonctionne correctement
         try:
+            # Utilisation de la librairie Sort pour suivre les personnes détectées
             track = model_sort.update(predictions)
         except Exception as e:
             log.error("Erreur lors du suivi des objets avec la bibliothèque Sort: " + str(e))
             continue
 
-        # Détection des nouvelles personnes
+        # Enregistre les objets détectés
         current = []
-        new_detected = False
         for j in range(len(track.tolist())):
             # Récupère les informations sur l'objet
             coords = track.tolist()[j]
@@ -183,7 +173,6 @@ def detect(video_capture, classes, interval, show):
             if not found:
                 color = utils.random_color(obj_id)
                 tracked_objects.add(obj_id, conf, x1, y1, x2, y2, color)
-                new_detected = True
                 log.debug("Nouvel objet détecté: " + str(obj_id))
 
         if current:
@@ -197,6 +186,7 @@ def detect(video_capture, classes, interval, show):
         else:
             log.debug("Aucun objet détecté")
 
+        # Génération du fichier CSV
         generate_csv(current)
 
         # Pause entre chaque détection
