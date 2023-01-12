@@ -108,19 +108,19 @@ def get_random_color(name_idx):
     return r, g, b
 
 
-def detect(video_capture, classes, interval, show):
+def detect(video_capture, object_types, interval, display_detection):
     """
     Fonction de détection
 
     :param video_capture: Objet VideoCapture pour la caméra
-    :param classes: type de détection (0: personnes, 1: vélos) ou liste de types
+    :param object_types: type de détection (0: personnes, 1: vélos) ou liste de types
     :param interval: intervalle de temps entre chaque détection
-    :param show: affichage de la détection (True/False) (optionnel)
+    :param display_detection: affichage de la détection (True/False) (optionnel)
     :return: None
     """
     log.info("Début de la détection")
     model = torch.hub.load('ultralytics/yolov5', 'yolov5s')
-    model.classes = 0
+    model.classes = object_types
     model.conf = 0.25
     model.iou = 0.45
     model.agnostic = False
@@ -158,13 +158,13 @@ def detect(video_capture, classes, interval, show):
         current = []
         for j in range(len(track.tolist())):
             # Récupère les informations sur l'objet
-            coords = track.tolist()[j]
-            obj_id = int(coords[4])  # Identifiant de l'objet
+            tracked_object = track.tolist()[j]
+            obj_id = int(tracked_object[4])  # Identifiant de l'objet
             conf = results.xyxy[0][j][4]  # Confiance de l'objet
-            x1 = int(coords[0])
-            y1 = int(coords[1])
-            x2 = int(coords[2])
-            y2 = int(coords[3])
+            x1 = int(tracked_object[0])
+            y1 = int(tracked_object[1])
+            x2 = int(tracked_object[2])
+            y2 = int(tracked_object[3])
 
             current.append(obj_id)
 
@@ -201,7 +201,7 @@ def detect(video_capture, classes, interval, show):
             time.sleep(interval)
 
         # affichage des images
-        if show:
+        if display_detection:
             draw_bounding_boxes(frame, current)
             key = cv2.waitKey(10)
             if key == ord('q'):
@@ -214,7 +214,7 @@ def detect(video_capture, classes, interval, show):
     log.info("Detection terminée")
 
 
-def main(source, classes, interval, show):
+def main(source, classes, interval, display_detection):
     # Initialisation de la caméra
     video_capture = cv2.VideoCapture(source)
 
@@ -223,8 +223,8 @@ def main(source, classes, interval, show):
         log.error("Impossible d'ouvrir la source, verifier le fichier de configuration")
         return
 
-    if show:
+    if display_detection:
         log.info("Pour quitter l'application, appuyez sur la touche 'q'")
 
     # Détection des personnes
-    detect(video_capture, classes, interval, show)
+    detect(video_capture, classes, interval, display_detection)
