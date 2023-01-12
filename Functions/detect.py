@@ -3,12 +3,10 @@ import os
 import time
 
 import yolov5
-import numpy as np
 import cv2 as cv
 from deep_sort_realtime.deepsort_tracker import DeepSort
 
 from Functions import TrackedObjects
-from Functions import sort
 from Functions import utils
 
 log = logging.getLogger("main")
@@ -165,11 +163,11 @@ def detect(video_capture, classes, interval, show):
             # Détection des nouvelles personnes
             for j in range(len(tracks)):
                 # Récupère les informations sur l'objet
-                coords = tracks[j].to_tlbr()
-                x1 = int(coords[0])
-                y1 = int(coords[1])
-                x2 = int(coords[2])
-                y2 = int(coords[3])
+                boxes = predictions[:, :4]
+                x1 = int(boxes[j][0])
+                y1 = int(boxes[j][1])
+                x2 = int(boxes[j][2])
+                y2 = int(boxes[j][3])
                 obj_id = tracks[j].track_id
                 conf = scores[j]
 
