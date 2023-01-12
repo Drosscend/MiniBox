@@ -1,13 +1,12 @@
 import logging
 import os
 import time
-
+import random
 import yolov5
 import cv2 as cv
 
 from Functions import TrackedObjects
 from Functions import sort
-from Functions import utils
 
 log = logging.getLogger("main")
 
@@ -42,16 +41,15 @@ def generate_csv(current):
     # Parcours de la liste des identifiants d'objets
     for obj_id in current:
         obj = tracked_objects.get(obj_id)
-        if obj.direction is None:
-            continue
-        if obj.direction == "top-left":
-            top_left += 1
-        elif obj.direction == "top-right":
-            top_right += 1
-        elif obj.direction == "bottom-left":
-            bottom_left += 1
-        elif obj.direction == "bottom-right":
-            bottom_right += 1
+        if obj is not None:
+            if obj.direction == "top-left":
+                top_left += 1
+            elif obj.direction == "top-right":
+                top_right += 1
+            elif obj.direction == "bottom-left":
+                bottom_left += 1
+            elif obj.direction == "bottom-right":
+                bottom_right += 1
 
     # enregistrement des données dans un fichier csv
     try:
@@ -84,25 +82,39 @@ def show_output(image, current):
         for obj_id in current:
             # Récupère les informations sur l'objet
             obj = tracked_objects.get(obj_id)  # Objet suivi
-            conf = format(obj.confidence, ".2f")
-            x1 = obj.x1
-            y1 = obj.y1
-            x2 = obj.x2
-            y2 = obj.y2
-            color = obj.color
-            direction = obj.direction
+            if obj is not None:
+                conf = format(obj.confidence, ".2f")
+                x1 = obj.x1
+                y1 = obj.y1
+                x2 = obj.x2
+                y2 = obj.y2
+                color = obj.color
+                direction = obj.direction
 
-            # Dessine un rectangle autour de l'objet
-            cv.rectangle(image, (x1, y1), (x2, y2), color, 2)
-            # Affiche l'identifiant et la direction de l'objet près de l'objet
-            text = f"{obj_id} - {conf}"
-            if direction:
-                text += f" - ({direction})"
+                # Dessine un rectangle autour de l'objet
+                cv.rectangle(image, (x1, y1), (x2, y2), color, 2)
+                # Affiche l'identifiant et la direction de l'objet près de l'objet
+                text = f"{obj_id} - {conf}"
+                if direction:
+                    text += f" - ({direction})"
 
-            cv.putText(image, text, (x1, y1 - 5), cv.FONT_HERSHEY_SIMPLEX, 0.7, color, 2)
+                cv.putText(image, text, (x1, y1 - 5), cv.FONT_HERSHEY_SIMPLEX, 0.7, color, 2)
 
     # Affiche l'image modifiée à l'écran
     cv.imshow('Video', image)
+
+
+def get_random_color(name_idx):
+    """
+    Génère une couleur aléatoire pour chaque personne
+    :param name_idx: identifiant
+    :return: couleur aléatoire
+    """
+    random.seed(name_idx)
+    r = random.randint(0, 255)
+    g = random.randint(0, 255)
+    b = random.randint(0, 255)
+    return r, g, b
 
 
 def detect(video_capture, classes, interval, show):
@@ -141,7 +153,6 @@ def detect(video_capture, classes, interval, show):
 
         predictions = results.pred[0]
 
-        tracks = []
         try:
             # Utilisation de la librairie Sort pour suivre les personnes détectées
             track = model_sort.update(predictions)
@@ -171,7 +182,7 @@ def detect(video_capture, classes, interval, show):
                     tracked_object.update_position(conf, x1, y1, x2, y2)
                     break
             if not found:
-                color = utils.random_color(obj_id)
+                color = get_random_color(obj_id)
                 tracked_objects.add(obj_id, conf, x1, y1, x2, y2, color)
                 log.debug("Nouvel objet détecté: " + str(obj_id))
 
