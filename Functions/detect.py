@@ -116,7 +116,7 @@ def detect(video_capture, classes, interval, show):
     :return: None
     """
     log.info("Début de la détection")
-    model = yolov5.load('yolov5l.pt')
+    model = yolov5.load('yolov5s.pt')
     model.classes = classes
     model.conf = 0.25
     model.iou = 0.45
