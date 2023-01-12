@@ -159,41 +159,45 @@ def detect(video_capture, classes, interval, show):
             log.error("Erreur lors du suivie des objets: " + str(e))
             continue
 
-        # Détection des nouvelles personnes
-        for j in range(len(tracks)):
-            # Récupère les informations sur l'objet
-            coords = tracks[j].to_tlbr()
-            x1 = int(coords[0])
-            y1 = int(coords[1])
-            x2 = int(coords[2])
-            y2 = int(coords[3])
-            obj_id = tracks[j].track_id
-            conf = scores[j]
 
-            # Si l'objet n'a pas encore été suivi, c'est un nouvel objet
-            found = False
-            for tracked_object in tracked_objects.tracked_objects:
-                if tracked_object.obj_id == obj_id:
-                    found = True
-                    tracked_object.update_position(conf, x1, y1, x2, y2)
-                    break
-            if not found:
-                color = utils.random_color(obj_id)
-                tracked_objects.add(obj_id, conf, x1, y1, x2, y2, color)
-                log.debug("Nouvel objet détecté: " + str(obj_id))
-
+        current = []
         if tracks:
-            log.debug("Nombre d'objets détectés: " + str(len(tracks)))
-            # Suppression des éléments qui ne sont plus détectés par le programme.
-            if len(tracked_objects.tracked_objects) > len(tracks):
-                log.debug("Suppression de " + str(len(tracked_objects.tracked_objects) - len(tracks)) + " objets non détectés")
+            # Détection des nouvelles personnes
+            for j in range(len(tracks)):
+                # Récupère les informations sur l'objet
+                coords = tracks[j].to_tlbr()
+                x1 = int(coords[0])
+                y1 = int(coords[1])
+                x2 = int(coords[2])
+                y2 = int(coords[3])
+                obj_id = tracks[j].track_id
+                conf = scores[j]
+
+                current.append(obj_id)
+
+                # Si l'objet n'a pas encore été suivi, c'est un nouvel objet
+                found = False
                 for tracked_object in tracked_objects.tracked_objects:
-                    if tracked_object.obj_id not in tracks:
-                        tracked_objects.remove(tracked_object.obj_id)
+                    if tracked_object.obj_id == obj_id:
+                        found = True
+                        tracked_object.update_position(conf, x1, y1, x2, y2)
+                        break
+                if not found:
+                    color = utils.random_color(obj_id)
+                    tracked_objects.add(obj_id, conf, x1, y1, x2, y2, color)
+                    log.debug("Nouvel objet détecté: " + str(obj_id))
+            if current:
+                log.debug("Nombre d'objets détectés: " + str(len(current)))
+                # Suppression des éléments qui ne sont plus détectés par le programme.
+                if len(tracked_objects.tracked_objects) > len(current):
+                    log.debug("Suppression de " + str(len(tracked_objects.tracked_objects) - len(current)) + " objets non détectés")
+                    for tracked_object in tracked_objects.tracked_objects:
+                        if tracked_object.obj_id not in current:
+                            tracked_objects.remove(tracked_object.obj_id)
         else:
             log.debug("Aucun objet détecté")
 
-        generate_csv(tracks)
+        generate_csv(current)
 
         # Pause entre chaque détection
         if interval > 0:
@@ -202,7 +206,7 @@ def detect(video_capture, classes, interval, show):
 
         # affichage des images
         if show:
-            show_output(frame, tracks)
+            show_output(frame, current)
             key = cv.waitKey(10)
             if key == ord('q'):
                 break
