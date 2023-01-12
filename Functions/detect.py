@@ -113,11 +113,20 @@ def detect(video_capture, object_types, interval, display_detection):
     Fonction de détection
 
     :param video_capture: Objet VideoCapture pour la caméra
-    :param object_types: type de détection (0: personnes, 1: vélos) ou liste de types
+    :param object_types: type de détection (0: personnes, 1: vélos, ...)
     :param interval: intervalle de temps entre chaque détection
     :param display_detection: affichage de la détection (True/False) (optionnel)
     :return: None
     """
+
+    # Vérifier si les paramètres ont des valeurs valides
+    if not isinstance(object_types, int) or object_types < 0:
+        raise ValueError(f"Type d'objet non valide: {object_types}")
+    if not isinstance(interval, float) or interval < 0:
+        raise ValueError("Intervalle non valide")
+    if not isinstance(display_detection, bool):
+        raise ValueError("Affichage de la détection non valide")
+
     log.info("Début de la détection")
     model = torch.hub.load('ultralytics/yolov5', 'yolov5s')
     model.classes = object_types
@@ -142,7 +151,7 @@ def detect(video_capture, object_types, interval, display_detection):
         try:
             results = model(frame)
         except Exception as e:
-            log.error("Erreur lors du traitement de l'image avec le modèle YOLOv5: " + str(e))
+            log.error("Erreur lors du traitement de l'image avec le modèle YOLOv5: {}".format(e))
             continue
 
         predictions = results.pred[0]
@@ -151,7 +160,7 @@ def detect(video_capture, object_types, interval, display_detection):
             # Utilisation de la librairie Sort pour suivre les personnes détectées
             track = model_sort.update(predictions)
         except Exception as e:
-            log.error("Erreur lors du suivie des objets: " + str(e))
+            log.error("Erreur lors du suivie des objets: {}".format(e))
             continue
 
         # Enregistre les objets détectés
@@ -159,48 +168,34 @@ def detect(video_capture, object_types, interval, display_detection):
         for j in range(len(track.tolist())):
             # Récupère les informations sur l'objet
             tracked_object = track.tolist()[j]
-            obj_id = int(tracked_object[4])  # Identifiant de l'objet
-            conf = results.xyxy[0][j][4]  # Confiance de l'objet
-            x1 = int(tracked_object[0])
-            y1 = int(tracked_object[1])
-            x2 = int(tracked_object[2])
-            y2 = int(tracked_object[3])
+            object_id = int(tracked_object[4])
+            object_conf = results.xyxy[0][j][4]
+            object_x1 = int(tracked_object[0])
+            object_y1 = int(tracked_object[1])
+            object_x2 = int(tracked_object[2])
+            object_y2 = int(tracked_object[3])
 
-            current.append(obj_id)
+            current.append(object_id)
 
             # Si l'objet n'a pas encore été suivi, c'est un nouvel objet
             found = False
             for tracked_object in tracked_objects.tracked_objects:
-                if tracked_object.obj_id == obj_id:
+                if tracked_object.obj_id == object_id:
                     found = True
-                    tracked_object.update_position(conf, x1, y1, x2, y2)
+                    tracked_object.update_position(object_conf, object_x1, object_y1, object_x2, object_y2)
                     break
             if not found:
-                color = get_random_color(obj_id)
-                tracked_objects.add(obj_id, conf, x1, y1, x2, y2, color)
-                log.debug("Nouvel objet détecté: " + str(obj_id))
+                color = get_random_color(object_id)
+                tracked_objects.add(object_id, object_conf, object_x1, object_y1, object_x2, object_y2, color)
+                log.debug("Nouvel objet détecté: {}".format(object_id))
 
-        if current:
-            log.debug("Nombre d'objets détectés: " + str(len(current)))
-            # Suppression des éléments qui ne sont plus détectés par le programme.
-            if len(tracked_objects.tracked_objects) > len(current):
-                log.debug("Suppression de " + str(
-                    len(tracked_objects.tracked_objects) - len(current)) + " objets non détectés")
-                for tracked_object in tracked_objects.tracked_objects:
-                    if tracked_object.obj_id not in current:
-                        tracked_objects.remove(tracked_object.obj_id)
-        else:
-            log.debug("Aucun objet détecté")
+        # Supprime les objets qui n'ont pas été détectés dans le frame courant
+        for tracked_object in tracked_objects.tracked_objects:
+            if tracked_object.obj_id not in current:
+                tracked_objects.remove(tracked_object.obj_id)
+                log.debug("Suppression de l'objet: {}".format(tracked_object.obj_id))
 
-        # Génération du fichier CSV
-        generate_csv(current)
-
-        # Pause entre chaque détection
-        if interval > 0:
-            log.debug("Pause de " + str(interval) + " secondes")
-            time.sleep(interval)
-
-        # affichage des images
+        # affichage des images si spécifié
         if display_detection:
             draw_bounding_boxes(frame, current)
             key = cv2.waitKey(10)
@@ -208,6 +203,14 @@ def detect(video_capture, object_types, interval, display_detection):
                 break
             elif key == -1:
                 continue
+
+        # Génération du fichier CSV
+        generate_csv(current)
+
+        # Pause entre chaque détection si spécifiée
+        if interval > 0:
+            log.debug("Pause de " + str(interval) + " secondes")
+            time.sleep(interval)
 
     video_capture.release()
     cv2.destroyAllWindows()
