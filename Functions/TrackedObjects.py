@@ -21,7 +21,15 @@ CALCUL_DIRECTION_NB_POSITIONS = 4  # Nombre de positions à prendre en compte po
 SPEED_THRESHOLD = 10  # Vitesse minimale pour que la direction soit prise en compte
 
 
-def calculate_direction(positions):
+def calculate_direction(positions: list):
+    """Calcul la direction de l'objet en fonction des positions enregistrées.
+
+    Args:
+        positions (list(int,int,int,int)): tableau de positions (x1, y1, x2, y2)
+
+    Returns:
+        string: direction de l'objet
+    """
     total_distance = 0
     total_dx = 0
     total_dy = 0
@@ -56,7 +64,9 @@ def calculate_direction(positions):
 
 
 class TrackedObject:
-    def __init__(self, obj_id, confidence, x1, y1, x2, y2, color):
+    """Classe représentant un objet suivi dans une vidéo.
+    """
+    def __init__(self, obj_id:int, confidence:float, x1:int, y1:int, x2:int, y2:int, color:tuple):
         self.obj_id = obj_id
         self.confidence = confidence
         self.x1 = x1
@@ -67,7 +77,16 @@ class TrackedObject:
         self.positions = [(x1, y1, x2, y2)]
         self.direction = None
 
-    def update_position(self, confidence, x1, y1, x2, y2):
+    def update_position(self, confidence:float, x1:int, y1:int, x2:int, y2:int):
+        """Mise à jour de la position de l'objet.
+
+        Args:
+            confidence (float): confiance de l'objet
+            x1 (int): coordonnée x du point en haut à gauche du rectangle englobant l'objet
+            y1 (int): coordonnée y du point en haut à gauche du rectangle englobant l'objet
+            x2 (int): coordonnée x du point en bas à droite du rectangle englobant l'objet
+            y2 (int): coordonnée y du point en bas à droite du rectangle englobant l'objet
+        """
         self.confidence = confidence
         self.x1 = x1
         self.y1 = y1
@@ -79,10 +98,17 @@ class TrackedObject:
             self.set_direction()
 
     def set_direction(self):
+        """Calcule la direction de l'objet en fonction des positions enregistrées.
+        """
         direction = calculate_direction(self.positions)
         self.direction = direction
 
     def __str__(self):
+        """Affichage de l'objet.
+
+        Returns:
+            string: description de l'objet
+        """
         direction = self.direction
         text = f"\n id: {self.obj_id},\n Confidence: {self.confidence},\n positions: {self.x1}, {self.y1}, " \
                f"{self.x2}, {self.y2},\n couleur: {self.color}"
@@ -92,20 +118,46 @@ class TrackedObject:
 
 
 class TrackedObjects:
+    """Classe représentant un ensemble d'objets suivi dans une vidéo.
+    """
     def __init__(self):
         self.tracked_objects = []
 
-    def add(self, obj_id, confidence, x1, y1, x2, y2, color):
+    def add(self, obj_id:int, confidence:float, x1:int, y1:int, x2:int, y2:int, color:tuple):
+        """Ajoute un objet à la liste des objets suivis.
+
+        Args:
+            obj_id (int): identifiant de l'objet
+            confidence (float): confiance de l'objet
+            x1 (int): coordonnée x du point en haut à gauche du rectangle englobant l'objet
+            y1 (int): coordonnée y du point en haut à gauche du rectangle englobant l'objet
+            x2 (int): coordonnée x du point en bas à droite du rectangle englobant l'objet
+            y2 (int): coordonnée y du point en bas à droite du rectangle englobant l'objet
+            color (tuple(int,int,int)): couleur de l'objet
+        """
         tracked_object = TrackedObject(obj_id, confidence, x1, y1, x2, y2, color)
         self.tracked_objects.append(tracked_object)
 
-    def get(self, obj_id):
+    def get(self, obj_id:int):
+        """Retourne l'objet correspondant à l'identifiant.
+
+        Args:
+            obj_id (int): identifiant de l'objet
+
+        Returns:
+            TrackedObject: objet correspondant à l'identifiant
+        """
         for tracked_object in self.tracked_objects:
             if tracked_object.obj_id == obj_id:
                 return tracked_object
         return None
 
-    def remove(self, obj_id):
+    def remove(self, obj_id:int):
+        """Supprime l'objet correspondant à l'identifiant.
+
+        Args:
+            obj_id (int): identifiant de l'objet
+        """
         for i, tracked_object in enumerate(self.tracked_objects):
             if tracked_object.obj_id == obj_id:
                 del self.tracked_objects[i]
