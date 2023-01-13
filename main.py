@@ -11,9 +11,6 @@ ch.setLevel('INFO')
 ch.setFormatter(CustomFormatter())
 log.addHandler(ch)
 
-config = configparser.ConfigParser()
-config.read('config.ini')
-
 ####################################
 
 # Créer un parseur d'arguments

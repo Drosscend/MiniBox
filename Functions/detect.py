@@ -19,7 +19,7 @@ CSV_FILE_NAME = 'OUTPUT/data.csv'
 tracked_objects = TrackedObjects.TrackedObjects()
 
 
-def generate_csv(current):
+def generate_csv(current: list[int]):
     """Enregistre les résultat de la détection dans un fichier CSV.
 
     Args:
@@ -62,19 +62,19 @@ def generate_csv(current):
         log.warning("Erreur lors de l'écriture dans le fichier CSV: " + str(e))
 
 
-def draw_bounding_boxes(image, objects):
+def draw_bounding_boxes(image, current: list[int]):
     """Dessine des boîtes englobantes autour des objets détectés et affiche leurs ID, leurs confidence et leurs directions
 
     Args:
         image (frame): Image à afficher
-        objects (list): Liste des objets détectés
+        current (list): Liste des objets détectés
     """
 
     # Si aucun objet n'a été détecté
-    if not objects:
+    if not current:
         cv2.putText(image, "Aucun objet detecte", (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
     else:
-        for object_id in objects:
+        for object_id in current:
             object_info = tracked_objects.get(object_id)
             if object_info is not None:
                 confidence = format(object_info.confidence, ".2f")
@@ -95,7 +95,7 @@ def draw_bounding_boxes(image, objects):
     cv2.imshow("Video", image)
 
 
-def get_random_color(name_idx):
+def get_random_color(name_idx:int):
     """Génère une couleur aléatoire pour chaque personne
 
     Args:
@@ -111,7 +111,7 @@ def get_random_color(name_idx):
     return r, g, b
 
 
-def detect(video_capture, object_types, interval, display_detection):
+def detect(video_capture, object_types:int, interval:int, display_detection:bool):
     """Fonction de détection
 
     Args:
@@ -122,7 +122,7 @@ def detect(video_capture, object_types, interval, display_detection):
 
     Raises:
         ValueError: Type d'objet non valide
-        ValueError: Interval non valide
+        ValueError: Intervalle non valide
         ValueError: Affichage de la détection non valide
     """
 
@@ -202,6 +202,11 @@ def detect(video_capture, object_types, interval, display_detection):
                 tracked_objects.remove(tracked_object.obj_id)
                 log.debug("Suppression de l'objet: {}".format(tracked_object.obj_id))
 
+        # Pause entre chaque détection si spécifiée
+        if interval > 0:
+            log.debug("Pause de " + str(interval) + " secondes")
+            time.sleep(interval)
+
         # affichage des images si spécifié
         if display_detection:
             draw_bounding_boxes(frame, current)
@@ -213,11 +218,6 @@ def detect(video_capture, object_types, interval, display_detection):
 
         # Génération du fichier CSV
         generate_csv(current)
-
-        # Pause entre chaque détection si spécifiée
-        if interval > 0:
-            log.debug("Pause de " + str(interval) + " secondes")
-            time.sleep(interval)
 
     video_capture.release()
     cv2.destroyAllWindows()
