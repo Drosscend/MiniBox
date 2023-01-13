@@ -90,7 +90,13 @@ def draw_bounding_boxes(image, current: list[int]):
                 if direction:
                     text += f" - ({direction})"
 
-                cv2.putText(image, text, (x1, y1 - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.7, color, 2)
+                text_color = (255, 255, 255)
+                font = cv2.FONT_HERSHEY_SIMPLEX
+                text_size = cv2.getTextSize(text, font, 0.7, 2)[0]
+                text_x = x1 + 4
+                text_w = text_size[0] + 10
+                cv2.rectangle(image, (text_x-5, y1-25), (text_x + text_w, y1), color, -1)
+                cv2.putText(image, text, (text_x, y1-5), font, 0.7, text_color, 2)
 
     cv2.imshow("Video", image)
 
@@ -138,12 +144,12 @@ def detect(video_capture, object_types:int, interval:int, display_detection:bool
     # load pretrained model
     model = yolov5.load('yolov5s.pt')
     model.classes = object_types
-    model.conf = 0.25
-    model.iou = 0.45
-    model.agnostic = False
-    model.multi_label = True
-    model.max_det = 20
-    model.amp = True
+    model.conf = 0.25  # NMS confidence threshold
+    model.iou = 0.45  # NMS IoU threshold
+    model.agnostic = False  # NMS class-agnostic
+    model.multi_label = True  # NMS multiple labels per box
+    model.max_det = 50  # maximum number of detections per image
+    model.amp = True  # Automatic Mixed Precision (AMP) inference
 
     # Initialisation de la librairie Sort pour suivre les personnes détectées
     model_sort = sort.Sort()
