@@ -20,12 +20,12 @@ tracked_objects = TrackedObjects.TrackedObjects()
 
 
 def generate_csv(current):
-    """
-    Enregistre les résultats de la détection dans un fichier CSV.
+    """Enregistre les résultat de la détection dans un fichier CSV.
 
-    :param current: Liste des identifiants des personnes détectées
-    :return: None
+    Args:
+        current (list): Liste des identifiants des personnes détectées
     """
+
 
     # verifie que le dosser OUTPUT existe et le crée si ce n'est pas le cas
     if not os.path.exists("OUTPUT"):
@@ -63,11 +63,11 @@ def generate_csv(current):
 
 
 def draw_bounding_boxes(image, objects):
-    """
-    Dessine des boîtes englobantes autour des objets détectés et affiche leurs ID, leurs confidence et leurs directions
+    """Dessine des boîtes englobantes autour des objets détectés et affiche leurs ID, leurs confidence et leurs directions
 
-    :param image: Image à afficher
-    :param objects: Liste des objets détectés
+    Args:
+        image (frame): Image à afficher
+        objects (list): Liste des objets détectés
     """
 
     # Si aucun objet n'a été détecté
@@ -96,10 +96,13 @@ def draw_bounding_boxes(image, objects):
 
 
 def get_random_color(name_idx):
-    """
-    Génère une couleur aléatoire pour chaque personne
-    :param name_idx: identifiant
-    :return: couleur aléatoire
+    """Génère une couleur aléatoire pour chaque personne
+
+    Args:
+        name_idx (int): Identifiant de la personne
+
+    Returns:
+        tuple: tuple contenant les valeurs RGB de la couleur
     """
     random.seed(name_idx)
     r = random.randint(0, 255)
@@ -109,14 +112,18 @@ def get_random_color(name_idx):
 
 
 def detect(video_capture, object_types, interval, display_detection):
-    """
-    Fonction de détection
+    """Fonction de détection
 
-    :param video_capture: Objet VideoCapture pour la caméra
-    :param object_types: type de détection (0: personnes, 1: vélos, ...)
-    :param interval: intervalle de temps entre chaque détection
-    :param display_detection: affichage de la détection (True/False) (optionnel)
-    :return: None
+    Args:
+        video_capture (VideoCapture): Objet VideoCapture pour la caméra
+        object_types (int): type de détection (0: personnes, 1: vélos, ...)
+        interval (float): intervalle de temps entre chaque détection
+        display_detection (bool): affichage de la détection (True/False) (optionnel)
+
+    Raises:
+        ValueError: Type d'objet non valide
+        ValueError: Interval non valide
+        ValueError: Affichage de la détection non valide
     """
 
     # Vérifier si les paramètres ont des valeurs valides
@@ -218,6 +225,14 @@ def detect(video_capture, object_types, interval, display_detection):
 
 
 def main(source, classes, interval, display_detection):
+    """fonction principale de l'application
+
+    Args:
+        source (int): id de la caméra
+        classes (int): type de détection (0: personnes, 1: vélos, ...)
+        interval (float): intervalle de temps entre chaque détection
+        display_detection (bool): affichage de la détection (True/False) (optionnel)
+    """
     # Initialisation de la caméra
     video_capture = cv2.VideoCapture(source)
 
@@ -230,4 +245,9 @@ def main(source, classes, interval, display_detection):
         log.info("Pour quitter l'application, appuyez sur la touche 'q'")
 
     # Détection des personnes
-    detect(video_capture, classes, interval, display_detection)
+    try:
+        detect(video_capture, classes, interval, display_detection)
+    except ValueError as e:
+        log.error("Erreur lors de la détection: {}".format(e))
+    except Exception as e:
+        log.error("Erreur lors de la détection: {}".format(e))
