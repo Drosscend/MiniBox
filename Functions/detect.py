@@ -6,7 +6,7 @@ import csv
 from datetime import datetime
 
 import cv2
-import torch
+import yolov5
 
 from Functions import TrackedObjects
 from Functions import sort
@@ -135,7 +135,8 @@ def detect(video_capture, object_types:int, interval:int, display_detection:bool
         raise ValueError("Affichage de la détection non valide")
 
     log.info("Début de la détection")
-    model = torch.hub.load('ultralytics/yolov5', 'yolov5s')
+    # load pretrained model
+    model = yolov5.load('yolov5s.pt')
     model.classes = object_types
     model.conf = 0.25
     model.iou = 0.45
