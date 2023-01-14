@@ -26,7 +26,6 @@ def generate_csv(current: list[int]):
         current (list): Liste des identifiants des personnes détectées
     """
 
-
     # verifie que le dosser OUTPUT existe et le crée si ce n'est pas le cas
     if not os.path.exists("OUTPUT"):
         os.makedirs("OUTPUT")
@@ -63,7 +62,8 @@ def generate_csv(current: list[int]):
 
 
 def draw_bounding_boxes(image, current: list[int]):
-    """Dessine des boîtes englobantes autour des objets détectés et affiche leurs ID, leurs confidence et leurs directions
+    """Dessine des boîtes englobantes autour des objets détectés et affiche leurs ID, leurs confidence et leurs
+    directions
 
     Args:
         image (frame): Image à afficher
@@ -95,13 +95,13 @@ def draw_bounding_boxes(image, current: list[int]):
                 text_size = cv2.getTextSize(text, font, 0.7, 2)[0]
                 text_x = x1 + 4
                 text_w = text_size[0] + 10
-                cv2.rectangle(image, (text_x-5, y1-25), (text_x + text_w, y1), color, -1)
-                cv2.putText(image, text, (text_x, y1-5), font, 0.7, text_color, 2)
+                cv2.rectangle(image, (text_x - 5, y1 - 25), (text_x + text_w, y1), color, -1)
+                cv2.putText(image, text, (text_x, y1 - 5), font, 0.7, text_color, 2)
 
     cv2.imshow("Video", image)
 
 
-def get_random_color(name_idx:int):
+def get_random_color(name_idx: int):
     """Génère une couleur aléatoire pour chaque personne
 
     Args:
@@ -117,7 +117,7 @@ def get_random_color(name_idx:int):
     return r, g, b
 
 
-def detect(video_capture, object_types:int, interval:int, display_detection:bool):
+def detect(video_capture, object_types: int, interval: float, display_detection: bool):
     """Fonction de détection
 
     Args:

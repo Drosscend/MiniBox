@@ -27,11 +27,13 @@ expected_sections = ['PARAMS']
 expected_options = {'PARAMS': ['source', 'classes', 'interval', 'display_detection', 'debug']}
 for section in expected_sections:
     if not config.has_section(section):
-        log.error("Erreur : section {} attendue dans le fichier de configuration".format(section))
+        log.error("Erreur : section {} attendue dans le fichier de configuration"
+                  .format(section))
         exit(1)
     for option in expected_options[section]:
         if not config.has_option(section, option):
-            log.error("Erreur : option {} attendue dans la section {} du fichier de configuration".format(option, section))
+            log.error("Erreur : option {} attendue dans la section {} du fichier de configuration"
+                      .format(option, section))
             exit(1)
 
 
@@ -56,7 +58,8 @@ except ValueError:
 try:
     display_detection = config.getboolean('PARAMS', 'display_detection')
 except ValueError:
-    log.error("Erreur : la valeur de l'option display_detection doit être un boolean, verifier le fichier de configuration")
+    log.error("Erreur : la valeur de l'option display_detection doit être un boolean, verifier le fichier de "
+              "configuration")
     exit(1)
 
 try:
