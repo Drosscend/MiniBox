@@ -1,8 +1,8 @@
+import csv
 import logging
 import os
 import random
 import time
-import csv
 from datetime import datetime
 
 import cv2
