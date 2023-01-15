@@ -20,12 +20,13 @@
 """
 
 import numpy as np
+import torch
 from filterpy.kalman import KalmanFilter
 
 np.random.seed(0)
 
 
-def iou_batch(bb_test, bb_gt):
+def iou_batch(bb_test: torch.Tensor, bb_gt: np.ndarray) -> np.ndarray:
     """
     From SORT: Computes IOU between two bboxes in the form [x1,y1,x2,y2]
     """
@@ -44,7 +45,7 @@ def iou_batch(bb_test, bb_gt):
     return o
 
 
-def convert_bbox_to_z(bbox):
+def convert_bbox_to_z(bbox: torch.Tensor) -> np.ndarray:
     """
     Takes a bounding box in the form [x1,y1,x2,y2] and returns z in the form
       [x,y,s,r] where x,y is the centre of the box and s is the scale/area and r is
@@ -59,17 +60,14 @@ def convert_bbox_to_z(bbox):
     return np.array([x, y, s, r]).reshape((4, 1))
 
 
-def convert_x_to_bbox(x, score=None):
+def convert_x_to_bbox(x: np.ndarray) -> np.ndarray:
     """
     Takes a bounding box in the centre form [x,y,s,r] and returns it in the form
       [x1,y1,x2,y2] where x1,y1 is the top left and x2,y2 is the bottom right
     """
     w = np.sqrt(x[2] * x[3])
     h = x[2] / w
-    if score is None:
-        return np.array([x[0] - w / 2., x[1] - h / 2., x[0] + w / 2., x[1] + h / 2.]).reshape((1, 4))
-    else:
-        return np.array([x[0] - w / 2., x[1] - h / 2., x[0] + w / 2., x[1] + h / 2., score]).reshape((1, 5))
+    return np.array([x[0] - w / 2., x[1] - h / 2., x[0] + w / 2., x[1] + h / 2.]).reshape((1, 4))
 
 
 class KalmanBoxTracker(object):
@@ -78,7 +76,7 @@ class KalmanBoxTracker(object):
     """
     count = 0
 
-    def __init__(self, params):
+    def __init__(self, params: torch.Tensor) -> None:
         """
         Initialises a tracker using initial bounding box.
         """
@@ -107,7 +105,7 @@ class KalmanBoxTracker(object):
         self.obj_confidence = params[4]
         self.obj_class = params[5]
 
-    def update(self, params):
+    def update(self, params: torch.Tensor) -> None:
         """
         Updates the state vector with observed bbox.
         """
@@ -119,7 +117,7 @@ class KalmanBoxTracker(object):
         self.obj_confidence = params[4]
         self.obj_class = params[5]
 
-    def predict(self):
+    def predict(self) -> np.ndarray:
         """
         Advances the state vector and returns the predicted bounding box estimate.
         """
@@ -133,19 +131,20 @@ class KalmanBoxTracker(object):
         self.history.append(convert_x_to_bbox(self.kf.x))
         return self.history[-1]
 
-    def get_state(self):
+    def get_state(self) -> np.ndarray:
         """
         Returns the current bounding box estimate.
         """
         return convert_x_to_bbox(self.kf.x)
 
 
-def associate_detections_to_trackers(detections, trackers, iou_threshold=0.3):
+def associate_detections_to_trackers(detections: torch.Tensor, trackers: np.ndarray, iou_threshold: float = 0.3) -> \
+        tuple[np.ndarray, np.ndarray, np.ndarray]:
     """Assigne les détections aux objets suivis (les deux représentés sous forme de boîtes englobantes)
 
     Args:
-        detections (list): liste des détections
-        trackers (list): liste des objets suivis
+        detections (torch.Tensor): liste des détections
+        trackers (numpy.ndarray): liste des objets suivis
         iou_threshold (float) : Seuil de similarité IOU pour l'association entre les détections et les trackers
 
     Returns:
@@ -188,7 +187,7 @@ def associate_detections_to_trackers(detections, trackers, iou_threshold=0.3):
 
 
 class Sort(object):
-    def __init__(self, max_age=1, min_hits=3, iou_threshold=0.3):
+    def __init__(self, max_age: int = 1, min_hits: int = 3, iou_threshold: float = 0.3) -> None:
         """Initialise les paramètres clés pour SORT
 
         Args:
@@ -203,11 +202,11 @@ class Sort(object):
         self.trackers = []
         self.frame_count = 0
 
-    def update(self, dets=np.empty((0, 6))):
+    def update(self, dets: torch.Tensor = np.empty((0, 6))) -> np.ndarray:
         """Met à jour les trackers en utilisant les détections fournies
 
         Args:
-            dets (list): Tableau des détections au format [[x1, y1, x2, y2, confidence, classe], ...]
+            dets (torch.Tensor): Tableau des détections au format [[x1, y1, x2, y2, confidence, classe], ...]
             Cette méthode doit être appelée pour chaque frame, même avec des détections vides
             (par défaut np.empty((0, 6)))
 
