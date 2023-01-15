@@ -69,7 +69,7 @@ python main.py
 
 Le programme sera lancé avec les paramètres par défaut.
 - source = 0
-- classes de détection = 0 (personne)
+- classes de détection = 0 et 1 (personne et vélo)
 - intervalle de détection = 1
 - affichage = False
 - débug = False
@@ -77,21 +77,21 @@ Le programme sera lancé avec les paramètres par défaut.
 Pour lancer le programme avec des paramètres personnalisés, modifiez le fichier config.ini
 ```ini
 [PARAMS]
-# La valeur par défaut est 0
+# La valeur par défaut est `0`
 source = 0
-# La valeur par défaut est 0 (personne)
-classes = 0
-# La valeur par défaut est 1, si vous voulez augmenter le temps entre chaque prise, augmentez la valeur
-interval = 1
-# La valeur par défaut est False, si vous voulez activer l'affichage graphique, mettez True
+# La valeur par défaut est `0,1` (personne, vélo)
+classes = 0,1
+# La valeur par défaut est `1`, si vous voulez augmenter le temps entre chaque prise, augmentez la valeur
+interval = 0
+# La valeur par défaut est `False`, si vous voulez activer l'affichage graphique, mettez `True`
 display_detection = False
-# La valeur par défaut est False, si vous voulez activer l'affichage des messages, mettez True
+# La valeur par défaut est `False`, si vous voulez activer l'affichage des messages, mettez `True`
 debug = False
 ```
 
 Vous pouvez fournir un fichier de configuration personnalisé en utilisant l'option -c ou --config :
 ```bash
-python main.py -c config.ini
+python main.py -c custom_config.ini
 ```
 
 </details>

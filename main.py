@@ -44,9 +44,9 @@ except ValueError:
     exit(1)
 
 try:
-    classes = config.getint('PARAMS', 'classes')
+    classes = [int(x) for x in config.get('PARAMS', 'classes').split(',')]
 except ValueError:
-    log.error("Erreur : la valeur de l'option classes doit être un entier, verifier le fichier de configuration")
+    log.error("Erreur : la valeur de l'option classes doit être un tableau, verifier le fichier de configuration")
     exit(1)
 
 try:

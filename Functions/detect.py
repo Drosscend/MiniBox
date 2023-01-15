@@ -20,7 +20,7 @@ tracked_objects = TrackedObjects.TrackedObjects()
 
 
 def generate_csv(current: list[int]):
-    """Enregistre les résultat de la détection dans un fichier CSV.
+    """Enregistre les résultats de la détection dans un fichier CSV.
 
     Args:
         current (list): Liste des identifiants des personnes détectées
@@ -62,8 +62,7 @@ def generate_csv(current: list[int]):
 
 
 def draw_bounding_boxes(image, current: list[int]):
-    """Dessine des boîtes englobantes autour des objets détectés et affiche leurs ID, leurs confidence et leurs
-    directions
+    """Dessine des boîtes englobantes autour des objets détectés et affiche leurs informations
 
     Args:
         image (frame): Image à afficher
@@ -117,12 +116,12 @@ def get_random_color(name_idx: int):
     return r, g, b
 
 
-def detect(video_capture, object_types: int, interval: float, display_detection: bool):
+def detect(video_capture, object_types: list[int], interval: float, display_detection: bool):
     """Fonction de détection
 
     Args:
         video_capture (VideoCapture): Objet VideoCapture pour la caméra
-        object_types (int): type de détection (0: personnes, 1: vélos, ...)
+        object_types (list[int]): type de détection (0: personnes, 1: vélos, ...)
         interval (float): intervalle de temps entre chaque détection
         display_detection (bool): affichage de la détection (True/False) (optionnel)
 
@@ -133,8 +132,8 @@ def detect(video_capture, object_types: int, interval: float, display_detection:
     """
 
     # Vérifier si les paramètres ont des valeurs valides
-    if not isinstance(object_types, int) or object_types < 0:
-        raise ValueError(f"Type d'objet non valide: {object_types}")
+    if not isinstance(object_types, list) or not all(isinstance(x, int) for x in object_types):
+        raise ValueError("Type d'objet non valide")
     if not isinstance(interval, float) or interval < 0:
         raise ValueError("Intervalle non valide")
     if not isinstance(display_detection, bool):
@@ -231,12 +230,12 @@ def detect(video_capture, object_types: int, interval: float, display_detection:
     log.info("Detection terminée")
 
 
-def main(source, classes, interval, display_detection):
+def main(source: int, classes: list[int], interval: float, display_detection: bool):
     """fonction principale de l'application
 
     Args:
         source (int): id de la caméra
-        classes (int): type de détection (0: personnes, 1: vélos, ...)
+        classes (list[int]): type de détection (0: personnes, 1: vélos, ...)
         interval (float): intervalle de temps entre chaque détection
         display_detection (bool): affichage de la détection (True/False) (optionnel)
     """
