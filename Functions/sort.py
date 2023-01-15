@@ -21,14 +21,8 @@
 
 import numpy as np
 from filterpy.kalman import KalmanFilter
-from scipy.optimize import linear_sum_assignment
 
 np.random.seed(0)
-
-
-def linear_assignment(cost_matrix):
-    x, y = linear_sum_assignment(cost_matrix)
-    return np.array(list(zip(x, y)))
 
 
 def iou_batch(bb_test, bb_gt):
@@ -159,10 +153,7 @@ def associate_detections_to_trackers(detections, trackers, iou_threshold=0.3):
 
     if min(iou_matrix.shape) > 0:
         a = (iou_matrix > iou_threshold).astype(np.int32)
-        if a.sum(1).max() == 1 and a.sum(0).max() == 1:
-            matched_indices = np.stack(np.where(a), axis=1)
-        else:
-            matched_indices = linear_assignment(-iou_matrix)
+        matched_indices = np.stack(np.where(a), axis=1)
     else:
         matched_indices = np.empty(shape=(0, 2))
 
@@ -237,7 +228,8 @@ class Sort(object):
         for trk in reversed(self.trackers):
             d = trk.get_state()[0]
             if (trk.time_since_update < 1) and (trk.hit_streak >= self.min_hits or self.frame_count <= self.min_hits):
-                ret.append(np.concatenate((d, [trk.id + 1], [trk.obj_confidence], [trk.obj_class])).reshape(1, -1))  # +1 as MOT benchmark requires positive
+                ret.append(np.concatenate((d, [trk.id + 1], [trk.obj_confidence], [trk.obj_class])).reshape(1, -1))
+                # +1 as MOT benchmark requires positive
             i -= 1
             # remove dead tracklet
             if trk.time_since_update > self.max_age:

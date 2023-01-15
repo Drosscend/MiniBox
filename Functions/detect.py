@@ -86,9 +86,11 @@ def draw_bounding_boxes(image, current: list[int]):
                 classe = object_info.classe
 
                 cv2.rectangle(image, (x1, y1), (x2, y2), color, 2)
-                text = f"{object_id} - {confidence} - {classe}"
+                text = f"id:{object_id}"
+                text += f" - {classe}"
+                text += f" - {confidence}"
                 if direction:
-                    text += f" - ({direction})"
+                    text += f" - direction:({direction})"
 
                 text_color = (255, 255, 255)
                 font = cv2.FONT_HERSHEY_SIMPLEX
