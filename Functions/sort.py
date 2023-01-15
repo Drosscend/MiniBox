@@ -28,7 +28,10 @@ np.random.seed(0)
 
 def iou_batch(bb_test: torch.Tensor, bb_gt: np.ndarray) -> np.ndarray:
     """
-    From SORT: Computes IOU between two bboxes in the form [x1,y1,x2,y2]
+    From SORT: Computes IUO between two bboxes in the form [x1,y1,x2,y2]
+    @param bb_test: (N,4) ndarray of float
+    @param bb_gt: (K,4) ndarray of float
+    @return: ndarray of overlap between boxes and query_boxes
     """
     bb_gt = np.expand_dims(bb_gt, 0)
     bb_test = np.expand_dims(bb_test, 1)
@@ -50,6 +53,8 @@ def convert_bbox_to_z(bbox: torch.Tensor) -> np.ndarray:
     Takes a bounding box in the form [x1,y1,x2,y2] and returns z in the form
       [x,y,s,r] where x,y is the centre of the box and s is the scale/area and r is
       the aspect ratio
+    @param bbox: (N,4) ndarray of float
+    @return: (N,5) ndarray of float
     """
     w = bbox[2] - bbox[0]
     h = bbox[3] - bbox[1]
@@ -64,6 +69,8 @@ def convert_x_to_bbox(x: np.ndarray) -> np.ndarray:
     """
     Takes a bounding box in the centre form [x,y,s,r] and returns it in the form
       [x1,y1,x2,y2] where x1,y1 is the top left and x2,y2 is the bottom right
+    @param x: (N,5) ndarray of float
+    @return: (N,4) ndarray of float
     """
     w = np.sqrt(x[2] * x[3])
     h = x[2] / w
@@ -79,6 +86,7 @@ class KalmanBoxTracker(object):
     def __init__(self, params: torch.Tensor) -> None:
         """
         Initialises a tracker using initial bounding box.
+        @param params: (N,6) ndarray of float
         """
         # define constant velocity model
         self.kf = KalmanFilter(dim_x=7, dim_z=4)
@@ -108,6 +116,7 @@ class KalmanBoxTracker(object):
     def update(self, params: torch.Tensor) -> None:
         """
         Updates the state vector with observed bbox.
+        @param params: (N,6) ndarray of float
         """
         self.time_since_update = 0
         self.history = []
@@ -120,6 +129,7 @@ class KalmanBoxTracker(object):
     def predict(self) -> np.ndarray:
         """
         Advances the state vector and returns the predicted bounding box estimate.
+        @return: (N,4) ndarray of float
         """
         if (self.kf.x[6] + self.kf.x[2]) <= 0:
             self.kf.x[6] *= 0.0
@@ -134,21 +144,19 @@ class KalmanBoxTracker(object):
     def get_state(self) -> np.ndarray:
         """
         Returns the current bounding box estimate.
+        @return: (N,4) ndarray of float
         """
         return convert_x_to_bbox(self.kf.x)
 
 
 def associate_detections_to_trackers(detections: torch.Tensor, trackers: np.ndarray, iou_threshold: float = 0.3) -> \
         tuple[np.ndarray, np.ndarray, np.ndarray]:
-    """Assigne les détections aux objets suivis (les deux représentés sous forme de boîtes englobantes)
-
-    Args:
-        detections (torch.Tensor): liste des détections
-        trackers (numpy.ndarray): liste des objets suivis
-        iou_threshold (float) : Seuil de similarité IOU pour l'association entre les détections et les trackers
-
-    Returns:
-        (list,list,list) : Les trackers valides, les détections non associées et les trackers morts
+    """
+    Assigne les détections aux objets suivis (les deux représentés sous forme de boîtes englobantes)
+    @param detections:liste des détections
+    @param trackers: liste des objets suivis
+    @param iou_threshold: Seuil de similarité IOU pour l'association entre les détections et les trackers
+    @return: Les trackers valides, les détections non associées et les trackers morts
     """
     if len(trackers) == 0:
         return np.empty((0, 2), dtype=int), np.arange(len(detections)), np.empty((0, 5), dtype=int)
@@ -188,13 +196,12 @@ def associate_detections_to_trackers(detections: torch.Tensor, trackers: np.ndar
 
 class Sort(object):
     def __init__(self, max_age: int = 1, min_hits: int = 3, iou_threshold: float = 0.3) -> None:
-        """Initialise les paramètres clés pour SORT
-
-        Args:
-            max_age (int): Durée maximale d'un tracker avant qu'il soit considéré comme mort
-            min_hits (int) : Nombre minimum de fois où un tracker doit être associé à une détection
-            pour être considéré comme valide
-            iou_threshold (float) : Seuil de similarité IOU pour l'association entre les détections et les trackers
+        """
+        Initialise les paramètres clés pour SORT
+        @param max_age: Durée maximale d'un tracker avant qu'il soit considéré comme mort
+        @param min_hits: Nombre minimum de fois où un tracker doit être associé à une détection
+         pour être considéré comme valide
+        @param iou_threshold: Seuil de similarité IOU pour l'association entre les détections et les trackers
         """
         self.max_age = max_age
         self.min_hits = min_hits
@@ -203,17 +210,11 @@ class Sort(object):
         self.frame_count = 0
 
     def update(self, dets: torch.Tensor = np.empty((0, 6))) -> np.ndarray:
-        """Met à jour les trackers en utilisant les détections fournies
-
-        Args:
-            dets (torch.Tensor): Tableau des détections au format [[x1, y1, x2, y2, confidence, classe], ...]
-            Cette méthode doit être appelée pour chaque frame, même avec des détections vides
-            (par défaut np.empty((0, 6)))
-
-        Returns:
-            numpy.ndarray: Même tableau que les détections, avec en plus l'ID du tracker associé à la position 4
-            
+        """
+        Met à jour les trackers en utilisant les détections fournies
         Note : Le nombre d'objets retournés peut être différent du nombre de détections fournies.
+        @param dets: Tableau des détections au format [[x1, y1, x2, y2, confidence, classe], ...]
+        @return: Même tableau que les détections, avec en plus l'ID du tracker associé à la position 4
         """
         self.frame_count += 1
         # obtenir les emplacements prévus à partir des trackers existants

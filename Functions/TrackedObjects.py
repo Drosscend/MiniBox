@@ -14,6 +14,7 @@ retourné."""
 
 import logging
 import math
+from typing import Optional
 
 log = logging.getLogger("main")
 
@@ -21,14 +22,11 @@ CALCUL_DIRECTION_NB_POSITIONS = 4  # Nombre de positions à prendre en compte po
 SPEED_THRESHOLD = 10  # Vitesse minimale pour que la direction soit prise en compte
 
 
-def calculate_direction(positions: list):
-    """Calcul la direction de l'objet en fonction des positions enregistrées.
-
-    Args:
-        positions (list(int,int,int,int)): tableau de positions (x1, y1, x2, y2)
-
-    Returns:
-        string: direction de l'objet
+def calculate_direction(positions: list) -> Optional[str]:
+    """
+    Calcule la direction d'un objet à partir de ses positions précédentes.
+    @param positions: Liste des positions précédentes de l'objet.
+    @return: Direction de l'objet.
     """
     total_distance = 0
     total_dx = 0
@@ -67,7 +65,19 @@ class TrackedObject:
     """Classe représentant un objet suivi dans une vidéo.
     """
 
-    def __init__(self, obj_id: int, confidence: float, x1: int, y1: int, x2: int, y2: int, classe: int, color: tuple):
+    def __init__(self, obj_id: int, confidence: float, x1: int, y1: int, x2: int, y2: int, classe: int, color: tuple) \
+            -> None:
+        """Constructeur de la classe `TrackedObject`.
+
+        @param obj_id: identifiant unique de l'objet
+        @param confidence: confiance de l'objet
+        @param x1: coordonnée x du point en haut à gauche du rectangle englobant l'objet
+        @param y1: coordonnée y du point en haut à gauche du rectangle englobant l'objet
+        @param x2: coordonnée x du point en bas à droite du rectangle englobant l'objet
+        @param y2: coordonnée y du point en bas à droite du rectangle englobant l'objet
+        @param classe: classe de l'objet
+        @param color: couleur de l'objet
+        """
         self.obj_id = obj_id
         self.confidence = confidence
         self.x1 = x1
@@ -79,15 +89,14 @@ class TrackedObject:
         self.positions = [(x1, y1, x2, y2)]
         self.direction = None
 
-    def update_position(self, confidence: float, x1: int, y1: int, x2: int, y2: int):
+    def update_position(self, confidence: float, x1: int, y1: int, x2: int, y2: int) -> None:
         """Mise à jour de la position de l'objet.
 
-        Args:
-            confidence (float): confiance de l'objet
-            x1 (int): coordonnée x du point en haut à gauche du rectangle englobant l'objet
-            y1 (int): coordonnée y du point en haut à gauche du rectangle englobant l'objet
-            x2 (int): coordonnée x du point en bas à droite du rectangle englobant l'objet
-            y2 (int): coordonnée y du point en bas à droite du rectangle englobant l'objet
+        @param confidence: confiance de l'objet
+        @param x1: coordonnée x du point en haut à gauche du rectangle englobant l'objet
+        @param y1: coordonnée y du point en haut à gauche du rectangle englobant l'objet
+        @param x2: coordonnée x du point en bas à droite du rectangle englobant l'objet
+        @param y2: coordonnée y du point en bas à droite du rectangle englobant l'objet
         """
         self.confidence = confidence
         self.x1 = x1
@@ -99,17 +108,17 @@ class TrackedObject:
             self.positions.pop(0)
             self.set_direction()
 
-    def set_direction(self):
-        """Calcule la direction de l'objet en fonction des positions enregistrées.
+    def set_direction(self) -> None:
+        """
+        Détermine la direction de l'objet en fonction de ses dernières positions.
         """
         direction = calculate_direction(self.positions)
         self.direction = direction
 
-    def __str__(self):
-        """Affichage de l'objet.
-
-        Returns:
-            string: description de l'objet
+    def __str__(self) -> str:
+        """
+        Retourne une représentation textuelle de l'objet.
+        @return: représentation textuelle de l'objet
         """
         direction = self.direction
         text = f"\n id: {self.obj_id},\n Confidence: {self.confidence},\n positions: {self.x1}, {self.y1}, " \
@@ -123,49 +132,51 @@ class TrackedObjects:
     """Classe représentant un ensemble d'objets suivi dans une vidéo.
     """
 
-    def __init__(self):
+    def __init__(self) -> None:
+        """
+        Constructeur de la classe `TrackedObjects`.
+        """
         self.tracked_objects = []
 
-    def add(self, obj_id: int, confidence: float, x1: int, y1: int, x2: int, y2: int, classe: int, color: tuple):
-        """Ajoute un objet à la liste des objets suivis.
-
-        Args:
-            obj_id (int): identifiant de l'objet
-            confidence (float): confiance de l'objet
-            x1 (int): coordonnée x du point en haut à gauche du rectangle englobant l'objet
-            y1 (int): coordonnée y du point en haut à gauche du rectangle englobant l'objet
-            x2 (int): coordonnée x du point en bas à droite du rectangle englobant l'objet
-            y2 (int): coordonnée y du point en bas à droite du rectangle englobant l'objet
-            classe (int): classe de l'objet
-            color (tuple(int,int,int)): couleur de l'objet
+    def add(self, obj_id: int, confidence: float, x1: int, y1: int, x2: int, y2: int, classe: int, color: tuple) \
+            -> None:
+        """
+        Ajoute un objet à la liste des objets suivis.
+        @param obj_id: identifiant de l'objet
+        @param confidence: confiance de l'objet
+        @param x1: coordonnée x du point en haut à gauche du rectangle englobant l'objet
+        @param y1: coordonnée y du point en haut à gauche du rectangle englobant l'objet
+        @param x2: coordonnée x du point en bas à droite du rectangle englobant l'objet
+        @param y2: coordonnée y du point en bas à droite du rectangle englobant l'objet
+        @param classe: classe de l'objet
+        @param color: couleur de l'objet
         """
         tracked_object = TrackedObject(obj_id, confidence, x1, y1, x2, y2, classe, color)
         self.tracked_objects.append(tracked_object)
 
-    def get(self, obj_id: int):
-        """Retourne l'objet correspondant à l'identifiant.
-
-        Args:
-            obj_id (int): identifiant de l'objet
-
-        Returns:
-            TrackedObject: objet correspondant à l'identifiant
+    def get(self, obj_id: int) -> Optional[TrackedObject]:
+        """
+        Retourne l'objet correspondant à l'identifiant donné.
+        @param obj_id: identifiant de l'objet
+        @return: objet correspondant à l'identifiant donné
         """
         for tracked_object in self.tracked_objects:
             if tracked_object.obj_id == obj_id:
                 return tracked_object
         return None
 
-    def remove(self, obj_id: int):
-        """Supprime l'objet correspondant à l'identifiant.
-
-        Args:
-            obj_id (int): identifiant de l'objet
+    def remove(self, obj_id: int) -> None:
+        """
+        Supprime l'objet correspondant à l'identifiant donné.
+        @param obj_id: identifiant de l'objet
         """
         for i, tracked_object in enumerate(self.tracked_objects):
             if tracked_object.obj_id == obj_id:
                 del self.tracked_objects[i]
                 break
 
-    def purge(self):
+    def purge(self) -> None:
+        """
+        Supprime les objets qui n'ont pas été détectés depuis un certain temps.
+        """
         self.tracked_objects = []

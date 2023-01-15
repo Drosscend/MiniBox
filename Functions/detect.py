@@ -19,13 +19,11 @@ CSV_FILE_NAME = 'OUTPUT/data.csv'
 tracked_objects = TrackedObjects.TrackedObjects()
 
 
-def generate_csv(current: list[int]):
-    """Enregistre les résultats de la détection dans un fichier CSV.
-
-    Args:
-        current (list): Liste des identifiants des personnes détectées
+def generate_csv(current: list[int]) -> None:
     """
-
+    Génère un fichier CSV contenant les informations des objets détectés
+    @param current: Liste des objets détectés
+    """
     # verifie que le dosser OUTPUT existe et le crée si ce n'est pas le cas
     if not os.path.exists("OUTPUT"):
         os.makedirs("OUTPUT")
@@ -61,14 +59,12 @@ def generate_csv(current: list[int]):
         log.warning("Erreur lors de l'écriture dans le fichier CSV: " + str(e))
 
 
-def draw_bounding_boxes(image, current: list[int]):
-    """Dessine des boîtes englobantes autour des objets détectés et affiche leurs informations
-
-    Args:
-        image (frame): Image à afficher
-        current (list): Liste des objets détectés
+def draw_bounding_boxes(image, current: list[int]) -> None:
     """
-
+    Dessine les boites englobantes des objets détectés
+    @param image: Image sur laquelle dessiner les boites englobantes
+    @param current: Liste des objets détectés
+    """
     # Si aucun objet n'a été détecté
     if not current:
         cv2.putText(image, "Aucun objet detecte", (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
@@ -103,14 +99,11 @@ def draw_bounding_boxes(image, current: list[int]):
     cv2.imshow("Video", image)
 
 
-def get_random_color(name_idx: int):
-    """Génère une couleur aléatoire pour chaque personne
-
-    Args:
-        name_idx (int): Identifiant de la personne
-
-    Returns:
-        tuple: tuple contenant les valeurs RGB de la couleur
+def get_random_color(name_idx: int) -> tuple[int, int, int]:
+    """
+    Génère une couleur aléatoire pour un objet
+    @param name_idx: Identifiant de l'objet
+    @return: Couleur aléatoire
     """
     random.seed(name_idx)
     r = random.randint(0, 255)
@@ -119,21 +112,14 @@ def get_random_color(name_idx: int):
     return r, g, b
 
 
-def detect(video_capture, object_types: list[int], interval: float, display_detection: bool):
-    """Fonction de détection
-
-    Args:
-        video_capture (VideoCapture): Objet VideoCapture pour la caméra
-        object_types (list[int]): type de détection (0: personnes, 1: vélos, ...)
-        interval (float): intervalle de temps entre chaque détection
-        display_detection (bool): affichage de la détection (True/False) (optionnel)
-
-    Raises:
-        ValueError: Type d'objet non valide
-        ValueError: Intervalle non valide
-        ValueError: Affichage de la détection non valide
+def detect(video_capture: cv2.VideoCapture, object_types: list[int], interval: float, display_detection: bool) -> None:
     """
-
+    Détection des objets
+    @param video_capture: Flux vidéo 
+    @param object_types: Liste des types d'objets à détecter
+    @param interval: Intervalle de temps entre chaque détection
+    @param display_detection: Affichage des boites englobantes
+    """
     # Vérifier si les paramètres ont des valeurs valides
     if not isinstance(object_types, list) or not all(isinstance(x, int) for x in object_types):
         raise ValueError("Type d'objet non valide")
@@ -234,14 +220,13 @@ def detect(video_capture, object_types: list[int], interval: float, display_dete
     log.info("Detection terminée")
 
 
-def main(source: int, classes: list[int], interval: float, display_detection: bool):
-    """fonction principale de l'application
-
-    Args:
-        source (int): id de la caméra
-        classes (list[int]): type de détection (0: personnes, 1: vélos, ...)
-        interval (float): intervalle de temps entre chaque détection
-        display_detection (bool): affichage de la détection (True/False) (optionnel)
+def main(source: int, classes: list[int], interval: float, display_detection: bool) -> None:
+    """
+    Fonction principale
+    @param source: Source de la vidéo
+    @param classes: Liste des types d'objets à détecter
+    @param interval: Intervalle de temps entre chaque détection
+    @param display_detection: Affichage des boites englobantes
     """
     # Initialisation de la caméra
     video_capture = cv2.VideoCapture(source)

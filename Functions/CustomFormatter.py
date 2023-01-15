@@ -18,7 +18,12 @@ class CustomFormatter(logging.Formatter):
         logging.CRITICAL: bold_red + log_format + reset
     }
 
-    def format(self, record):
+    def format(self, record: logging.LogRecord) -> str:
+        """
+        Formatte le message de log
+        @param record: Enregistrement de log
+        @return: Message de log formaté
+        """
         log_fmt = self.FORMATS.get(record.levelno)
         formatter = logging.Formatter(log_fmt, "%Y/%m/%d %H:%M:%S")
         return formatter.format(record)
