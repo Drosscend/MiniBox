@@ -141,10 +141,15 @@ class KalmanBoxTracker(object):
 
 
 def associate_detections_to_trackers(detections, trackers, iou_threshold=0.3):
-    """
-    Assigns detections to tracked object (both represented as bounding boxes)
+    """Assigne les détections aux objets suivis (les deux représentés sous forme de boîtes englobantes)
 
-    Returns 3 lists of matches, unmatched_detections and unmatched_trackers
+    Args:
+        detections (list): liste des détections
+        trackers (list): liste des objets suivis
+        iou_threshold (float) : Seuil de similarité IOU pour l'association entre les détections et les trackers
+
+    Returns:
+        (list,list,list) : Les trackers valides, les détections non associées et les trackers morts
     """
     if len(trackers) == 0:
         return np.empty((0, 2), dtype=int), np.arange(len(detections)), np.empty((0, 5), dtype=int)
@@ -166,7 +171,7 @@ def associate_detections_to_trackers(detections, trackers, iou_threshold=0.3):
         if t not in matched_indices[:, 1]:
             unmatched_trackers.append(t)
 
-    # filter out matched with low IOU
+    # filtrer les correspondances avec un faible IOU
     matches = []
     for m in matched_indices:
         if iou_matrix[m[0], m[1]] < iou_threshold:
