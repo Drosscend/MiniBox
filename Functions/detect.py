@@ -115,7 +115,7 @@ def get_random_color(name_idx: int) -> tuple[int, int, int]:
 def detect(video_capture: cv2.VideoCapture, object_types: list[int], interval: float, display_detection: bool) -> None:
     """
     Détection des objets
-    @param video_capture: Flux vidéo 
+    @param video_capture: Flux vidéo
     @param object_types: Liste des types d'objets à détecter
     @param interval: Intervalle de temps entre chaque détection
     @param display_detection: Affichage des boites englobantes
@@ -189,7 +189,8 @@ def detect(video_capture: cv2.VideoCapture, object_types: list[int], interval: f
                     break
             if not found:
                 color = get_random_color(object_id)
-                tracked_objects.add(object_id, object_conf, object_x1, object_y1, object_x2, object_y2, object_classe, color)
+                tracked_objects.add(object_id, object_conf, object_x1, object_y1, object_x2, object_y2, object_classe,
+                                    color)
                 log.debug("Nouvel objet détecté: {}".format(object_id))
 
         # Supprime les objets qui n'ont pas été détectés dans le frame courant
