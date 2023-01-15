@@ -1,7 +1,8 @@
 # MiniBox 🎯 requirements
 # Usage: pip install -r requirements.txt
 
-pytest>=7.2.0
+pytest>=7.2.1
 opencv-python~=4.7.0.68
 yolov5>=7.0.7
 filterpy>=1.4.5
+numpy~=1.24.1
