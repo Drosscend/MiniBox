@@ -175,6 +175,8 @@ def detect(video_capture, object_types: list[int], interval: float, display_dete
         try:
             # Utilisation de la librairie Sort pour suivre les personnes détectées
             track = model_sort.update(predictions)
+            # affiche le type de track
+            print(type(track))
         except Exception as e:
             log.error("Erreur lors du suivie des objets: {}".format(e))
             continue

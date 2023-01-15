@@ -210,9 +210,9 @@ class Sort(object):
             dets (list): Tableau des détections au format [[x1, y1, x2, y2, confidence, classe], ...]
             Cette méthode doit être appelée pour chaque frame, même avec des détections vides
             (par défaut np.empty((0, 6)))
-        
+
         Returns:
-            list: Même tableau que les détections, avec en plus l'ID du tracker associé à la position 4
+            numpy.ndarray: Même tableau que les détections, avec en plus l'ID du tracker associé à la position 4
             
         Note : Le nombre d'objets retournés peut être différent du nombre de détections fournies.
         """
