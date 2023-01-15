@@ -84,7 +84,7 @@ class KalmanBoxTracker(object):
     """
     count = 0
 
-    def __init__(self, bbox):
+    def __init__(self, params):
         """
         Initialises a tracker using initial bounding box.
         """
@@ -102,7 +102,7 @@ class KalmanBoxTracker(object):
         self.kf.Q[-1, -1] *= 0.01
         self.kf.Q[4:, 4:] *= 0.01
 
-        self.kf.x[:4] = convert_bbox_to_z(bbox)
+        self.kf.x[:4] = convert_bbox_to_z(params)
         self.time_since_update = 0
         self.id = KalmanBoxTracker.count
         KalmanBoxTracker.count += 1
@@ -110,8 +110,10 @@ class KalmanBoxTracker(object):
         self.hits = 0
         self.hit_streak = 0
         self.age = 0
+        self.obj_confidence = params[4]
+        self.obj_class = params[5]
 
-    def update(self, bbox):
+    def update(self, params):
         """
         Updates the state vector with observed bbox.
         """
@@ -119,7 +121,9 @@ class KalmanBoxTracker(object):
         self.history = []
         self.hits += 1
         self.hit_streak += 1
-        self.kf.update(convert_bbox_to_z(bbox))
+        self.kf.update(convert_bbox_to_z(params))
+        self.obj_confidence = params[4]
+        self.obj_class = params[5]
 
     def predict(self):
         """
@@ -233,11 +237,12 @@ class Sort(object):
         for trk in reversed(self.trackers):
             d = trk.get_state()[0]
             if (trk.time_since_update < 1) and (trk.hit_streak >= self.min_hits or self.frame_count <= self.min_hits):
-                ret.append(np.concatenate((d, [trk.id + 1])).reshape(1, -1))  # +1 as MOT benchmark requires positive
+                ret.append(np.concatenate((d, [trk.id + 1], [trk.obj_confidence], [trk.obj_class])).reshape(1, -1))  # +1 as MOT benchmark requires positive
             i -= 1
             # remove dead tracklet
             if trk.time_since_update > self.max_age:
                 self.trackers.pop(i)
         if len(ret) > 0:
+            print("ret", ret)
             return np.concatenate(ret)
-        return np.empty((0, 5))
+        return np.empty((0, 7))

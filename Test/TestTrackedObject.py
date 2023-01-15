@@ -8,20 +8,21 @@ TrackedObject = TrackedObjects.TrackedObject
 class TestTrackedObject(unittest.TestCase):
     def test_init(self):
         # Test de création d'un objet suivi
-        obj = TrackedObject(1, 0.99, 50, 50, 100, 100, "red")
+        obj = TrackedObject(1, 0.99, 50, 50, 100, 100, 0, (0, 0, 0))
         self.assertEqual(obj.obj_id, 1)
         self.assertEqual(obj.confidence, 0.99)
         self.assertEqual(obj.x1, 50)
         self.assertEqual(obj.y1, 50)
         self.assertEqual(obj.x2, 100)
         self.assertEqual(obj.y2, 100)
-        self.assertEqual(obj.color, "red")
+        self.assertEqual(obj.classe, 0)
+        self.assertEqual(obj.color, (0, 0, 0))
         self.assertEqual(obj.positions, [(50, 50, 100, 100)])
         self.assertIsNone(obj.direction)
 
     def test_update_position(self):
         # Test de mise à jour de la position d'un objet suivi
-        obj = TrackedObject(1, 0.99, 50, 50, 100, 100, "red")
+        obj = TrackedObject(1, 0.99, 50, 50, 100, 100, 0, (0, 0, 0))
         obj.update_position(0.99, 55, 55, 105, 105)
         self.assertEqual(obj.positions, [(50, 50, 100, 100), (55, 55, 105, 105)])
         self.assertIsNone(obj.direction)

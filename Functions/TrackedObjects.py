@@ -66,18 +66,20 @@ def calculate_direction(positions: list):
 class TrackedObject:
     """Classe représentant un objet suivi dans une vidéo.
     """
-    def __init__(self, obj_id:int, confidence:float, x1:int, y1:int, x2:int, y2:int, color:tuple):
+
+    def __init__(self, obj_id: int, confidence: float, x1: int, y1: int, x2: int, y2: int, classe: int, color: tuple):
         self.obj_id = obj_id
         self.confidence = confidence
         self.x1 = x1
         self.y1 = y1
         self.x2 = x2
         self.y2 = y2
+        self.classe = classe
         self.color = color
         self.positions = [(x1, y1, x2, y2)]
         self.direction = None
 
-    def update_position(self, confidence:float, x1:int, y1:int, x2:int, y2:int):
+    def update_position(self, confidence: float, x1: int, y1: int, x2: int, y2: int):
         """Mise à jour de la position de l'objet.
 
         Args:
@@ -111,7 +113,7 @@ class TrackedObject:
         """
         direction = self.direction
         text = f"\n id: {self.obj_id},\n Confidence: {self.confidence},\n positions: {self.x1}, {self.y1}, " \
-               f"{self.x2}, {self.y2},\n couleur: {self.color}"
+               f"{self.x2}, {self.y2},\n classe: {self.classe},\n couleur: {self.color}"
         if direction:
             text += f",\n direction: {direction}"
         return text
@@ -120,10 +122,11 @@ class TrackedObject:
 class TrackedObjects:
     """Classe représentant un ensemble d'objets suivi dans une vidéo.
     """
+
     def __init__(self):
         self.tracked_objects = []
 
-    def add(self, obj_id:int, confidence:float, x1:int, y1:int, x2:int, y2:int, color:tuple):
+    def add(self, obj_id: int, confidence: float, x1: int, y1: int, x2: int, y2: int, classe: int, color: tuple):
         """Ajoute un objet à la liste des objets suivis.
 
         Args:
@@ -133,12 +136,13 @@ class TrackedObjects:
             y1 (int): coordonnée y du point en haut à gauche du rectangle englobant l'objet
             x2 (int): coordonnée x du point en bas à droite du rectangle englobant l'objet
             y2 (int): coordonnée y du point en bas à droite du rectangle englobant l'objet
+            classe (int): classe de l'objet
             color (tuple(int,int,int)): couleur de l'objet
         """
-        tracked_object = TrackedObject(obj_id, confidence, x1, y1, x2, y2, color)
+        tracked_object = TrackedObject(obj_id, confidence, x1, y1, x2, y2, classe, color)
         self.tracked_objects.append(tracked_object)
 
-    def get(self, obj_id:int):
+    def get(self, obj_id: int):
         """Retourne l'objet correspondant à l'identifiant.
 
         Args:
@@ -152,7 +156,7 @@ class TrackedObjects:
                 return tracked_object
         return None
 
-    def remove(self, obj_id:int):
+    def remove(self, obj_id: int):
         """Supprime l'objet correspondant à l'identifiant.
 
         Args:

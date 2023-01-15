@@ -83,9 +83,10 @@ def draw_bounding_boxes(image, current: list[int]):
                 y2 = object_info.y2
                 color = object_info.color
                 direction = object_info.direction
+                classe = object_info.classe
 
                 cv2.rectangle(image, (x1, y1), (x2, y2), color, 2)
-                text = f"{object_id} - {confidence}"
+                text = f"{object_id} - {confidence} - {classe}"
                 if direction:
                     text += f" - ({direction})"
 
@@ -181,12 +182,13 @@ def detect(video_capture, object_types: list[int], interval: float, display_dete
         for j in range(len(track.tolist())):
             # Récupère les informations sur l'objet
             tracked_object = track.tolist()[j]
-            object_id = int(tracked_object[4])
-            object_conf = results.xyxy[0][j][4]
             object_x1 = int(tracked_object[0])
             object_y1 = int(tracked_object[1])
             object_x2 = int(tracked_object[2])
             object_y2 = int(tracked_object[3])
+            object_id = int(tracked_object[4])
+            object_conf = float(tracked_object[5])
+            object_classe = int(tracked_object[6])
 
             current.append(object_id)
 
@@ -199,7 +201,7 @@ def detect(video_capture, object_types: list[int], interval: float, display_dete
                     break
             if not found:
                 color = get_random_color(object_id)
-                tracked_objects.add(object_id, object_conf, object_x1, object_y1, object_x2, object_y2, color)
+                tracked_objects.add(object_id, object_conf, object_x1, object_y1, object_x2, object_y2, object_classe, color)
                 log.debug("Nouvel objet détecté: {}".format(object_id))
 
         # Supprime les objets qui n'ont pas été détectés dans le frame courant

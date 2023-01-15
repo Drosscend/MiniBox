@@ -11,7 +11,7 @@ class TestTrackedObjects(unittest.TestCase):
         objs = TrackedObjects()
 
         # Add a tracked object with name_idx 0
-        objs.add(0, 0, 0, 0, 0, 0, "red")
+        objs.add(0, 0, 0, 0, 0, 0, 0, (0, 0, 0))
         self.assertEqual(len(objs.tracked_objects), 1)
 
         # Get the tracked object with name_idx 0
@@ -23,7 +23,8 @@ class TestTrackedObjects(unittest.TestCase):
         self.assertEqual(obj.y1, 0)
         self.assertEqual(obj.x2, 0)
         self.assertEqual(obj.y2, 0)
-        self.assertEqual(obj.color, "red")
+        self.assertEqual(obj.classe, 0)
+        self.assertEqual(obj.color, (0, 0, 0))
 
         # Try to get a tracked object with an invalid name_idx
         obj = objs.get(1)
@@ -34,8 +35,8 @@ class TestTrackedObjects(unittest.TestCase):
         objs = TrackedObjects()
 
         # Add two tracked objects with name_idx 0 and 1
-        objs.add(0, 0, 0, 0, 0, 0, "red")
-        objs.add(1, 0, 0, 0, 0, 0, "blue")
+        objs.add(0, 0, 0, 0, 0, 0, 0, (0, 0, 0))
+        objs.add(1, 0, 0, 0, 0, 0, 0, (255, 0, 0))
         self.assertEqual(len(objs.tracked_objects), 2)
 
         # Remove the tracked object with name_idx 0
@@ -55,8 +56,8 @@ class TestTrackedObjects(unittest.TestCase):
         objs = TrackedObjects()
 
         # Add two tracked objects
-        objs.add(0, 0, 0, 0, 0, 0, "red")
-        objs.add(1, 0, 0, 0, 0, 0, "blue")
+        objs.add(0, 0, 0, 0, 0, 0, 0, (0, 0, 0))
+        objs.add(1, 0, 0, 0, 0, 0, 0, (255, 0, 0))
         self.assertEqual(len(objs.tracked_objects), 2)
 
         # Purge tracked objects
