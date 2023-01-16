@@ -1,115 +1,18 @@
-import csv
 import logging
-import os
-import random
 import time
-from datetime import datetime
-
 import cv2
 import yolov5
 
 from Functions import TrackedObjects
 from Functions import sort
+from Functions import CSV_manipulation
+from Functions import CV2_manipulations
+from Functions import utils
 
 log = logging.getLogger("main")
 
-CSV_FILE_NAME = 'OUTPUT/data.csv'
-
 # Initialisation de la collection d'objets suivis
 tracked_objects = TrackedObjects.TrackedObjects()
-
-
-def generate_csv(current: list[int]) -> None:
-    """
-    Génère un fichier CSV contenant les informations des objets détectés
-    @param current: Liste des objets détectés
-    """
-    # verifie que le dosser OUTPUT existe et le crée si ce n'est pas le cas
-    if not os.path.exists("OUTPUT"):
-        os.makedirs("OUTPUT")
-
-    date = datetime.now()
-
-    # Initialisation des compteurs pour chaque direction
-    counts = {
-        "top-left": 0,
-        "top-right": 0,
-        "bottom-left": 0,
-        "bottom-right": 0
-    }
-
-    # Parcours de la liste des identifiants d'objets
-    for obj_id in current:
-        obj = tracked_objects.get(obj_id)
-        if obj is not None:
-            # Incrémentation du compteur de la direction de l'objet s'il existe
-            if obj.direction is not None:
-                counts[obj.direction] += 1
-
-    # enregistrement des données dans un fichier csv
-    try:
-        with open(CSV_FILE_NAME, 'a', newline='') as f:
-            writer = csv.writer(f)
-            # si le fichier est vide, on écrit l'entête
-            if os.path.getsize(CSV_FILE_NAME) == 0:
-                writer.writerow(["date", "occurence", "top-left", "top-right", "bottom-left", "bottom-right"])
-            writer.writerow([date.strftime("%d/%m/%Y %H:%M:%S"), len(current), counts["top-left"], counts["top-right"],
-                             counts["bottom-left"], counts["bottom-right"]])
-    except IOError as e:
-        log.warning("Erreur lors de l'écriture dans le fichier CSV: " + str(e))
-
-
-def draw_bounding_boxes(image, current: list[int]) -> None:
-    """
-    Dessine les boites englobantes des objets détectés
-    @param image: Image sur laquelle dessiner les boites englobantes
-    @param current: Liste des objets détectés
-    """
-    # Si aucun objet n'a été détecté
-    if not current:
-        cv2.putText(image, "Aucun objet detecte", (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
-    else:
-        for object_id in current:
-            object_info = tracked_objects.get(object_id)
-            if object_info is not None:
-                confidence = format(object_info.confidence, ".2f")
-                x1 = object_info.x1
-                y1 = object_info.y1
-                x2 = object_info.x2
-                y2 = object_info.y2
-                color = object_info.color
-                direction = object_info.direction
-                classe = object_info.classe
-
-                cv2.rectangle(image, (x1, y1), (x2, y2), color, 2)
-                text = f"id:{object_id}"
-                text += f" - {classe}"
-                text += f" - {confidence}"
-                if direction:
-                    text += f" - direction:({direction})"
-
-                text_color = (255, 255, 255)
-                font = cv2.FONT_HERSHEY_SIMPLEX
-                text_size = cv2.getTextSize(text, font, 0.7, 2)[0]
-                text_x = x1 + 4
-                text_w = text_size[0] + 10
-                cv2.rectangle(image, (text_x - 5, y1 - 25), (text_x + text_w, y1), color, -1)
-                cv2.putText(image, text, (text_x, y1 - 5), font, 0.7, text_color, 2)
-
-    cv2.imshow("Video", image)
-
-
-def get_random_color(name_idx: int) -> tuple[int, int, int]:
-    """
-    Génère une couleur aléatoire pour un objet
-    @param name_idx: Identifiant de l'objet
-    @return: Couleur aléatoire
-    """
-    random.seed(name_idx)
-    r = random.randint(0, 255)
-    g = random.randint(0, 255)
-    b = random.randint(0, 255)
-    return r, g, b
 
 
 def detect(video_capture: cv2.VideoCapture, object_types: list[int], interval: float, display_detection: bool) -> None:
@@ -188,7 +91,7 @@ def detect(video_capture: cv2.VideoCapture, object_types: list[int], interval: f
                     tracked_object.update_position(object_conf, object_x1, object_y1, object_x2, object_y2)
                     break
             if not found:
-                color = get_random_color(object_id)
+                color = utils.get_random_color(object_id)
                 tracked_objects.add(object_id, object_conf, object_x1, object_y1, object_x2, object_y2, object_classe,
                                     color)
                 log.debug("Nouvel objet détecté: {}".format(object_id))
@@ -204,17 +107,17 @@ def detect(video_capture: cv2.VideoCapture, object_types: list[int], interval: f
             log.debug("Pause de " + str(interval) + " secondes")
             time.sleep(interval)
 
+        # Génération du fichier CSV
+        CSV_manipulation.generate_csv(current, tracked_objects)
+
         # affichage des images si spécifié
         if display_detection:
-            draw_bounding_boxes(frame, current)
+            CV2_manipulations.draw_bounding_boxes(frame, current, tracked_objects)
             key = cv2.waitKey(10)
             if key == ord('q'):
                 break
             elif key == -1:
                 continue
-
-        # Génération du fichier CSV
-        generate_csv(current)
 
     video_capture.release()
     cv2.destroyAllWindows()
