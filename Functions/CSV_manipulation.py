@@ -1,6 +1,6 @@
 import csv
-import os
 import logging
+import os
 from datetime import datetime
 
 from Functions import TrackedObjects
@@ -8,6 +8,7 @@ from Functions import TrackedObjects
 log = logging.getLogger("main")
 
 CSV_FILE_NAME = 'OUTPUT/data.csv'
+
 
 def generate_csv(current: list[int], tracked_objects: TrackedObjects.TrackedObjects) -> None:
     """
@@ -37,10 +38,10 @@ def generate_csv(current: list[int], tracked_objects: TrackedObjects.TrackedObje
             # Incrémentation du compteur de la direction de l'objet s'il existe
             if obj.direction is not None:
                 counts_direction[obj.direction] += 1
-            #incrémentation du compteur de la classe de l'objet s'il existe
+            # incrémentation du compteur de la classe de l'objet s'il existe
             if obj.classe in counts_classe:
                 counts_classe[obj.classe] += 1
-            else :
+            else:
                 counts_classe[obj.classe] = 1
 
     # enregistrement des données dans un fichier csv
@@ -51,7 +52,8 @@ def generate_csv(current: list[int], tracked_objects: TrackedObjects.TrackedObje
             if os.path.getsize(CSV_FILE_NAME) == 0:
                 writer.writerow(["date", "occurence", "top-left", "top-right", "bottom-left", "bottom-right", "classe"])
             for classe, nb_occurence in counts_classe.items():
-                writer.writerow([date.strftime("%d/%m/%Y %H:%M:%S"), nb_occurence, counts_direction["top-left"], counts_direction["top-right"],
+                writer.writerow([date.strftime("%d/%m/%Y %H:%M:%S"), nb_occurence, counts_direction["top-left"],
+                                 counts_direction["top-right"],
                                  counts_direction["bottom-left"], counts_direction["bottom-right"], classe])
     except IOError as e:
         log.warning("Erreur lors de l'écriture dans le fichier CSV: " + str(e))

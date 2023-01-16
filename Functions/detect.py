@@ -1,12 +1,13 @@
 import logging
 import time
+
 import cv2
 import yolov5
 
-from Functions import TrackedObjects
-from Functions import sort
 from Functions import CSV_manipulation
 from Functions import CV2_manipulations
+from Functions import TrackedObjects
+from Functions import sort
 from Functions import utils
 
 log = logging.getLogger("main")
