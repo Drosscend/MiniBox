@@ -26,6 +26,9 @@ Pour chaque personne, on essayera de récupérer les données suivantes :
 ### Maquette du programme principal :
 ![Programme principal](/docs/maquette_main.svg)
 
+### Diagramme de classe :
+![Programme principal (diagramme de classe)](/docs/classDiagram.svg)
+
 <details open>
 <summary>Prérequis</summary>
 Pour faire fonctionner ce projet, il faut avoir au maximum une version de python égale à 3.9.13. Pour vérifier la version de python installée, il faut lancer la commande suivante :

@@ -5,7 +5,7 @@ import cv2
 import yolov5
 
 from Functions import CSV_manipulation
-from Functions import CV2_manipulations
+from Functions import CV2_manipulation
 from Functions import TrackedObjects
 from Functions import sort
 from Functions import utils
@@ -113,7 +113,7 @@ def detect(video_capture: cv2.VideoCapture, object_types: list[int], interval: f
 
         # affichage des images si spécifié
         if display_detection:
-            CV2_manipulations.draw_bounding_boxes(frame, current, tracked_objects)
+            CV2_manipulation.draw_bounding_boxes(frame, current, tracked_objects)
             key = cv2.waitKey(10)
             if key == ord('q'):
                 break
