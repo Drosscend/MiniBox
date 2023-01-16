@@ -77,6 +77,10 @@ Le programme sera lancé avec les paramètres par défaut.
 - affichage = False
 - débug = False
 
+</details>
+<details>
+<summary>Lancement avec paramètres personalisés</summary>
+
 Pour lancer le programme avec des paramètres personnalisés, modifiez le fichier config.ini
 ```ini
 [PARAMS]
@@ -95,6 +99,15 @@ debug = False
 Vous pouvez fournir un fichier de configuration personnalisé en utilisant l'option -c ou --config :
 ```bash
 python main.py -c custom_config.ini
+```
+</details>
+
+<details>
+<summary>Lancement des tests</summary>
+
+Pour lancer les tests, il faut lancer la commande suivante :
+```bash
+pytest Test/
 ```
 
 </details>
