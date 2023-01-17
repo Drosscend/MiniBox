@@ -17,7 +17,7 @@ Ces compteurs sont un projet open source, et seront à destination :
 Pour chaque personne, on essayera de récupérer les données suivantes :
 - [x] heure de passage
 - [x] sens de circulation
-- [ ] mode de transport (piéton, cycliste, trottinette, vélo couché…)
+- [x] mode de transport (piéton, cycliste, trottinette, vélo couché…)
 - [ ] le vélo est-il chargé ?
 - [ ] la personne porte-t-elle des équipements de protection ?
 
@@ -54,8 +54,12 @@ Dans un terminal, lancer la commande suivante :
 ```bash
 git clone https://github.com/Drosscend/MiniBox  # clone
 cd MiniBox
+# pour les utilisateurs de windows
 py -m venv .mémoire # création de l'environnement virtuel
 .mémoire\Scripts\activate # activation de l'environnement virtuel
+# pour les utilisateurs de linux
+python3 -m venv .mémoire # création de l'environnement virtuel
+source .mémoire/bin/activate # activation de l'environnement virtuel
 pip install -r requirements.txt  # installation des dépendances du projet
 ```
 </details>
@@ -94,6 +98,26 @@ interval = 1
 display_detection = False
 # La valeur par défaut est `False`, si vous voulez activer l'affichage des messages, mettez `True`
 debug = False
+
+[YOLOV5_PARAMS]
+# La valeur par défaut est `yolov5s.pt`
+weights = yolov5s.pt
+# La valeur par défaut est `0.25`
+conf_thres = 0.25
+# La valeur par défaut est `0.45`
+iou_thres = 0.45
+# La valeur par défaut est `False`
+agnostic_nms = False
+# La valeur par défaut est `True`
+multi_label_nms = True
+# La valeur par défaut est `50`
+max_det = 50
+# La valeur par défaut est `True`
+amp = True
+# la valeur par défaut est `OUTPUT`
+output_folder = OUTPUT
+# la valeur par défaut est `data.csv`
+csv_name = data.csv
 ```
 
 Vous pouvez fournir un fichier de configuration personnalisé en utilisant l'option -c ou --config :

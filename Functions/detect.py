@@ -16,32 +16,30 @@ log = logging.getLogger("main")
 tracked_objects = TrackedObjects.TrackedObjects()
 
 
-def detect(video_capture: cv2.VideoCapture, object_types: list[int], interval: float, display_detection: bool) -> None:
+
+def detect(video_capture: cv2.VideoCapture, object_types: list[int], interval: float, display_detection: bool, yolov5_paramms: dict) -> None:
     """
     Détection des objets
     @param video_capture: Flux vidéo
     @param object_types: Liste des types d'objets à détecter
     @param interval: Intervalle de temps entre chaque détection
     @param display_detection: Affichage des boites englobantes
+    @param yolov5_paramms: Paramètres de la librairie Yolov5
     """
-    # Vérifier si les paramètres ont des valeurs valides
-    if not isinstance(object_types, list) or not all(isinstance(x, int) for x in object_types):
-        raise ValueError("Type d'objet non valide")
-    if not isinstance(interval, float) or interval < 0:
-        raise ValueError("Intervalle non valide")
-    if not isinstance(display_detection, bool):
-        raise ValueError("Affichage de la détection non valide")
 
     log.info("Début de la détection")
     # load pretrained model
-    model = yolov5.load('yolov5s.pt')
+    model = yolov5.load(yolov5_paramms["weights"])
     model.classes = object_types
-    model.conf = 0.25  # NMS confidence threshold
-    model.iou = 0.45  # NMS IoU threshold
-    model.agnostic = False  # NMS class-agnostic
-    model.multi_label = True  # NMS multiple labels per box
-    model.max_det = 50  # maximum number of detections per image
-    model.amp = True  # Automatic Mixed Precision (AMP) inference
+    model.conf = yolov5_paramms["conf_thres"]  # NMS confidence threshold
+    model.iou = yolov5_paramms["iou_thres"]  # NMS IoU threshold
+    model.agnostic = yolov5_paramms["agnostic_nms"]  # NMS class-agnostic
+    model.multi_label = yolov5_paramms["multi_label_nms"]  # NMS multiple labels per box
+    model.max_det = yolov5_paramms["max_det"]  # maximum number of detections per image
+    model.amp = yolov5_paramms["amp"]  # Automatic Mixed Precision (AMP) inference
+    
+    output_folder = yolov5_paramms["output_folder"]
+    csv_name = yolov5_paramms["csv_name"]
 
     # Initialisation de la librairie Sort pour suivre les personnes détectées
     model_sort = sort.Sort()
@@ -109,7 +107,7 @@ def detect(video_capture: cv2.VideoCapture, object_types: list[int], interval: f
             time.sleep(interval)
 
         # Génération du fichier CSV
-        CSV_manipulation.generate_csv(current, tracked_objects)
+        CSV_manipulation.generate_csv(current, tracked_objects, output_folder, csv_name)
 
         # affichage des images si spécifié
         if display_detection:
@@ -125,13 +123,14 @@ def detect(video_capture: cv2.VideoCapture, object_types: list[int], interval: f
     log.info("Detection terminée")
 
 
-def main(source: int, classes: list[int], interval: float, display_detection: bool) -> None:
+def main(source: int, classes: list[int], interval: float, display_detection: bool, yolov5_paramms: dict) -> None:
     """
     Fonction principale
     @param source: Source de la vidéo
     @param classes: Liste des types d'objets à détecter
     @param interval: Intervalle de temps entre chaque détection
     @param display_detection: Affichage des boites englobantes
+    @param yolov5_paramms: Paramètres de la librairie Yolov5
     """
     # Initialisation de la caméra
     video_capture = cv2.VideoCapture(source)
@@ -146,8 +145,6 @@ def main(source: int, classes: list[int], interval: float, display_detection: bo
 
     # Détection des personnes
     try:
-        detect(video_capture, classes, interval, display_detection)
-    except ValueError as e:
-        log.error("Erreur lors de la détection: {}".format(e))
+        detect(video_capture, classes, interval, display_detection, yolov5_paramms)
     except Exception as e:
         log.error("Erreur lors de la détection: {}".format(e))
