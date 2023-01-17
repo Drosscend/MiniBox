@@ -74,13 +74,14 @@ class TestGenerateCSV(unittest.TestCase):
         CSV_manipulation.generate_csv(current, new_tracking, self.csv_folder_name, self.csv_file_name)
         with open(self.csv_folder_name + '/' + self.csv_file_name, 'r') as file:
             lines = file.readlines()
-            self.assertEqual(lines[1], new_date + ",3,2,1,1,1,1\n")
-            self.assertEqual(lines[2], new_date + ",2,2,1,1,1,0\n")
+            self.assertEqual(lines[1], new_date + ",3,2,1,0,0,1\n")
+            self.assertEqual(lines[2], new_date + ",2,0,0,1,1,0\n")
             self.assertEqual(len(lines), 3)
 
     def tearDown(self):
         # Suppression du dossier créé pour les tests
         shutil.rmtree(self.csv_folder_name)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -24,26 +24,29 @@ def generate_csv(current: list[int], tracked_objects: TrackedObjects.TrackedObje
     date = datetime.now()
 
     # Initialisation des compteurs pour chaque direction et classe d'objet
-    counts_direction = {
-        "top-left": 0,
-        "top-right": 0,
-        "bottom-left": 0,
-        "bottom-right": 0
-    }
     counts_classe = {}
+    counts_direction_classe = {}
 
     # Parcours de la liste des identifiants d'objets
     for obj_id in current:
         obj = tracked_objects.get(obj_id)
         if obj is not None:
-            # Incrémentation du compteur de la direction de l'objet s'il existe
-            if obj.direction is not None:
-                counts_direction[obj.direction] += 1
             # incrémentation du compteur de la classe de l'objet s'il existe
             if obj.classe in counts_classe:
                 counts_classe[obj.classe] += 1
             else:
                 counts_classe[obj.classe] = 1
+            # Si la classe n'est pas encore dans le dictionnaire de compteurs de direction par classe, on l'ajoute
+            if obj.classe not in counts_direction_classe:
+                counts_direction_classe[obj.classe] = {
+                    "top-left": 0,
+                    "top-right": 0,
+                    "bottom-left": 0,
+                    "bottom-right": 0
+                }
+            # Incrémente le compteur de direction pour cette classe
+            if obj.direction is not None:
+                counts_direction_classe[obj.classe][obj.direction] += 1
 
     # enregistrement des données dans un fichier csv
     try:
@@ -54,8 +57,8 @@ def generate_csv(current: list[int], tracked_objects: TrackedObjects.TrackedObje
             if os.path.getsize(path) == 0:
                 writer.writerow(["date", "occurence", "top-left", "top-right", "bottom-left", "bottom-right", "classe"])
             for classe, nb_occurence in counts_classe.items():
-                writer.writerow([date.strftime("%d/%m/%Y %H:%M:%S"), nb_occurence, counts_direction["top-left"],
-                                 counts_direction["top-right"],
-                                 counts_direction["bottom-left"], counts_direction["bottom-right"], classe])
+                writer.writerow([date.strftime("%d/%m/%Y %H:%M:%S"), nb_occurence, counts_direction_classe[classe]["top-left"],
+                                    counts_direction_classe[classe]["top-right"], counts_direction_classe[classe]["bottom-left"],
+                                    counts_direction_classe[classe]["bottom-right"], classe])
     except IOError as e:
         log.warning("Erreur lors de l'écriture dans le fichier CSV: " + str(e))
