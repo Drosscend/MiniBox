@@ -8,7 +8,8 @@ from Functions import TrackedObjects
 log = logging.getLogger("main")
 
 
-def generate_csv(current: list[int], tracked_objects: TrackedObjects.TrackedObjects, csv_folder_name:str, csv_file_name: str) -> None:
+def generate_csv(current: list[int], tracked_objects: TrackedObjects.TrackedObjects, csv_folder_name: str,
+                 csv_file_name: str) -> None:
     """
     Génère un fichier CSV contenant les informations des objets détectés
     @param current: Liste des ids des objets détectés à l'instant t
@@ -57,8 +58,14 @@ def generate_csv(current: list[int], tracked_objects: TrackedObjects.TrackedObje
             if os.path.getsize(path) == 0:
                 writer.writerow(["date", "occurence", "top-left", "top-right", "bottom-left", "bottom-right", "classe"])
             for classe, nb_occurence in counts_classe.items():
-                writer.writerow([date.strftime("%d/%m/%Y %H:%M:%S"), nb_occurence, counts_direction_classe[classe]["top-left"],
-                                    counts_direction_classe[classe]["top-right"], counts_direction_classe[classe]["bottom-left"],
-                                    counts_direction_classe[classe]["bottom-right"], classe])
+                writer.writerow([
+                    date.strftime("%d/%m/%Y %H:%M:%S"),
+                    nb_occurence,
+                    counts_direction_classe[classe]["top-left"],
+                    counts_direction_classe[classe]["top-right"],
+                    counts_direction_classe[classe]["bottom-left"],
+                    counts_direction_classe[classe]["bottom-right"],
+                    classe
+                ])
     except IOError as e:
         log.warning("Erreur lors de l'écriture dans le fichier CSV: " + str(e))

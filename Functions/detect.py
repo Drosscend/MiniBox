@@ -16,8 +16,8 @@ log = logging.getLogger("main")
 tracked_objects = TrackedObjects.TrackedObjects()
 
 
-
-def detect(video_capture: cv2.VideoCapture, object_types: list[int], interval: float, display_detection: bool, yolov5_paramms: dict) -> None:
+def detect(video_capture: cv2.VideoCapture, object_types: list[int], interval: float, display_detection: bool,
+           yolov5_paramms: dict) -> None:
     """
     Détection des objets
     @param video_capture: Flux vidéo

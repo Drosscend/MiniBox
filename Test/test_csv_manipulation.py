@@ -1,9 +1,11 @@
+import os
 import shutil
 import unittest
-import os
 from datetime import datetime
-from Functions import TrackedObjects
+
 from Functions import CSV_manipulation
+from Functions import TrackedObjects
+
 
 class TestGenerateCSV(unittest.TestCase):
     csv_folder_name = 'csv_folder'

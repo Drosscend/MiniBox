@@ -1,9 +1,9 @@
-import logging
-import configparser
 import argparse
+import configparser
+import logging
 
-from Functions.CustomFormatter import CustomFormatter
 from Functions import detect
+from Functions.CustomFormatter import CustomFormatter
 
 log = logging.getLogger("main")
 log.setLevel('INFO')
@@ -27,7 +27,8 @@ config.read(args.config)
 expected_sections = ['PARAMS', 'YOLOV5_PARAMS']
 expected_options = {
     'PARAMS': ['source', 'classes', 'interval', 'display_detection', 'debug'],
-    'YOLOV5_PARAMS': ['weights', 'conf_thres', 'iou_thres', 'agnostic_nms', 'multi_label_nms', 'max_det', 'amp', 'output_folder', 'csv_name']
+    'YOLOV5_PARAMS': ['weights', 'conf_thres', 'iou_thres', 'agnostic_nms', 'multi_label_nms', 'max_det', 'amp',
+                      'output_folder', 'csv_name']
 }
 
 for section in expected_sections:
@@ -74,17 +75,19 @@ except ValueError:
     exit(1)
 
 # Vérification pour YOLOV5_PARAMS
-tab_of_weights = ["yolov5n.pt","yolov5s.pt", "yolov5m.pt", "yolov5l.pt", "yolov5x.pt"]
+tab_of_weights = ["yolov5n.pt", "yolov5s.pt", "yolov5m.pt", "yolov5l.pt", "yolov5x.pt"]
 if config.get('YOLOV5_PARAMS', 'weights') in tab_of_weights:
     weights = config.get('YOLOV5_PARAMS', 'weights')
 else:
-    log.error("Erreur : la valeur de l'option weights doit être un des fichiers suivants : " + str(tab_of_weights) + ", verifier le fichier de configuration")
+    log.error("Erreur : la valeur de l'option weights doit être un des fichiers suivants : " + str(tab_of_weights)
+              + ", verifier le fichier de configuration")
     exit(1)
 
 try:
     conf_thres = config.getfloat('YOLOV5_PARAMS', 'conf_thres')
     if conf_thres > 1.00 or conf_thres < 0:
-        log.error("Erreur : la valeur de l'option conf_thres doit être comprise entre 0 et 1, verifier le fichier de configuration")
+        log.error("Erreur : la valeur de l'option conf_thres doit être comprise entre 0 et 1, "
+                  "verifier le fichier de configuration")
         exit(1)
 except Exception as e:
     print(e)
@@ -94,7 +97,8 @@ except Exception as e:
 try:
     iou_thres = config.getfloat('YOLOV5_PARAMS', 'iou_thres')
     if iou_thres > 1 or iou_thres < 0:
-        log.error("Erreur : la valeur de l'option iou_thres doit être comprise entre 0 et 1, verifier le fichier de configuration")
+        log.error("Erreur : la valeur de l'option iou_thres doit être comprise entre 0 et 1, "
+                  "verifier le fichier de configuration")
         exit(1)
 except ValueError:
     log.error("Erreur : la valeur de l'option iou_thres doit être un double, verifier le fichier de configuration")
@@ -109,7 +113,8 @@ except ValueError:
 try:
     multi_label_nms = config.getboolean('YOLOV5_PARAMS', 'multi_label_nms')
 except ValueError:
-    log.error("Erreur : la valeur de l'option multi_label_nms doit être un boolean, verifier le fichier de configuration")
+    log.error("Erreur : la valeur de l'option multi_label_nms doit être un boolean, "
+              "verifier le fichier de configuration")
     exit(1)
 
 try:
