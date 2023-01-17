@@ -1,7 +1,7 @@
 import logging
 import configparser
 import argparse
-import os
+
 from Functions.CustomFormatter import CustomFormatter
 from Functions import detect
 
@@ -78,7 +78,7 @@ tab_of_weights = ["yolov5n.pt","yolov5s.pt", "yolov5m.pt", "yolov5l.pt", "yolov5
 if config.get('YOLOV5_PARAMS', 'weights') in tab_of_weights:
     weights = config.get('YOLOV5_PARAMS', 'weights')
 else:
-    log.error("Erreur : la valeur de l'option weights doit être un des fichiers suivants : yolov5n.pt, yolov5s.pt, yolov5m.pt, yolov5l.pt, yolov5x.pt, verifier le fichier de configuration")
+    log.error("Erreur : la valeur de l'option weights doit être un des fichiers suivants : " + str(tab_of_weights) + ", verifier le fichier de configuration")
     exit(1)
 
 try:

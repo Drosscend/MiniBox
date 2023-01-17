@@ -37,7 +37,7 @@ def detect(video_capture: cv2.VideoCapture, object_types: list[int], interval: f
     model.multi_label = yolov5_paramms["multi_label_nms"]  # NMS multiple labels per box
     model.max_det = yolov5_paramms["max_det"]  # maximum number of detections per image
     model.amp = yolov5_paramms["amp"]  # Automatic Mixed Precision (AMP) inference
-    
+
     output_folder = yolov5_paramms["output_folder"]
     csv_name = yolov5_paramms["csv_name"]
 
