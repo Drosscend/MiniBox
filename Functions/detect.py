@@ -107,11 +107,11 @@ def detect(video_capture: cv2.VideoCapture, object_types: list[int], interval: f
             time.sleep(interval)
 
         # Génération du fichier CSV
-        CSV_manipulation.generate_csv(current, tracked_objects, output_folder, csv_name)
+        csv_manipulation.generate_csv(current, tracked_objects, output_folder, csv_name)
 
         # affichage des images si spécifié
         if display_detection:
-            CV2_manipulation.draw_bounding_boxes(frame, current, tracked_objects)
+            cv2_manipulation.draw_bounding_boxes(frame, current, tracked_objects)
             key = cv2.waitKey(10)
             if key == ord('q'):
                 break
