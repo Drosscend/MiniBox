@@ -3,7 +3,7 @@ import shutil
 import unittest
 from datetime import datetime
 
-from Functions import CSV_manipulation
+from Functions import csv_manipulation
 from Functions import TrackedObjects
 
 
@@ -31,7 +31,7 @@ class TestGenerateCSV(unittest.TestCase):
 
         current = [1, 2, 3, 4]
         self.date = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-        CSV_manipulation.generate_csv(current, self.tracked_objects, self.csv_folder_name, self.csv_file_name)
+        csv_manipulation.generate_csv(current, self.tracked_objects, self.csv_folder_name, self.csv_file_name)
 
     def test_createFolder(self):
         self.assertTrue(os.path.isdir(self.csv_folder_name))
@@ -73,7 +73,7 @@ class TestGenerateCSV(unittest.TestCase):
         obj5.direction = "top-left"
 
         current = [1, 2, 3, 4, 5]
-        CSV_manipulation.generate_csv(current, new_tracking, self.csv_folder_name, self.csv_file_name)
+        csv_manipulation.generate_csv(current, new_tracking, self.csv_folder_name, self.csv_file_name)
         with open(self.csv_folder_name + '/' + self.csv_file_name, 'r') as file:
             lines = file.readlines()
             self.assertEqual(lines[1], new_date + ",3,2,1,0,0,1\n")

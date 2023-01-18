@@ -4,8 +4,8 @@ import time
 import cv2
 import yolov5
 
-from Functions import CSV_manipulation
-from Functions import CV2_manipulation
+from Functions import csv_manipulation
+from Functions import cv2_manipulation
 from Functions import TrackedObjects
 from Functions import sort
 from Functions import utils
