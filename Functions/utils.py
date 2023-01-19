@@ -1,28 +1,11 @@
-import logging
-import os
 import random
 
-log = logging.getLogger("main")
 
-
-def removeFile(path_to_file_to_remove):
+def get_random_color(name_idx: int) -> tuple[int, int, int]:
     """
-    Supprime le fichier passé en paramètre
-    :param path_to_file_to_remove: chemin du fichier à supprimer
-    """
-    log.debug("Suppression du fichier " + path_to_file_to_remove)
-    if os.path.exists(path_to_file_to_remove):
-        os.remove(path_to_file_to_remove)
-        log.debug("Fichier " + path_to_file_to_remove + " supprimé")
-    else:
-        log.error("Fichier " + path_to_file_to_remove + " inexistant")
-
-
-def random_color(name_idx):
-    """
-    Génère une couleur aléatoire pour chaque personne
-    :param name_idx: identifiant
-    :return: couleur aléatoire
+    Génère une couleur aléatoire pour un objet
+    @param name_idx: Identifiant de l'objet
+    @return: Couleur aléatoire
     """
     random.seed(name_idx)
     r = random.randint(0, 255)
