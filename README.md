@@ -118,6 +118,16 @@ amp = True
 output_folder = OUTPUT
 # la valeur par défaut est `data.csv`
 csv_name = data.csv
+
+[BDD_PARAMS]
+# Activer la sauvegarde dans la base de données, la valeur par défaut est `True`
+save_in_bdd = True
+# Nom de la base de données, la valeur par défaut est `detect_save.db`
+bdd_name = detect_save.db
+# Nom de la table, la valeur par défaut est `detect`
+table_name = detect
+# Heure à laquelle les données seront enregistrées, la valeur par défaut est `00:00:00` (Attention la detection sera mise en pause)
+time_to_save = 00:00:00
 ```
 
 Vous pouvez fournir un fichier de configuration personnalisé en utilisant l'option -c ou --config :

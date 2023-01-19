@@ -1,6 +1,7 @@
 import argparse
 import configparser
 import logging
+import re
 
 from Functions import detect
 from Functions.CustomFormatter import CustomFormatter
@@ -24,11 +25,12 @@ config = configparser.ConfigParser()
 config.read(args.config)
 
 # Vérifier que le fichier de configuration est valide
-expected_sections = ['PARAMS', 'YOLOV5_PARAMS']
+expected_sections = ['PARAMS', 'YOLOV5_PARAMS', 'BDD_PARAMS']
 expected_options = {
     'PARAMS': ['source', 'classes', 'interval', 'display_detection', 'debug'],
     'YOLOV5_PARAMS': ['weights', 'conf_thres', 'iou_thres', 'agnostic_nms', 'multi_label_nms', 'max_det', 'amp',
-                      'output_folder', 'csv_name']
+                      'output_folder', 'csv_name'],
+    'BDD_PARAMS': ['save_in_bdd', 'bdd_name', 'table_name', 'time_to_save']
 }
 
 for section in expected_sections:
@@ -75,9 +77,10 @@ except ValueError:
     exit(1)
 
 # Vérification pour YOLOV5_PARAMS
+yolov5_paramms = {}
 tab_of_weights = ["yolov5n.pt", "yolov5s.pt", "yolov5m.pt", "yolov5l.pt", "yolov5x.pt"]
 if config.get('YOLOV5_PARAMS', 'weights') in tab_of_weights:
-    weights = config.get('YOLOV5_PARAMS', 'weights')
+    yolov5_paramms['weights'] = config.get('YOLOV5_PARAMS', 'weights')
 else:
     log.error("Erreur : la valeur de l'option weights doit être un des fichiers suivants : " + str(tab_of_weights)
               + ", verifier le fichier de configuration")
@@ -89,6 +92,8 @@ try:
         log.error("Erreur : la valeur de l'option conf_thres doit être comprise entre 0 et 1, "
                   "verifier le fichier de configuration")
         exit(1)
+    else:
+        yolov5_paramms['conf_thres'] = conf_thres
 except Exception as e:
     print(e)
     log.error("Erreur : la valeur de l'option conf_thres doit être un double, verifier le fichier de configuration")
@@ -100,37 +105,39 @@ try:
         log.error("Erreur : la valeur de l'option iou_thres doit être comprise entre 0 et 1, "
                   "verifier le fichier de configuration")
         exit(1)
+    else:
+        yolov5_paramms['iou_thres'] = iou_thres
 except ValueError:
     log.error("Erreur : la valeur de l'option iou_thres doit être un double, verifier le fichier de configuration")
     exit(1)
 
 try:
-    agnostic_nms = config.getboolean('YOLOV5_PARAMS', 'agnostic_nms')
+    yolov5_paramms['agnostic_nms'] = config.getboolean('YOLOV5_PARAMS', 'agnostic_nms')
 except ValueError:
     log.error("Erreur : la valeur de l'option agnostic_nms doit être un boolean, verifier le fichier de configuration")
     exit(1)
 
 try:
-    multi_label_nms = config.getboolean('YOLOV5_PARAMS', 'multi_label_nms')
+    yolov5_paramms['multi_label_nms'] = config.getboolean('YOLOV5_PARAMS', 'multi_label_nms')
 except ValueError:
     log.error("Erreur : la valeur de l'option multi_label_nms doit être un boolean, "
               "verifier le fichier de configuration")
     exit(1)
 
 try:
-    max_det = config.getint('YOLOV5_PARAMS', 'max_det')
+    yolov5_paramms['max_det'] = config.getint('YOLOV5_PARAMS', 'max_det')
 except ValueError:
     log.error("Erreur : la valeur de l'option max_det doit être un entier, verifier le fichier de configuration")
     exit(1)
 
 try:
-    amp = config.getboolean('YOLOV5_PARAMS', 'amp')
+    yolov5_paramms['amp'] = config.getboolean('YOLOV5_PARAMS', 'amp')
 except ValueError:
     log.error("Erreur : la valeur de l'option amp doit être un boolean, verifier le fichier de configuration")
     exit(1)
 
 try:
-    output_folder = config.get('YOLOV5_PARAMS', 'output_folder')
+    yolov5_paramms['output_folder'] = config.get('YOLOV5_PARAMS', 'output_folder')
 except ValueError:
     log.error("Erreur : la valeur de l'option output_folder doit être un chemin, verifier le fichier de configuration")
     exit(1)
@@ -140,21 +147,54 @@ try:
     if not csv_name.endswith(".csv"):
         log.error("Erreur : le fichier csv_name doit être un fichier csv, verifier le fichier de configuration")
         exit(1)
+    else:
+        yolov5_paramms['csv_name'] = csv_name
 except ValueError:
     log.error("Erreur : la valeur de l'option csv_name doit être un chemin, verifier le fichier de configuration")
     exit(1)
 
-yolov5_paramms = {
-    "weights": weights,
-    "conf_thres": conf_thres,
-    "iou_thres": iou_thres,
-    "agnostic_nms": agnostic_nms,
-    "multi_label_nms": multi_label_nms,
-    "max_det": max_det,
-    "amp": amp,
-    "output_folder": output_folder,
-    "csv_name": csv_name
-}
+
+# Vérification pour BDD_PARAMS
+bdd_params = {}
+try:
+    bdd_params['save_in_bdd'] = config.getboolean('BDD_PARAMS', 'save_in_bdd')
+except ValueError:
+    log.error("Erreur : la valeur de l'option save_in_bdd doit être un boolean, verifier le fichier de configuration")
+    exit(1)
+
+if bdd_params['save_in_bdd']:
+    try:
+        bdd_name = config.get('BDD_PARAMS', 'bdd_name')
+        if not bdd_name.endswith(".db"):
+            log.error("Erreur : le fichier bdd_name doit être un fichier de base de données, verifier le fichier de "
+                      "configuration")
+            exit(1)
+        else:
+            bdd_params['bdd_name'] = bdd_name
+    except ValueError:
+        log.error("Erreur : la valeur de l'option bdd_name doit être un chemin, verifier le fichier de configuration")
+        exit(1)
+
+    try:
+        bdd_params['table_name'] = config.get('BDD_PARAMS', 'table_name')
+    except ValueError:
+        log.error("Erreur : la valeur de l'option table_name doit être un chemin, verifier le fichier de configuration")
+        exit(1)
+
+    try:
+        time_to_save = config.get('BDD_PARAMS', 'time_to_save')
+        # 00:00:00
+        if not re.match(r"([01]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]", time_to_save):
+            log.error("Erreur : la valeur de l'option time_to_save doit être au format hh:mm:ss, verifier le fichier "
+                      "de configuration")
+            exit(1)
+        else:
+            bdd_params['time_to_save'] = time_to_save
+    except ValueError:
+        log.error("Erreur : la valeur de l'option time_to_save doit être un chemin, verifier le fichier "
+                  "de configuration")
+        exit(1)
+
 ####################################
 
 
@@ -177,6 +217,11 @@ if __name__ == "__main__":
     log.info("output_folder : " + str(yolov5_paramms["output_folder"]))
     log.info("csv_name : " + str(yolov5_paramms["csv_name"]))
 
+    if bdd_params['save_in_bdd']:
+        log.info("bdd_name : " + str(bdd_params["bdd_name"]))
+        log.info("table_name : " + str(bdd_params["table_name"]))
+        log.info("time_to_save : " + str(bdd_params["time_to_save"]))
+
     # si debug = True, on passe le niveau de log à DEBUG
     if debug:
         log.setLevel('DEBUG')
@@ -185,7 +230,7 @@ if __name__ == "__main__":
 
     # lancement de la détection
     try:
-        detect.main(source, classes, interval, display_detection, yolov5_paramms)
+        detect.main(source, classes, interval, display_detection, yolov5_paramms, bdd_params)
     except KeyboardInterrupt:
         log.info("Detection terminée")
         exit(0)
