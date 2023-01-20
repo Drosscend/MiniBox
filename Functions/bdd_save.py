@@ -7,12 +7,13 @@ import time
 log = logging.getLogger("main")
 
 
-def save_bdd(bdd_name: str, table_name: str, csv_file: str) -> None:
+def save_bdd(bdd_name: str, table_name: str, csv_file: str, keep_csv: bool) -> None:
     """
     Sauvegarde les données du fichier csv dans la base de données SQLite
     @param bdd_name: nom du fichier de la base de données
     @param table_name: nom de la table
     @param csv_file: nom du fichier csv
+    @param keep_csv: booléen pour garder ou non le fichier csv
     """
 
     log.info("Sauvegarde des données dans la base de données")
@@ -59,12 +60,21 @@ def save_bdd(bdd_name: str, table_name: str, csv_file: str) -> None:
     conn.close()
 
     # suppression du fichier csv
+    if  keep_csv:
+        # renommage du fichier csv pour éviter de le réutiliser (nom + date)
+        try:
+            log.debug("Renommage du fichier csv")
+            os.rename(csv_file, (csv_file[:-4] + "_" + time.strftime("%Y%m%d-%H%M%S") + ".csv"))
+        except FileNotFoundError as e:
+            log.error("Erreur lors du renommage du fichier csv: {}".format(e))
+            return
     try:
         log.debug("Suppression du fichier csv")
         os.remove(csv_file)
     except FileNotFoundError as e:
         log.error("Erreur lors de la suppression du fichier csv: {}".format(e))
         return
+
 
     # Affichage du temps d'execution
     log.info(f"Temps d'execution : {(time.time() - start_time).__round__(2)} secondes")

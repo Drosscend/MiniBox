@@ -128,6 +128,8 @@ bdd_name = detect_save.db
 table_name = detect
 # Heure à laquelle les données seront enregistrées, la valeur par défaut est `00:00:00` (Attention la detection sera mise en pause)
 time_to_save = 00:00:00
+# Désactiver la suppression du fichier csv, la valeur par défaut est `False`
+keep_csv = False
 ```
 
 Vous pouvez fournir un fichier de configuration personnalisé en utilisant l'option -c ou --config :

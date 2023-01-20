@@ -2,6 +2,7 @@ import unittest
 import os
 import sqlite3
 import logging
+import time
 from Functions import bdd_save
 
 class TestSaveBDD(unittest.TestCase):
@@ -17,7 +18,7 @@ class TestSaveBDD(unittest.TestCase):
 
     def test_save_bdd(self):
         # Appeler la fonction à tester
-        bdd_save.save_bdd("test.db", "test_table", "test.csv")
+        bdd_save.save_bdd("test.db", "test_table", "test.csv", False)
 
         # Vérifier que la base de données a été créée
         self.assertTrue(os.path.exists("test.db"))
@@ -34,8 +35,18 @@ class TestSaveBDD(unittest.TestCase):
     def test_file_not_found(self):
         # Vérifier que la fonction génère une exception lorsque le fichier csv n'existe pas
         with self.assertRaises(FileNotFoundError):
-            bdd_save.save_bdd("test.db", "test_table", "notfound.csv")
+            bdd_save.save_bdd("test.db", "test_table", "notfound.csv", False)
 
+    def test_save_csv(self):
+        timeStart = time.strftime("%Y%m%d-%H%M%S")
+        # faire une sauvegarde avec le paramètre keep_csv à True
+        bdd_save.save_bdd("test.db", "test_table", "test.csv", True)
+        # vérifier que le fichier csv de base n'existe plus
+        self.assertFalse(os.path.exists("test.csv"))
+        # vérifier qu'un nouveau fichier csv a été créé avec le nom du fichier de base + timeStart
+        self.assertTrue(os.path.exists("test_" + timeStart + ".csv"))
+        # suppression du fichier csv de test
+        os.remove("test_" + timeStart + ".csv")
 
     def tearDown(self):
         # Supprimer les fichiers de test
