@@ -1,4 +1,3 @@
-import argparse
 import configparser
 import logging
 import re
@@ -193,7 +192,6 @@ def get_bdd_params(config) -> dict:
 
         try:
             time_to_save = config.get('BDD_PARAMS', 'time_to_save')
-            # 00:00:00
             if not re.match(r"([01]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]", time_to_save):
                 log.error("Erreur : la valeur de l'option time_to_save doit être au format hh:mm:ss, verifier le fichier "
                         "de configuration")
@@ -213,7 +211,7 @@ def get_bdd_params(config) -> dict:
 
     return bdd_params
 
-def print_config(base_params, yolov5_params, bdd_params):
+def print_config(base_params, yolov5_params, bdd_params) -> None:
     """
     Fonction principale
     @param base_params: Paramètres de base
