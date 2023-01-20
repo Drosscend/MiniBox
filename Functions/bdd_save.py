@@ -23,7 +23,7 @@ def save_bdd(bdd_name: str, table_name: str, csv_file: str) -> None:
     # vérification de l'existence du fichier csv à la racine du projet
     if not os.path.exists(csv_file):
         log.error("Le fichier csv n'existe pas")
-        return
+        raise FileNotFoundError("Le fichier csv n'existe pas")
 
     # Connexion à la base de données
     conn = sqlite3.connect(bdd_name)
@@ -72,7 +72,3 @@ def save_bdd(bdd_name: str, table_name: str, csv_file: str) -> None:
     # attendre 1 seconde pour éviter de sauvegarder plusieurs fois dans la base de données
     time.sleep(1)
     log.info("Sauvegarde terminée")
-
-
-if __name__ == "__main__":
-    save_bdd("detect_save.db", "detect", "OUTPUT/data.csv")
