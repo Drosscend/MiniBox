@@ -42,5 +42,6 @@ class TestConfigHandler(unittest.TestCase):
         self.assertEqual(bdd_params['time_to_save'], "00:00:00")
         self.assertFalse(bdd_params['keep_csv'])
 
+
 if __name__ == "__main__":
     unittest.main()
