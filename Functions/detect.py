@@ -122,7 +122,7 @@ def detect(
         if bdd_params["save_in_bdd"]:
             if bdd_params["time_to_save"] == time.strftime("%H:%M:%S"):
                 csv_pah = os.path.join(output_folder, csv_name)
-                bdd_save.save_bdd(bdd_params["bdd_name"], bdd_params["table_name"], csv_pah)
+                bdd_save.save_bdd(bdd_params["bdd_name"], bdd_params["table_name"], csv_pah, bdd_params["keep_csv"])
 
                 # affichage des images si spécifié
         if display_detection:
@@ -139,24 +139,21 @@ def detect(
 
 
 def main(
-        source: int,
-        classes: list[int],
-        interval: float,
-        display_detection: bool,
+        base_params: dict,
         yolov5_paramms: dict,
         bdd_params: dict
 ) -> None:
     """
     Fonction principale
-    @param source: Source de la vidéo
-    @param classes: Liste des types d'objets à détecter
-    @param interval: Intervalle de temps entre chaque détection
-    @param display_detection: Affichage des boites englobantes
+    @param base_params: Paramètres de base
     @param yolov5_paramms: Paramètres de la librairie Yolov5
     @param bdd_params: Paramètres de la base de données
     """
     # Initialisation de la caméra
-    video_capture = cv2.VideoCapture(source)
+    video_capture = cv2.VideoCapture(base_params["source"])
+    classes = base_params["classes"]
+    interval = base_params["interval"]
+    display_detection = base_params["display_detection"]
 
     # Vérification de l'ouverture de la caméra
     if not video_capture.isOpened():
