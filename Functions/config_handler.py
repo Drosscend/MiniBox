@@ -4,7 +4,8 @@ import re
 
 log = logging.getLogger("main")
 
-def check_params(config) -> bool :
+
+def check_params(config) -> bool:
     """
     Vérifier que le fichier de configuration est valide
     @param config: le fichier de configuration
@@ -15,21 +16,22 @@ def check_params(config) -> bool :
     expected_options = {
         'PARAMS': ['source', 'classes', 'interval', 'display_detection', 'debug'],
         'YOLOV5_PARAMS': ['weights', 'conf_thres', 'iou_thres', 'agnostic_nms', 'multi_label_nms', 'max_det', 'amp',
-                        'output_folder', 'csv_name'],
+                          'output_folder', 'csv_name'],
         'BDD_PARAMS': ['save_in_bdd', 'bdd_name', 'table_name', 'time_to_save', 'keep_csv']
     }
 
     for section in expected_sections:
         if not config.has_section(section):
             log.error("Erreur : section {} attendue dans le fichier de configuration"
-                    .format(section))
+                      .format(section))
             return False
         for option in expected_options[section]:
             if not config.has_option(section, option):
                 log.error("Erreur : option {} attendue dans la section {} du fichier de configuration"
-                        .format(option, section))
+                          .format(option, section))
                 return False
     return True
+
 
 def get_base_params(config) -> dict:
     """
@@ -60,7 +62,7 @@ def get_base_params(config) -> dict:
         base_params['display_detection'] = config.getboolean('PARAMS', 'display_detection')
     except ValueError:
         log.error("Erreur : la valeur de l'option display_detection doit être un boolean, verifier le fichier de "
-                "configuration")
+                  "configuration")
         exit(1)
 
     try:
@@ -84,14 +86,14 @@ def get_yolov5_params(config) -> dict:
         yolov5_paramms['weights'] = config.get('YOLOV5_PARAMS', 'weights')
     else:
         log.error("Erreur : la valeur de l'option weights doit être un des fichiers suivants : " + str(tab_of_weights)
-                + ", verifier le fichier de configuration")
+                  + ", verifier le fichier de configuration")
         exit(1)
 
     try:
         conf_thres = config.getfloat('YOLOV5_PARAMS', 'conf_thres')
         if conf_thres > 1.00 or conf_thres < 0:
             log.error("Erreur : la valeur de l'option conf_thres doit être comprise entre 0 et 1, "
-                    "verifier le fichier de configuration")
+                      "verifier le fichier de configuration")
             exit(1)
         else:
             yolov5_paramms['conf_thres'] = conf_thres
@@ -104,7 +106,7 @@ def get_yolov5_params(config) -> dict:
         iou_thres = config.getfloat('YOLOV5_PARAMS', 'iou_thres')
         if iou_thres > 1 or iou_thres < 0:
             log.error("Erreur : la valeur de l'option iou_thres doit être comprise entre 0 et 1, "
-                    "verifier le fichier de configuration")
+                      "verifier le fichier de configuration")
             exit(1)
         else:
             yolov5_paramms['iou_thres'] = iou_thres
@@ -115,14 +117,15 @@ def get_yolov5_params(config) -> dict:
     try:
         yolov5_paramms['agnostic_nms'] = config.getboolean('YOLOV5_PARAMS', 'agnostic_nms')
     except ValueError:
-        log.error("Erreur : la valeur de l'option agnostic_nms doit être un boolean, verifier le fichier de configuration")
+        log.error(
+            "Erreur : la valeur de l'option agnostic_nms doit être un boolean, verifier le fichier de configuration")
         exit(1)
 
     try:
         yolov5_paramms['multi_label_nms'] = config.getboolean('YOLOV5_PARAMS', 'multi_label_nms')
     except ValueError:
         log.error("Erreur : la valeur de l'option multi_label_nms doit être un boolean, "
-                "verifier le fichier de configuration")
+                  "verifier le fichier de configuration")
         exit(1)
 
     try:
@@ -140,7 +143,8 @@ def get_yolov5_params(config) -> dict:
     try:
         yolov5_paramms['output_folder'] = config.get('YOLOV5_PARAMS', 'output_folder')
     except ValueError:
-        log.error("Erreur : la valeur de l'option output_folder doit être un chemin, verifier le fichier de configuration")
+        log.error(
+            "Erreur : la valeur de l'option output_folder doit être un chemin, verifier le fichier de configuration")
         exit(1)
 
     try:
@@ -167,7 +171,8 @@ def get_bdd_params(config) -> dict:
     try:
         bdd_params['save_in_bdd'] = config.getboolean('BDD_PARAMS', 'save_in_bdd')
     except ValueError:
-        log.error("Erreur : la valeur de l'option save_in_bdd doit être un boolean, verifier le fichier de configuration")
+        log.error(
+            "Erreur : la valeur de l'option save_in_bdd doit être un boolean, verifier le fichier de configuration")
         exit(1)
 
     # Si on veut sauvegarder les résultats dans la base de données
@@ -175,41 +180,47 @@ def get_bdd_params(config) -> dict:
         try:
             bdd_name = config.get('BDD_PARAMS', 'bdd_name')
             if not bdd_name.endswith(".db"):
-                log.error("Erreur : le fichier bdd_name doit être un fichier de base de données, verifier le fichier de "
-                        "configuration")
+                log.error(
+                    "Erreur : le fichier bdd_name doit être un fichier de base de données, verifier le fichier de "
+                    "configuration")
                 exit(1)
             else:
                 bdd_params['bdd_name'] = bdd_name
         except ValueError:
-            log.error("Erreur : la valeur de l'option bdd_name doit être un chemin, verifier le fichier de configuration")
+            log.error(
+                "Erreur : la valeur de l'option bdd_name doit être un chemin, verifier le fichier de configuration")
             exit(1)
 
         try:
             bdd_params['table_name'] = config.get('BDD_PARAMS', 'table_name')
         except ValueError:
-            log.error("Erreur : la valeur de l'option table_name doit être un chemin, verifier le fichier de configuration")
+            log.error(
+                "Erreur : la valeur de l'option table_name doit être un chemin, verifier le fichier de configuration")
             exit(1)
 
         try:
             time_to_save = config.get('BDD_PARAMS', 'time_to_save')
             if not re.match(r"([01]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]", time_to_save):
-                log.error("Erreur : la valeur de l'option time_to_save doit être au format hh:mm:ss, verifier le fichier "
-                        "de configuration")
+                log.error(
+                    "Erreur : la valeur de l'option time_to_save doit être au format hh:mm:ss, verifier le fichier "
+                    "de configuration")
                 exit(1)
             else:
                 bdd_params['time_to_save'] = time_to_save
         except ValueError:
             log.error("Erreur : la valeur de l'option time_to_save doit être un chemin, verifier le fichier "
-                    "de configuration")
+                      "de configuration")
             exit(1)
 
         try:
             bdd_params['keep_csv'] = config.getboolean('BDD_PARAMS', 'keep_csv')
         except ValueError:
-            log.error("Erreur : la valeur de l'option keep_csv doit être un boolean, verifier le fichier de configuration")
+            log.error(
+                "Erreur : la valeur de l'option keep_csv doit être un boolean, verifier le fichier de configuration")
             exit(1)
 
     return bdd_params
+
 
 def print_config(base_params, yolov5_params, bdd_params) -> None:
     """
@@ -239,6 +250,7 @@ def print_config(base_params, yolov5_params, bdd_params) -> None:
         log.info("table_name : " + str(bdd_params["table_name"]))
         log.info("time_to_save : " + str(bdd_params["time_to_save"]))
         log.info("keep_csv : " + str(bdd_params["keep_csv"]))
+
 
 def get_config(config_file) -> tuple[dict, dict, dict]:
     """
