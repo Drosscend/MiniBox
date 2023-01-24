@@ -3,8 +3,8 @@ import shutil
 import unittest
 from datetime import datetime
 
-from Functions import csv_manipulation
 from Functions import TrackedObjects
+from Functions import csv_manipulation
 
 
 class TestGenerateCSV(unittest.TestCase):

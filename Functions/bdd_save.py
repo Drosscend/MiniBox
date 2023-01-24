@@ -60,7 +60,7 @@ def save_bdd(bdd_name: str, table_name: str, csv_file: str, keep_csv: bool) -> N
     conn.close()
 
     # suppression du fichier csv
-    if  keep_csv:
+    if keep_csv:
         # renommage du fichier csv pour éviter de le réutiliser (nom + date)
         try:
             log.debug("Renommage du fichier csv")
@@ -74,7 +74,6 @@ def save_bdd(bdd_name: str, table_name: str, csv_file: str, keep_csv: bool) -> N
     except FileNotFoundError as e:
         log.error("Erreur lors de la suppression du fichier csv: {}".format(e))
         return
-
 
     # Affichage du temps d'execution
     log.info(f"Temps d'execution : {(time.time() - start_time).__round__(2)} secondes")

@@ -1,9 +1,11 @@
-import unittest
+import logging
 import os
 import sqlite3
-import logging
 import time
+import unittest
+
 from Functions import bdd_save
+
 
 class TestSaveBDD(unittest.TestCase):
     def setUp(self):

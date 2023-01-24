@@ -1,6 +1,7 @@
-import unittest
-from Functions.config_handler import check_params, get_base_params, get_yolov5_params, get_bdd_params
 import configparser
+import unittest
+
+from Functions.config_handler import check_params, get_base_params, get_yolov5_params, get_bdd_params
 
 
 class TestConfigHandler(unittest.TestCase):
@@ -31,7 +32,7 @@ class TestConfigHandler(unittest.TestCase):
         self.assertTrue(yolov5_params['multi_label_nms'])
         self.assertEqual(yolov5_params['max_det'], 50)
         self.assertTrue(yolov5_params['amp'])
-        self.assertEqual(yolov5_params['output_folder'],"OUTPUT")
+        self.assertEqual(yolov5_params['output_folder'], "OUTPUT")
         self.assertEqual(yolov5_params['csv_name'], "data.csv")
 
     def test_get_bdd_params(self):
