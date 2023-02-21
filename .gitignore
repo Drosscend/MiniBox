@@ -172,3 +172,4 @@ yolov5*.pt
 # Minibox settings
 custom_config.ini
 OUTPUT
+detect_save.db

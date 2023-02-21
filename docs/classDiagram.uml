@@ -44,6 +44,11 @@ package Function <<Functions>> {
     Fonction utiles pour le programme
     +get_random_color()
   }
+  
+  class bdd_save {
+    Fonction permettant la sauvegarde
+    +save_bdd()
+  }
 
   class CustomFormater {
     +format()
@@ -64,14 +69,15 @@ package Function <<Functions>> {
 Main *-left- Detect: Passage des paramètres
 Main *-right- CustomFormater: Mise en forme des logs
 
+TrackedObjects *-up- Detect: Enregistrement des données dans des classes
 
 Detect *-up- Utils: Appel de fonctions utilitaires
 Detect *-up- Sort: Tracking des objets
 Detect *-down- CSV_manipulation: Enregistrement des données dans le CSV
 Detect *-down- CV2_manipulations: Affichage des données
+Detect *-left- bdd_save: Sauvegarde des données
 
-TrackedObjects *-up- CSV_manipulation: Récupérer les infos
-TrackedObjects *-up- CV2_manipulations: Récupérer les infos
-TrackedObjects *-up- Detect: Enregistrement des données dans des classes
+TrackedObjects *-right- CSV_manipulation: Récupérer les infos
+TrackedObjects *-left- CV2_manipulations: Récupérer les infos
 
 @enduml

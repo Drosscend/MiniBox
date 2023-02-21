@@ -1,12 +1,14 @@
 import logging
+import os
 import time
 
 import cv2
 import yolov5
 
+from Functions import TrackedObjects
+from Functions import bdd_save
 from Functions import csv_manipulation
 from Functions import cv2_manipulation
-from Functions import TrackedObjects
 from Functions import sort
 from Functions import utils
 
@@ -16,15 +18,22 @@ log = logging.getLogger("main")
 tracked_objects = TrackedObjects.TrackedObjects()
 
 
-def detect(video_capture: cv2.VideoCapture, object_types: list[int], interval: float, display_detection: bool,
-           yolov5_paramms: dict) -> None:
+def detect(
+        video_capture: cv2.VideoCapture,
+        object_types: list[int],
+        interval: float,
+        display_detection: bool,
+        yolov5_paramms: dict,
+        bdd_params: dict
+) -> None:
     """
     Détection des objets
     @param video_capture: Flux vidéo
     @param object_types: Liste des types d'objets à détecter
     @param interval: Intervalle de temps entre chaque détection
     @param display_detection: Affichage des boites englobantes
-    @param yolov5_paramms: Paramètres de la librairie Yolov5
+    @param yolov5_paramms: Paramètres de la librairie Yolov5.
+    @param bdd_params: Paramètres de la base de données
     """
 
     log.info("Début de la détection")
@@ -109,7 +118,13 @@ def detect(video_capture: cv2.VideoCapture, object_types: list[int], interval: f
         # Génération du fichier CSV
         csv_manipulation.generate_csv(current, tracked_objects, output_folder, csv_name)
 
-        # affichage des images si spécifié
+        # sauvegarde dans la base de données
+        if bdd_params["save_in_bdd"]:
+            if bdd_params["time_to_save"] == time.strftime("%H:%M:%S"):
+                csv_pah = os.path.join(output_folder, csv_name)
+                bdd_save.save_bdd(bdd_params["bdd_name"], bdd_params["table_name"], csv_pah, bdd_params["keep_csv"])
+
+                # affichage des images si spécifié
         if display_detection:
             cv2_manipulation.draw_bounding_boxes(frame, current, tracked_objects)
             key = cv2.waitKey(10)
@@ -123,17 +138,22 @@ def detect(video_capture: cv2.VideoCapture, object_types: list[int], interval: f
     log.info("Detection terminée")
 
 
-def main(source: int, classes: list[int], interval: float, display_detection: bool, yolov5_paramms: dict) -> None:
+def main(
+        base_params: dict,
+        yolov5_paramms: dict,
+        bdd_params: dict
+) -> None:
     """
     Fonction principale
-    @param source: Source de la vidéo
-    @param classes: Liste des types d'objets à détecter
-    @param interval: Intervalle de temps entre chaque détection
-    @param display_detection: Affichage des boites englobantes
+    @param base_params: Paramètres de base
     @param yolov5_paramms: Paramètres de la librairie Yolov5
+    @param bdd_params: Paramètres de la base de données
     """
     # Initialisation de la caméra
-    video_capture = cv2.VideoCapture(source)
+    video_capture = cv2.VideoCapture(base_params["source"])
+    classes = base_params["classes"]
+    interval = base_params["interval"]
+    display_detection = base_params["display_detection"]
 
     # Vérification de l'ouverture de la caméra
     if not video_capture.isOpened():
@@ -145,6 +165,6 @@ def main(source: int, classes: list[int], interval: float, display_detection: bo
 
     # Détection des personnes
     try:
-        detect(video_capture, classes, interval, display_detection, yolov5_paramms)
+        detect(video_capture, classes, interval, display_detection, yolov5_paramms, bdd_params)
     except Exception as e:
         log.error("Erreur lors de la détection: {}".format(e))
