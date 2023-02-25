@@ -1,5 +1,6 @@
 import configparser
 import logging
+import os
 import re
 
 log = logging.getLogger("main")
@@ -41,7 +42,16 @@ def get_base_params(config) -> dict:
     """
     base_params = {}
     try:
-        base_params['source'] = config.getint('PARAMS', 'source')
+        base_params['source'] = config.get('PARAMS', 'source')
+        # transformer la source en entier si c'est un chiffre (pour la webcam)
+        if re.match(r'^\d+$', base_params['source']):
+            base_params['source'] = int(base_params['source'])
+        else:
+            # vérifier que le fichier existe
+            if not os.path.isfile(base_params['source']):
+                log.error("Erreur : le fichier {} n'existe pas, verifier le fichier de configuration"
+                          .format(base_params['source']))
+                exit(1)
     except ValueError:
         log.error("Erreur : la valeur de source doit être un entier, verifier le fichier de configuration")
         exit(1)
