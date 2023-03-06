@@ -18,7 +18,7 @@ class TestConfigHandler(unittest.TestCase):
     def test_get_base_params(self):
         base_params = get_base_params(self.valid_config)
         self.assertEqual(base_params['source'], 0)
-        self.assertEqual(base_params['classes'], [0, 1])
+        self.assertEqual(base_params['classes'], [1])
         self.assertEqual(base_params['interval'], 1)
         self.assertFalse(base_params['display_detection'])
         self.assertFalse(base_params['debug'])

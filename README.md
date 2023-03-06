@@ -88,10 +88,10 @@ Le programme sera lancé avec les paramètres par défaut.
 Pour lancer le programme avec des paramètres personnalisés, modifiez le fichier config.ini
 ```ini
 [PARAMS]
-# La valeur par défaut est `0`
+# La valeur par défaut est `0` (0 : Webcam, video.mp4 : Video")
 source = 0
-# La valeur par défaut est `0,1` (personne, vélo)
-classes = 0,1
+# La valeur par défaut est `1` (vélo)
+classes = 1
 # La valeur par défaut est `1`, si vous voulez augmenter le temps entre chaque prise, augmentez la valeur
 interval = 1
 # La valeur par défaut est `False`, si vous voulez activer l'affichage graphique, mettez `True`
