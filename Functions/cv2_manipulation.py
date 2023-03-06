@@ -1,5 +1,6 @@
 import cv2
-
+import platform
+import os
 from Functions import TrackedObjects
 
 
@@ -10,6 +11,16 @@ def draw_bounding_boxes(image, current: list[int], tracked_objects: TrackedObjec
     @param current: Liste des ids des objets détectés à l'instant t
     @param tracked_objects: Liste des objets détectés
     """
+
+    try:
+        if platform.system() == 'Linux' and not os.getenv('DISPLAY', ''): 
+            cv2.namedWindow("Video", cv2.WINDOW_NORMAL | cv2.WINDOW_KEEPRATIO)
+        else:
+            cv2.namedWindow("Video", cv2.WINDOW_NORMAL)
+        cv2.resizeWindow("Video", 640, 480)
+    except:
+        pass
+
     # Si aucun objet n'a été détecté
     if not current:
         cv2.putText(image, "Aucun objet detecte", (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
