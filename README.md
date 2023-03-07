@@ -151,8 +151,8 @@ pytest Test/
 ### <h2 align="center">Equipe</h2>
 
 Etudiants de l'APSIO de l'Université de Toulouse :
-- Noémie Tandol @Drosscend
-- Kévin Véronési @NoemieT82
+- Kévin Véronési @Drosscend
+- Noémie Tandol @NoemieT82
 
 Encadrants :
 - Yahn Formanczak
