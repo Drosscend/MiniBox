@@ -18,28 +18,20 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 """
-from __future__ import print_function
 
 import numpy as np
+import torch
 from filterpy.kalman import KalmanFilter
 
 np.random.seed(0)
 
 
-def linear_assignment(cost_matrix):
-    try:
-        import lap
-        _, x, y = lap.lapjv(cost_matrix, extend_cost=True)
-        return np.array([[y[i], i] for i in x if i >= 0])
-    except ImportError:
-        from scipy.optimize import linear_sum_assignment
-        x, y = linear_sum_assignment(cost_matrix)
-        return np.array(list(zip(x, y)))
-
-
-def iou_batch(bb_test, bb_gt):
+def iou_batch(bb_test: torch.Tensor, bb_gt: np.ndarray) -> np.ndarray:
     """
-    From SORT: Computes IOU between two bboxes in the form [x1,y1,x2,y2]
+    From SORT: Computes IUO between two bboxes in the form [x1,y1,x2,y2]
+    @param bb_test: (N,4) ndarray of float
+    @param bb_gt: (K,4) ndarray of float
+    @return: ndarray of overlap between boxes and query_boxes
     """
     bb_gt = np.expand_dims(bb_gt, 0)
     bb_test = np.expand_dims(bb_test, 1)
@@ -56,11 +48,13 @@ def iou_batch(bb_test, bb_gt):
     return o
 
 
-def convert_bbox_to_z(bbox):
+def convert_bbox_to_z(bbox: torch.Tensor) -> np.ndarray:
     """
     Takes a bounding box in the form [x1,y1,x2,y2] and returns z in the form
       [x,y,s,r] where x,y is the centre of the box and s is the scale/area and r is
       the aspect ratio
+    @param bbox: (N,4) ndarray of float
+    @return: (N,5) ndarray of float
     """
     w = bbox[2] - bbox[0]
     h = bbox[3] - bbox[1]
@@ -71,17 +65,16 @@ def convert_bbox_to_z(bbox):
     return np.array([x, y, s, r]).reshape((4, 1))
 
 
-def convert_x_to_bbox(x, score=None):
+def convert_x_to_bbox(x: np.ndarray) -> np.ndarray:
     """
     Takes a bounding box in the centre form [x,y,s,r] and returns it in the form
       [x1,y1,x2,y2] where x1,y1 is the top left and x2,y2 is the bottom right
+    @param x: (N,5) ndarray of float
+    @return: (N,4) ndarray of float
     """
     w = np.sqrt(x[2] * x[3])
     h = x[2] / w
-    if score is None:
-        return np.array([x[0] - w / 2., x[1] - h / 2., x[0] + w / 2., x[1] + h / 2.]).reshape((1, 4))
-    else:
-        return np.array([x[0] - w / 2., x[1] - h / 2., x[0] + w / 2., x[1] + h / 2., score]).reshape((1, 5))
+    return np.array([x[0] - w / 2., x[1] - h / 2., x[0] + w / 2., x[1] + h / 2.]).reshape((1, 4))
 
 
 class KalmanBoxTracker(object):
@@ -90,9 +83,10 @@ class KalmanBoxTracker(object):
     """
     count = 0
 
-    def __init__(self, bbox):
+    def __init__(self, params: torch.Tensor) -> None:
         """
         Initialises a tracker using initial bounding box.
+        @param params: (N,6) ndarray of float
         """
         # define constant velocity model
         self.kf = KalmanFilter(dim_x=7, dim_z=4)
@@ -108,7 +102,7 @@ class KalmanBoxTracker(object):
         self.kf.Q[-1, -1] *= 0.01
         self.kf.Q[4:, 4:] *= 0.01
 
-        self.kf.x[:4] = convert_bbox_to_z(bbox)
+        self.kf.x[:4] = convert_bbox_to_z(params)
         self.time_since_update = 0
         self.id = KalmanBoxTracker.count
         KalmanBoxTracker.count += 1
@@ -116,20 +110,26 @@ class KalmanBoxTracker(object):
         self.hits = 0
         self.hit_streak = 0
         self.age = 0
+        self.obj_confidence = params[4]
+        self.obj_class = params[5]
 
-    def update(self, bbox):
+    def update(self, params: torch.Tensor) -> None:
         """
         Updates the state vector with observed bbox.
+        @param params: (N,6) ndarray of float
         """
         self.time_since_update = 0
         self.history = []
         self.hits += 1
         self.hit_streak += 1
-        self.kf.update(convert_bbox_to_z(bbox))
+        self.kf.update(convert_bbox_to_z(params))
+        self.obj_confidence = params[4]
+        self.obj_class = params[5]
 
-    def predict(self):
+    def predict(self) -> np.ndarray:
         """
         Advances the state vector and returns the predicted bounding box estimate.
+        @return: (N,4) ndarray of float
         """
         if (self.kf.x[6] + self.kf.x[2]) <= 0:
             self.kf.x[6] *= 0.0
@@ -141,18 +141,22 @@ class KalmanBoxTracker(object):
         self.history.append(convert_x_to_bbox(self.kf.x))
         return self.history[-1]
 
-    def get_state(self):
+    def get_state(self) -> np.ndarray:
         """
         Returns the current bounding box estimate.
+        @return: (N,4) ndarray of float
         """
         return convert_x_to_bbox(self.kf.x)
 
 
-def associate_detections_to_trackers(detections, trackers, iou_threshold=0.3):
+def associate_detections_to_trackers(detections: torch.Tensor, trackers: np.ndarray, iou_threshold: float = 0.3) -> \
+        tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
-    Assigns detections to tracked object (both represented as bounding boxes)
-
-    Returns 3 lists of matches, unmatched_detections and unmatched_trackers
+    Assigne les détections aux objets suivis (les deux représentés sous forme de boîtes englobantes)
+    @param detections:liste des détections
+    @param trackers: liste des objets suivis
+    @param iou_threshold: Seuil de similarité IOU pour l'association entre les détections et les trackers
+    @return: Les trackers valides, les détections non associées et les trackers morts
     """
     if len(trackers) == 0:
         return np.empty((0, 2), dtype=int), np.arange(len(detections)), np.empty((0, 5), dtype=int)
@@ -161,10 +165,7 @@ def associate_detections_to_trackers(detections, trackers, iou_threshold=0.3):
 
     if min(iou_matrix.shape) > 0:
         a = (iou_matrix > iou_threshold).astype(np.int32)
-        if a.sum(1).max() == 1 and a.sum(0).max() == 1:
-            matched_indices = np.stack(np.where(a), axis=1)
-        else:
-            matched_indices = linear_assignment(-iou_matrix)
+        matched_indices = np.stack(np.where(a), axis=1)
     else:
         matched_indices = np.empty(shape=(0, 2))
 
@@ -177,7 +178,7 @@ def associate_detections_to_trackers(detections, trackers, iou_threshold=0.3):
         if t not in matched_indices[:, 1]:
             unmatched_trackers.append(t)
 
-    # filter out matched with low IOU
+    # filtrer les correspondances avec un faible IOU
     matches = []
     for m in matched_indices:
         if iou_matrix[m[0], m[1]] < iou_threshold:
@@ -194,9 +195,13 @@ def associate_detections_to_trackers(detections, trackers, iou_threshold=0.3):
 
 
 class Sort(object):
-    def __init__(self, max_age=1, min_hits=3, iou_threshold=0.3):
+    def __init__(self, max_age: int = 1, min_hits: int = 3, iou_threshold: float = 0.3) -> None:
         """
-        Sets key parameters for SORT
+        Initialise les paramètres clés pour SORT
+        @param max_age: Durée maximale d'un tracker avant qu'il soit considéré comme mort
+        @param min_hits: Nombre minimum de fois où un tracker doit être associé à une détection
+         pour être considéré comme valide
+        @param iou_threshold: Seuil de similarité IOU pour l'association entre les détections et les trackers
         """
         self.max_age = max_age
         self.min_hits = min_hits
@@ -204,16 +209,15 @@ class Sort(object):
         self.trackers = []
         self.frame_count = 0
 
-    def update(self, dets=np.empty((0, 5))):
+    def update(self, dets: torch.Tensor = np.empty((0, 6))) -> np.ndarray:
         """
-        Params: dets - a numpy array of detections in the format [[x1,y1,x2,y2,score],[x1,y1,x2,y2,score],
-        ...] Requires: this method must be called once for each frame even with empty detections (use np.empty((0,
-        5)) for frames without detections). Returns the a similar array, where the last column is the object ID.
-
-        NOTE: The number of objects returned may differ from the number of detections provided.
+        Met à jour les trackers en utilisant les détections fournies
+        Note : Le nombre d'objets retournés peut être différent du nombre de détections fournies.
+        @param dets: Tableau des détections au format [[x1, y1, x2, y2, confidence, classe], ...]
+        @return: Même tableau que les détections, avec en plus l'ID du tracker associé à la position 4
         """
         self.frame_count += 1
-        # get predicted locations from existing trackers.
+        # obtenir les emplacements prévus à partir des trackers existants
         trks = np.zeros((len(self.trackers), 5))
         to_del = []
         ret = []
@@ -227,11 +231,11 @@ class Sort(object):
             self.trackers.pop(t)
         matched, unmatched_dets, _ = associate_detections_to_trackers(dets, trks, self.iou_threshold)
 
-        # update matched trackers with assigned detections
+        # mettre à jour les trackers associés avec les détections correspondantes
         for m in matched:
             self.trackers[m[1]].update(dets[m[0], :])
 
-        # create and initialise new trackers for unmatched detections
+        # créer et initialiser de nouveaux trackers pour les détections non associées
         for i in unmatched_dets:
             trk = KalmanBoxTracker(dets[i, :])
             self.trackers.append(trk)
@@ -239,11 +243,12 @@ class Sort(object):
         for trk in reversed(self.trackers):
             d = trk.get_state()[0]
             if (trk.time_since_update < 1) and (trk.hit_streak >= self.min_hits or self.frame_count <= self.min_hits):
-                ret.append(np.concatenate((d, [trk.id + 1])).reshape(1, -1))  # +1 as MOT benchmark requires positive
+                ret.append(np.concatenate((d, [trk.id + 1], [trk.obj_confidence], [trk.obj_class])).reshape(1, -1))
+                # +1, car MOT benchmark nécessite des ID positifs
             i -= 1
-            # remove dead tracklet
+            # supprimer les trackers morts
             if trk.time_since_update > self.max_age:
                 self.trackers.pop(i)
         if len(ret) > 0:
             return np.concatenate(ret)
-        return np.empty((0, 5))
+        return np.empty((0, 6))

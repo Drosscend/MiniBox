@@ -1,0 +1,83 @@
+@startuml
+
+title Diagramme de classe
+
+class Main {
+}
+
+package Function <<Functions>> {
+
+  class Detect {
+    Fonction principale du code
+    +main()
+    +detect()
+  }
+
+  class TrackedObjects {
+    Permet de gérer les objets pour
+    les enregistrer et y accéder plus facilement
+    +int id
+    +float x1
+    +float y1
+    +float x2
+    +float y2
+    +float confidence
+    +str classe
+    +str direction
+    +tuple color
+    +void update_position()
+    +void calculate_direction()
+    +void set_direction()
+  }
+
+  class CSV_manipulation {
+    Crée le fichier csv
+    +generate_csv()
+  }
+
+  class CV2_manipulations {
+    Affiche les images et les objets détecté
+    +draw_bounding_boxes()
+  }
+
+  class Utils {
+    Fonction utiles pour le programme
+    +get_random_color()
+  }
+  
+  class bdd_save {
+    Fonction permettant la sauvegarde
+    +save_bdd()
+  }
+
+  class CustomFormater {
+    +format()
+  }
+
+  class Sort {
+    Permet de faire le tracking
+    +iou_batch()
+    +convert_bbox_to_z()
+    +convert_x_to_bbox()
+    +KalmanBoxTracker()
+    +associate_detections_to_track()
+    +Sort()
+  }
+
+}
+
+Main *-left- Detect: Passage des paramètres
+Main *-right- CustomFormater: Mise en forme des logs
+
+TrackedObjects *-up- Detect: Enregistrement des données dans des classes
+
+Detect *-up- Utils: Appel de fonctions utilitaires
+Detect *-up- Sort: Tracking des objets
+Detect *-down- CSV_manipulation: Enregistrement des données dans le CSV
+Detect *-down- CV2_manipulations: Affichage des données
+Detect *-left- bdd_save: Sauvegarde des données
+
+TrackedObjects *-right- CSV_manipulation: Récupérer les infos
+TrackedObjects *-left- CV2_manipulations: Récupérer les infos
+
+@enduml

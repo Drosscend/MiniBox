@@ -1,143 +1,132 @@
-import os
 import logging
+import os
 import time
-import torch
+
 import cv2
-import numpy as np
-from Functions import utils
+import yolov5
+
+from Functions import TrackedObjects
+from Functions import bdd_save
+from Functions import csv_manipulation
+from Functions import cv2_manipulation
 from Functions import sort
+from Functions import utils
 
 log = logging.getLogger("main")
 
-CSV_FILE = 'OUTPUT/data.csv'
-
-# Dictionnaire pour stocker les identifiants des personnes suivies
-tracked_object = []
-
-# Initialisation de la librairie Sort pour suivre les personnes détectées
-model_sort = sort.Sort()
+# Initialisation de la collection d'objets suivis
+tracked_objects = TrackedObjects.TrackedObjects()
 
 
-def generate_csv(occurence, classes):
+def detect(
+        video_capture: cv2.VideoCapture,
+        object_types: list[int],
+        interval: float,
+        display_detection: bool,
+        yolov5_paramms: dict,
+        bdd_params: dict
+) -> None:
     """
-    Enregistre les résultats de la détection dans un fichier CSV.
-
-    :param occurence: nombre de personnes ou vélos détectés
-    :param classes: type de détection (0: personnes, 1: vélos)
-    :return: None
-    """
-    date = time.strftime("%d/%m/%Y %H:%M:%S", time.localtime())
-    # verifie que le dosser OUTPUT existe et le crée si ce n'est pas le cas
-    if not os.path.exists("OUTPUT"):
-        os.makedirs("OUTPUT")
-
-    # enregistrement des données dans un fichier csv
-    try:
-        with open(CSV_FILE, 'a') as f:
-            # si le fichier est vide, on écrit l'entête
-            if f.tell() == 0:
-                f.write("date,occurence,type\n")
-            f.write(date + ',' + str(occurence) + ',' + str(classes) + '\r')
-    except IOError as e:
-        log.error("Erreur lors de l'écriture dans le fichier CSV: " + str(e))
-
-
-def show_output(image, track):
-    """
-    Affiche une image avec des rectangles entourant les personnes détectées et en affichant leur identifiant près de chaque personne.
-
-    :param image: image à afficher
-    :param track: informations sur les personnes détectées, y compris leurs coordonnées et leur identifiant
-    :return: None
+    Détection des objets
+    @param video_capture: Flux vidéo
+    @param object_types: Liste des types d'objets à détecter
+    @param interval: Intervalle de temps entre chaque détection
+    @param display_detection: Affichage des boites englobantes
+    @param yolov5_paramms: Paramètres de la librairie Yolov5.
+    @param bdd_params: Paramètres de la base de données
     """
 
-    # Pour chaque personne détectée, dessine un rectangle autour de la personne et affiche son identifiant
-    for i in range(len(track.tolist())):
-        # Récupère les informations sur la personne
-        coords = track.tolist()[i]
-        name_idx = int(coords[4])  # Identifiant de la personne
-        x1 = int(coords[0])
-        y1 = int(coords[1])
-        x2 = int(coords[2])
-        y2 = int(coords[3])
-        # Génère une couleur aléatoire pour chaque personne en utilisant son identifiant
-        color = utils.random_color(name_idx)
-        # Dessine un rectangle autour de la personne
-        cv2.rectangle(image, (x1, y1), (x2, y2), color, 2)
-        # Affiche l'identifiant de la personne près de la personne
-        cv2.putText(image, str(name_idx), (x1, y1), cv2.FONT_HERSHEY_SIMPLEX, 1, color, 2)
+    log.info("Début de la détection")
+    # load pretrained model
+    model = yolov5.load(yolov5_paramms["weights"])
+    model.classes = object_types
+    model.conf = yolov5_paramms["conf_thres"]  # NMS confidence threshold
+    model.iou = yolov5_paramms["iou_thres"]  # NMS IoU threshold
+    model.agnostic = yolov5_paramms["agnostic_nms"]  # NMS class-agnostic
+    model.multi_label = yolov5_paramms["multi_label_nms"]  # NMS multiple labels per box
+    model.max_det = yolov5_paramms["max_det"]  # maximum number of detections per image
+    model.amp = yolov5_paramms["amp"]  # Automatic Mixed Precision (AMP) inference
 
-    # Affiche l'image modifiée à l'écran
-    cv2.imshow('YOLO', image)
+    output_folder = yolov5_paramms["output_folder"]
+    csv_name = yolov5_paramms["csv_name"]
 
-
-def detect(video_capture, classes, interval, show, debug):
-    """
-    Fonction de détection
-    Enregistre les résultats dans un fichier csv avec comme entête :
-    date,occurence,type,positions
-
-    :param video_capture: objet cv2.VideoCapture pour la caméra
-    :param classes: type de détection (0: personnes, 1: vélos) ou liste de types
-    :param interval: intervalle de temps entre chaque détection
-    :param show: affichage de la détection (True/False) (optionnel)
-    :param debug: affichage des logs de débug (True/False) (optionnel)
-    :return: None
-    """
-    log.debug("Début de la détection")
-    model = torch.hub.load('ultralytics/yolov5', 'yolov5s', verbose=debug)
-    model.classes = classes
-    model.conf = 0.25
-    model.iou = 0.45
-    model.agnostic = False
-    model.multi_label = True
-    model.max_det = 20
-    model.amp = True
+    # Initialisation de la librairie Sort pour suivre les personnes détectées
+    model_sort = sort.Sort()
 
     while video_capture.isOpened():
-        _, frame = video_capture.read()
+        success, frame = video_capture.read()
+
+        # Si le frame n'a pas pu être récupéré ou si la vidéo est terminée, quitte la boucle
+        if not success:
+            break
 
         # Pour vérifier que le modèle YOLOv5 est chargé et fonctionne correctement
         try:
             results = model(frame)
         except Exception as e:
-            log.error("Erreur lors du traitement de l'image avec le modèle YOLOv5: " + str(e))
+            log.error("Erreur lors du traitement de l'image avec le modèle YOLOv5: {}".format(e))
             continue
 
-        # Utilisation de la librairie Sort pour suivre les personnes détectées
-        detections = np.array(results.xyxy[0][:, :4])
+        predictions = results.pred[0]
 
-        # Pour vérifier que la bibliothèque de suivi d'objets Sort fonctionne correctement
         try:
-            track = model_sort.update(detections)
+            # Utilisation de la librairie Sort pour suivre les personnes détectées
+            track = model_sort.update(predictions)
         except Exception as e:
-            log.error("Erreur lors du suivi des objets avec la bibliothèque Sort: " + str(e))
+            log.error("Erreur lors du suivie des objets: {}".format(e))
             continue
 
-        # Détection des nouvelles personnes
-        new_object_count = 0
+        # Enregistre les objets détectés
+        current = []
         for j in range(len(track.tolist())):
-            log.debug("Liste des personnes détectées: " + str(tracked_object))
-            coords = track.tolist()[j]
-            name_idx = int(coords[4])
-            # Si l'identifiant de la personne n'est pas déjà enregistré, c'est une nouvelle personne
-            if name_idx not in tracked_object:
-                new_object_count += 1
-                tracked_object.append(name_idx)
+            # Récupère les informations sur l'objet
+            tracked_object = track.tolist()[j]
+            object_x1 = int(tracked_object[0])
+            object_y1 = int(tracked_object[1])
+            object_x2 = int(tracked_object[2])
+            object_y2 = int(tracked_object[3])
+            object_id = int(tracked_object[4])
+            object_conf = float(tracked_object[5])
+            object_classe = int(tracked_object[6])
 
-        # Enregistrement des résultats dans un fichier csv si une nouvelle personne est détectée
-        if new_object_count > 0:
-            log.debug("Nouvelle objet détecté " + str(new_object_count) + " fois" + " de type " + str(classes))
-            generate_csv(new_object_count, classes)
+            current.append(object_id)
 
-        # Pause entre chaque détection
+            # Si l'objet n'a pas encore été suivi, c'est un nouvel objet
+            found = False
+            for tracked_object in tracked_objects.tracked_objects:
+                if tracked_object.obj_id == object_id:
+                    found = True
+                    tracked_object.update_position(object_conf, object_x1, object_y1, object_x2, object_y2)
+                    break
+            if not found:
+                color = utils.get_random_color(object_id)
+                tracked_objects.add(object_id, object_conf, object_x1, object_y1, object_x2, object_y2, object_classe,
+                                    color)
+                log.debug("Nouvel objet détecté: {}".format(object_id))
+
+        # Supprime les objets qui n'ont pas été détectés dans le frame courant
+        for tracked_object in tracked_objects.tracked_objects:
+            if tracked_object.obj_id not in current:
+                tracked_objects.remove(tracked_object.obj_id)
+                log.debug("Suppression de l'objet: {}".format(tracked_object.obj_id))
+
+        # Pause entre chaque détection si spécifiée
         if interval > 0:
             log.debug("Pause de " + str(interval) + " secondes")
             time.sleep(interval)
 
-        # affichage des images
-        if show:
-            show_output(frame, track)
+        # Génération du fichier CSV
+        csv_manipulation.generate_csv(current, tracked_objects, output_folder, csv_name)
+
+        # sauvegarde dans la base de données
+        if bdd_params["save_in_bdd"]:
+            if bdd_params["time_to_save"] == time.strftime("%H:%M:%S"):
+                csv_pah = os.path.join(output_folder, csv_name)
+                bdd_save.save_bdd(bdd_params["bdd_name"], bdd_params["table_name"], csv_pah, bdd_params["keep_csv"])
+
+                # affichage des images si spécifié
+        if display_detection:
+            cv2_manipulation.draw_bounding_boxes(frame, current, tracked_objects)
             key = cv2.waitKey(10)
             if key == ord('q'):
                 break
@@ -146,20 +135,36 @@ def detect(video_capture, classes, interval, show, debug):
 
     video_capture.release()
     cv2.destroyAllWindows()
-    log.debug("Detection terminée")
+    log.info("Detection terminée")
 
 
-def main(webcam, classes, interval, show, debug):
+def main(
+        base_params: dict,
+        yolov5_paramms: dict,
+        bdd_params: dict
+) -> None:
+    """
+    Fonction principale
+    @param base_params: Paramètres de base
+    @param yolov5_paramms: Paramètres de la librairie Yolov5
+    @param bdd_params: Paramètres de la base de données
+    """
     # Initialisation de la caméra
-    video_capture = cv2.VideoCapture(webcam)
+    video_capture = cv2.VideoCapture(base_params["source"])
+    classes = base_params["classes"]
+    interval = base_params["interval"]
+    display_detection = base_params["display_detection"]
 
     # Vérification de l'ouverture de la caméra
     if not video_capture.isOpened():
-        log.error("Impossible d'ouvrir la webcam")
+        log.error("Impossible d'ouvrir la source, verifier le fichier de configuration")
         return
 
-    if show:
+    if display_detection:
         log.info("Pour quitter l'application, appuyez sur la touche 'q'")
 
     # Détection des personnes
-    detect(video_capture, classes, interval, show, debug)
+    try:
+        detect(video_capture, classes, interval, display_detection, yolov5_paramms, bdd_params)
+    except Exception as e:
+        log.error("Erreur lors de la détection: {}".format(e))

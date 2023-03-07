@@ -1,42 +1,40 @@
-import logging
 import argparse
-from Functions.CustomFormatter import CustomFormatter
+import logging
+
 from Functions import detect
+from Functions.CustomFormatter import CustomFormatter
+from Functions.config_handler import get_config
 
-log = logging.getLogger("main")  # Get the logger for this module
-log.setLevel('INFO')  # Set the logging level to INFO
-ch = logging.StreamHandler()  # console handler
-ch.setLevel('INFO')  # set level to INFO
-ch.setFormatter(CustomFormatter())  # set custom formatter
-log.addHandler(ch)  # add console handler to logger
+log = logging.getLogger("main")
+log.setLevel('INFO')
+ch = logging.StreamHandler()
+ch.setLevel('INFO')
+ch.setFormatter(CustomFormatter())
+log.addHandler(ch)
 
-###################################################
+####################################
+
+# Créer un parseur d'arguments
 parser = argparse.ArgumentParser(prog='Mini Box', description='Projet de mémoire LP APSIO : Mini Box IOT')
-parser.add_argument('-w', '--webcam', type=int, default=0, help='Webcam à utiliser', required=False)
-parser.add_argument('-c', '--classes', type=int, default=0, help='Type de détection (0: personnes, 1: vélos)',
-                    required=False, choices=[0, 1])
-parser.add_argument('-i', '--interval', type=int, default=1, help='Intervalle entre chaque capture en secondes', required=False)
-parser.add_argument('-s', '--show', help='Affichage de la détection', required=False, action='store_true')
-parser.add_argument('-d', '--debug', help='Mode debug', required=False, action='store_true')
+parser.add_argument('-c', '--config', type=str, default='config.ini', help='Fichier de configuration à utiliser')
 args = parser.parse_args()
-###################################################
+
+# Récupérer le fichier de configuration
+base_params, yolov5_params, bdd_params = get_config(args.config)
 
 
 if __name__ == "__main__":
     log.info("Début du programme")
-    # afficahge des paramètres
-    log.info("Paramètres :")
-    log.info("Webcam : " + str(args.webcam))
-    log.info("Classes : " + str(args.classes))
-    log.info("Intervalle : " + str(args.interval) + " secondes")
-    log.info("Affichage : " + str(args.show))
-    log.info("Debug : " + str(args.debug))
 
-    # si debug = Ture, on passe le niveau de log à DEBUG
-    if args.debug:
+    # si debug = True, on passe le niveau de log à DEBUG
+    if base_params["debug"]:
         log.setLevel('DEBUG')
         ch.setLevel('DEBUG')
         log.debug("Mode debug activé")
 
     # lancement de la détection
-    detect.main(args.webcam, args.classes, args.interval, args.show, args.debug)
+    try:
+        detect.main(base_params, yolov5_params, bdd_params)
+    except KeyboardInterrupt:
+        log.info("Detection terminée")
+        exit(0)

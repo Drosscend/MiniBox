@@ -15,13 +15,19 @@ Ces compteurs sont un projet open source, et seront à destination :
 - Ou encore à but commercial sur les itinéraires longues distances tels que les voies EuroVelo afin d’inciter des commerçants à se lancer dans le tourisme cycliste
 
 Pour chaque personne, on essayera de récupérer les données suivantes :
-- heure de passage
-- sens de circulation
-- mode de transport (piéton, cycliste, trottinette, vélo couché…)
-- le vélo est-il chargé ?
-- la personne porte-t-elle des équipements de protection ?
+- [x] heure de passage
+- [x] sens de circulation
+- [x] mode de transport (piéton, cycliste, trottinette, vélo couché…)
+- [ ] le vélo est-il chargé ?
+- [ ] la personne porte-t-elle des équipements de protection ?
 
 ## <h2 align="center">Documentation</h2>
+
+### Maquette du programme principal :
+![Programme principal](/docs/maquette_main.svg)
+
+### Diagramme de classe :
+![Programme principal (diagramme de classe)](/docs/classDiagram.svg)
 
 <details open>
 <summary>Prérequis</summary>
@@ -48,8 +54,12 @@ Dans un terminal, lancer la commande suivante :
 ```bash
 git clone https://github.com/Drosscend/MiniBox  # clone
 cd MiniBox
+# pour les utilisateurs de windows
 py -m venv .mémoire # création de l'environnement virtuel
 .mémoire\Scripts\activate # activation de l'environnement virtuel
+# pour les utilisateurs de linux
+python3 -m venv .mémoire # création de l'environnement virtuel
+source .mémoire/bin/activate # activation de l'environnement virtuel
 pip install -r requirements.txt  # installation des dépendances du projet
 ```
 </details>
@@ -58,50 +68,91 @@ pip install -r requirements.txt  # installation des dépendances du projet
 
 <details open>
 <summary>Main</summary>
+
 Pour lancer le programme de détection, il faut lancer la commande suivante :
-
-Lancement du programme de détection avec paramètres par défaut :
-
-- source de la caméra = 0
-- classes de détection = 0 (personne)
-- intervalle de détection = 1
-- pas d'affichage = False
-- pas de débug = False
-
-```python
+```bash
 python main.py
 ```
 
-Lancement du programme de détection avec paramètres personnalisés :
-
-Options :
-
-- -h : Affiche de l'aide
-- -w : Source de la caméra (0 par défaut) (int) (ex : -s 0) (optionnel)
-- -c : Classes de détection (0 par défaut) (int) (ex : -c 0) (0 ou 1) (optionnel)
-- -i : Intervalle de détection (1 par défaut) (int) (ex : -i 1) (optionnel)
-- -s : Affichage de la sortie (False par défaut) (ex : -s) (optionnel)
-- -d : Affichage du debug (False par défaut) (ex : -d) (optionnel)
-
-```python
-python main.py -w 0 -c 1 -i 5 -s -d
-```
+Le programme sera lancé avec les paramètres par défaut.
+- source = 0
+- classes de détection = 0 et 1 (personne et vélo)
+- intervalle de détection = 1
+- affichage = False
+- débug = False
 
 </details>
-<details close>
-<summary>Graphique</summary>
-Pour lancer le programme permettant d'afficher le diagramme, il faut lancer la commande suivante :
+<details>
+<summary>Lancement avec paramètres personalisés</summary>
 
-```python
-python .\Functions\graph.py
+Pour lancer le programme avec des paramètres personnalisés, modifiez le fichier config.ini
+```ini
+[PARAMS]
+# La valeur par défaut est `0` (0 : Webcam, video.mp4 : Video")
+source = 0
+# La valeur par défaut est `1` (vélo)
+classes = 1
+# La valeur par défaut est `1`, si vous voulez augmenter le temps entre chaque prise, augmentez la valeur
+interval = 1
+# La valeur par défaut est `False`, si vous voulez activer l'affichage graphique, mettez `True`
+display_detection = False
+# La valeur par défaut est `False`, si vous voulez activer l'affichage des messages, mettez `True`
+debug = False
+
+[YOLOV5_PARAMS]
+# La valeur par défaut est `yolov5s.pt`
+weights = yolov5s.pt
+# La valeur par défaut est `0.45`
+conf_thres = 0.45
+# La valeur par défaut est `0.45`
+iou_thres = 0.45
+# La valeur par défaut est `False`
+agnostic_nms = False
+# La valeur par défaut est `True`
+multi_label_nms = True
+# La valeur par défaut est `50`
+max_det = 50
+# La valeur par défaut est `True`
+amp = True
+# la valeur par défaut est `OUTPUT`
+output_folder = OUTPUT
+# la valeur par défaut est `data.csv`
+csv_name = data.csv
+
+[BDD_PARAMS]
+# Activer la sauvegarde dans la base de données, la valeur par défaut est `True`
+save_in_bdd = True
+# Nom de la base de données, la valeur par défaut est `detect_save.db`
+bdd_name = detect_save.db
+# Nom de la table, la valeur par défaut est `detect`
+table_name = detect
+# Heure à laquelle les données seront enregistrées, la valeur par défaut est `00:00:00` (Attention la detection sera mise en pause)
+time_to_save = 00:00:00
+# Désactiver la suppression du fichier csv, la valeur par défaut est `False`
+keep_csv = False
 ```
+
+Vous pouvez fournir un fichier de configuration personnalisé en utilisant l'option -c ou --config :
+```bash
+python main.py -c custom_config.ini
+```
+</details>
+
+<details>
+<summary>Lancement des tests</summary>
+
+Pour lancer les tests, il faut lancer la commande suivante :
+```bash
+pytest Test/
+```
+
 </details>
 
 ### <h2 align="center">Equipe</h2>
 
 Etudiants de l'APSIO de l'Université de Toulouse :
-- Noémie Tandol @Drosscend
-- Kévin Véronési @NoemieT82
+- Kévin Véronési @Drosscend
+- Noémie Tandol @NoemieT82
 
 Encadrants :
 - Yahn Formanczak
