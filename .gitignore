@@ -166,10 +166,12 @@ cython_debug/
 # fleet settings
 .fleet/
 
-# yolov5 settings
-yolov5*.pt
+# yolo settings
+*.pt
 
 # Minibox settings
 custom_config.ini
 OUTPUT
 detect_save.db
+
+*.mp4

@@ -54,13 +54,20 @@ Dans un terminal, lancer la commande suivante :
 ```bash
 git clone https://github.com/Drosscend/MiniBox  # clone
 cd MiniBox
+```
 # pour les utilisateurs de windows
+```bash
 py -m venv .mémoire # création de l'environnement virtuel
 .mémoire\Scripts\activate # activation de l'environnement virtuel
-# pour les utilisateurs de linux
+```
+# pour les utilisateurs de Linux
+```bash
 python3 -m venv .mémoire # création de l'environnement virtuel
 source .mémoire/bin/activate # activation de l'environnement virtuel
-pip install -r requirements.txt  # installation des dépendances du projet
+```
+# Installation des dépendances du projet
+```bash
+pip install -r requirements.txt
 ```
 </details>
 
@@ -76,7 +83,7 @@ python main.py
 
 Le programme sera lancé avec les paramètres par défaut.
 - source = 0
-- classes de détection = 0 et 1 (personne et vélo)
+- classes de détection = 1 (vélo)
 - intervalle de détection = 1
 - affichage = False
 - débug = False
