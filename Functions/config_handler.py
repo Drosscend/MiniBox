@@ -6,7 +6,7 @@ import re
 log = logging.getLogger("main")
 
 
-def check_params(config) -> bool:
+def check_params(config: configparser.ConfigParser) -> bool:
     """
     Vérifier que le fichier de configuration est valide
     @param config: le fichier de configuration
@@ -34,7 +34,7 @@ def check_params(config) -> bool:
     return True
 
 
-def get_base_params(config) -> dict:
+def get_base_params(config: configparser.ConfigParser) -> dict:
     """
     Récupérer les paramètres de base
     @param config: le fichier de configuration
@@ -84,7 +84,7 @@ def get_base_params(config) -> dict:
     return base_params
 
 
-def get_yolov5_params(config) -> dict:
+def get_yolov5_params(config: configparser.ConfigParser) -> dict:
     """
     Récupérer les paramètres de yolov5
     @param config: le fichier de configuration
@@ -171,7 +171,7 @@ def get_yolov5_params(config) -> dict:
     return yolov5_paramms
 
 
-def get_bdd_params(config) -> dict:
+def get_bdd_params(config: configparser.ConfigParser) -> dict:
     """
     Récupérer les paramètres de la base de données
     @param config: le fichier de configuration
@@ -232,7 +232,7 @@ def get_bdd_params(config) -> dict:
     return bdd_params
 
 
-def print_config(base_params, yolov5_params, bdd_params) -> None:
+def print_config(base_params: dict, yolov5_params: dict, bdd_params: dict) -> None:
     """
     Fonction principale
     @param base_params: Paramètres de base
@@ -262,7 +262,7 @@ def print_config(base_params, yolov5_params, bdd_params) -> None:
         log.info("keep_csv : " + str(bdd_params["keep_csv"]))
 
 
-def get_config(config_file) -> tuple[dict, dict, dict]:
+def get_config(config_file: str)-> tuple[dict, dict, dict]:
     """
     Retourne les paramètres du fichier de configuration
     @param config_file: le fichier de configuration
