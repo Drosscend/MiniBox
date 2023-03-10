@@ -2,5 +2,6 @@
 # Usage: pip install -r requirements.txt
 
 pytest>=7.2.1
-ultralytics==8.0.51
+ultralytics==8.0.52
 supervision==0.3.0
+filterpy==1.4.5

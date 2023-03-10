@@ -174,7 +174,7 @@ Pour faire remonter des bugs ou des demandes de fonctionnalités, veuillez consu
 
 ### <h2 align="center">Remerciements</h2>
 
-- [ultralytics](https://github.com/ultralytics/yolov5) pour le code de détection d'objets
+- [ultralytics](ultralytics.com) pour le code de détection d'objets
 - [abewley](https://github.com/abewley/sort) pour le code de suivi d'objets
 
 ### <h2 align="center">Contributeurs</h2>

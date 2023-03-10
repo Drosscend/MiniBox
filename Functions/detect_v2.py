@@ -1,12 +1,14 @@
 import cv2
 import supervision as sv
 from ultralytics import YOLO
-
 import TrackedObjects
+import sort
 
 # Initialisation de la collection d'objets suivis
 tracked_objects = TrackedObjects.TrackedObjects()
 
+# Initialisation de la librairie Sort pour suivre les personnes détectées
+model_sort = sort.Sort()
 
 def main():
     cap = cv2.VideoCapture(0)
@@ -26,28 +28,35 @@ def main():
         if not success:
             break
 
-        # Pour vérifier que le modèle YOLOv5 est chargé et fonctionne correctement
+        # Pour vérifier que le modèle YOLOv8 est chargé et fonctionne correctement
         try:
             result = model(frame, agnostic_nms=False, verbose=False, conf=0.5, classes=[0])[0]
         except Exception as e:
             print("Erreur lors du traitement de l'image avec le modèle YOLOv8: {}".format(e))
             continue
 
+        # Pour vérifier que la librairie Sort est chargée et fonctionne correctement
+        try:
+            track = model_sort.update(result.pred[0])
+        except Exception as e:
+            print("Erreur lors du suivie des objets: {}".format(e))
+            continue
+
         detections = sv.Detections.from_yolov8(result)
 
         labels = [
             f"{tracked_id} {model.model.names[class_id]} {confidence:0.2f}"
-            for xyxy, confidence, class_id, tracked_id
+            for _, confidence, class_id, tracked_id
             in detections
         ]
+        
+        for j in range(len(track.tolist())):
+            # Récupère les informations sur l'objet
+            tracked_object = track.tolist()[j]
+            object_id = int(tracked_object[4])
+            print(object_id)
 
         frame = box_annotator.annotate(scene=frame, detections=detections, labels=labels)
-
-        # Supprime les objets qui n'ont pas été détectés dans le frame courant
-        for tracked_object in tracked_objects.tracked_objects:
-            if tracked_object.obj_id not in current:
-                tracked_objects.remove(tracked_object.obj_id)
-                print("Suppression de l'objet: {}".format(tracked_object.obj_id))
 
         cv2.imshow('frame', frame)
 
