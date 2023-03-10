@@ -2,13 +2,10 @@ import cv2
 import supervision as sv
 from ultralytics import YOLO
 import TrackedObjects
-import sort
 
 # Initialisation de la collection d'objets suivis
 tracked_objects = TrackedObjects.TrackedObjects()
 
-# Initialisation de la librairie Sort pour suivre les personnes détectées
-model_sort = sort.Sort()
 
 def main():
     cap = cv2.VideoCapture(0)
@@ -35,13 +32,6 @@ def main():
             print("Erreur lors du traitement de l'image avec le modèle YOLOv8: {}".format(e))
             continue
 
-        # Pour vérifier que la librairie Sort est chargée et fonctionne correctement
-        try:
-            track = model_sort.update(result.pred[0])
-        except Exception as e:
-            print("Erreur lors du suivie des objets: {}".format(e))
-            continue
-
         detections = sv.Detections.from_yolov8(result)
 
         labels = [
@@ -49,12 +39,6 @@ def main():
             for _, confidence, class_id, tracked_id
             in detections
         ]
-        
-        for j in range(len(track.tolist())):
-            # Récupère les informations sur l'objet
-            tracked_object = track.tolist()[j]
-            object_id = int(tracked_object[4])
-            print(object_id)
 
         frame = box_annotator.annotate(scene=frame, detections=detections, labels=labels)
 
