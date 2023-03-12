@@ -1,0 +1,24 @@
+{% extends './bootstrap/index.html' %}
+
+{% block content %}
+    <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+        {% load crispy_forms_tags %}
+        <form action="" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {{ form }}
+            {% if error %}
+            <label class="text-danger ">{{ error }}</label>
+            {% endif %}
+            <div class="form-group mt-3 text-center">
+                <input type="submit" class="btn btn-secondary" value="Envoyer">
+            </div>
+        </form>
+    </div>
+    {% if lines %}
+    <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
+        {% for line in lines %}
+            {{ line }}<br>
+        {% endfor %}
+    </div>
+    {% endif %}
+{% endblock %}
