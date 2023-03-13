@@ -18,6 +18,8 @@ def index(request):
                 for line in csv_reader.split('\r\n'):
                     lines.append(line.split(","))
 
+                del lines[0]
+
                 return render(request, 'index.html', {'form': form, 'lines': lines})
             else :
                 return render(request, 'index.html', {'form': form, 'error': "Le fichier doit être un .csv"})

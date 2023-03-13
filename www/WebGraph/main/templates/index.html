@@ -1,6 +1,53 @@
 {% extends './bootstrap/index.html' %}
 
 {% block content %}
+
+    <script>
+    {% if lines %}
+        // jquery function
+        var chart = undefined;
+        $(document).ready(function(){
+            if(chart != undefined && chart != null){
+                chart.destroy();
+            }
+
+            var new_width = {{ lines|length }} * 10;
+
+            // Modification de la largeur en fonction des données
+            if(new_width>1000){
+                document.getElementById("chart-container").style.width = new_width + "px";
+            }else{
+                document.getElementById("chart-container").style.width = 1000 + "px";
+            }
+
+            var ctx = document.getElementById('graphique').getContext('2d');
+            chart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [{% for line in lines %}'{{line.0}}',{% endfor %}], //loop through queryset,
+                    datasets: [{
+                        label: 'Nombre de passage en fonction du temps',
+                        data: [{% for line in lines %}{{line.1}},{% endfor %}],
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    },
+                    legend: {
+                        display: false
+                    },
+                    maintainAspectRatio:false
+                }
+            });
+        });
+    {% endif %}
+    </script>
+
     <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
         {% load crispy_forms_tags %}
         <form action="" method="post" enctype="multipart/form-data">
@@ -15,10 +62,12 @@
         </form>
     </div>
     {% if lines %}
-    <div class="row gx-4 gx-lg-5 row-cols-2 row-cols-md-3 row-cols-xl-4 justify-content-center">
-        {% for line in lines %}
-            {{ line }}<br>
-        {% endfor %}
+    <div class="row justify-content-center mt-2">
+        <div class="col-5" style="width:1000px; overflow-x: auto;">
+            <div id="chart-container" style="height:400px">
+                <canvas id="graphique"></canvas>
+            </div>
+        </div>
     </div>
     {% endif %}
 {% endblock %}
