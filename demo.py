@@ -125,7 +125,7 @@ args = parser.parse_args()
 
 model = YOLO(args.model_name, device=args.device)
 
-cap = cv2.VideoCapture("TLS_SeptDeniers.mp4")
+cap = cv2.VideoCapture(0)
 
 while(True):
     # Capture frame-by-frame
@@ -153,9 +153,22 @@ while(True):
     detections = yolo_detections_to_norfair_detections(
         yolo_detections, track_points=args.track_points
     )
+
+    # Display the id of the tracked object
+    for d in detections:
+        print(
+            d.label, "label",
+            d.points, "points",
+            d.data, "data",
+            d.scores, "scores",
+            d.absolute_points, "absolute_points",
+            d.age,  "age",
+            d.embedding, "embedding"
+        )
+        break
+    break
+
     tracked_objects = tracker.update(detections=detections)
-    # Display the resulting frame
-    print(detections)
 
     if args.track_points == "centroid":
         norfair.draw_points(frame, detections)
