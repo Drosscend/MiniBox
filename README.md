@@ -95,6 +95,7 @@ Le programme sera lancé avec les paramètres par défaut.
 - affichage de la vidéo = False
 - affichage des fps = False
 - débug = False
+- enregistrement dans le csv = True
 </details>
 
 <details>

@@ -15,7 +15,7 @@ def check_params(config) -> bool:
     # Vérifier que le fichier de configuration est valide
     expected_sections = ['PARAMS', 'YOLOV5_PARAMS', 'BDD_PARAMS']
     expected_options = {
-        'PARAMS': ['source', 'classes', 'interval', 'display_detection', 'display_fps', 'debug'],
+        'PARAMS': ['source', 'classes', 'interval', 'display_detection', 'display_fps', 'debug', 'save_in_csv'],
         'YOLOV5_PARAMS': ['weights', 'conf_thres', 'iou_thres', 'agnostic_nms', 'multi_label_nms', 'max_det', 'amp',
                           'output_folder', 'csv_name', 'device'],
         'BDD_PARAMS': ['save_in_bdd', 'bdd_name', 'table_name', 'time_to_save', 'keep_csv']
@@ -86,6 +86,13 @@ def get_base_params(config) -> dict:
         base_params['debug'] = config.getboolean('PARAMS', 'debug')
     except ValueError:
         log.error("Erreur : la valeur de l'option debug doit être un boolean, verifier le fichier de configuration")
+        exit(1)
+
+    try:
+        base_params['save_in_csv'] = config.getboolean('PARAMS', 'save_in_csv')
+    except ValueError:
+        log.error(
+            "Erreur : la valeur de l'option save_in_csv doit être un boolean, verifier le fichier de configuration")
         exit(1)
 
     return base_params

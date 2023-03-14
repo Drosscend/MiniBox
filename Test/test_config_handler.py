@@ -23,6 +23,7 @@ class TestConfigHandler(unittest.TestCase):
         self.assertFalse(base_params['display_detection'])
         self.assertTrue(base_params['display_fps'])
         self.assertFalse(base_params['debug'])
+        self.assertTrue(base_params['save_in_csv'])
 
     def test_get_yolov5_params(self):
         yolov5_params = get_yolov5_params(self.valid_config)

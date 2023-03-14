@@ -1,8 +1,7 @@
 import argparse
 import logging
 
-# from Functions import detect
-from Functions import detect2
+from Functions import detect
 from Functions.CustomFormatter import CustomFormatter
 from Functions.config_handler import get_config
 
@@ -35,7 +34,7 @@ if __name__ == "__main__":
 
     # lancement de la détection
     try:
-        detect2.main(base_params, yolov5_params, bdd_params)
+        detect.main(base_params, yolov5_params, bdd_params)
     except KeyboardInterrupt:
         log.info("Detection terminée")
         exit(0)
