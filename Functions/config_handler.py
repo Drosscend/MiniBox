@@ -91,7 +91,7 @@ def get_yolov5_params(config) -> dict:
     @return: un dictionnaire contenant les paramètres de yolov5
     """
     yolov5_paramms = {}
-    tab_of_weights = ["yolov5n.pt", "yolov5s.pt", "yolov5m.pt", "yolov5l.pt", "yolov5x.pt"]
+    tab_of_weights = ["yolov5n", "yolov5s", "yolov5m", "yolov5l", "yolov5x"]
     if config.get('YOLOV5_PARAMS', 'weights') in tab_of_weights:
         yolov5_paramms['weights'] = config.get('YOLOV5_PARAMS', 'weights')
     else:
