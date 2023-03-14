@@ -8,11 +8,10 @@ import cv2
 import numpy as np
 import supervision as sv
 import torch
-from norfair import Detection, Tracker
+from norfair import Tracker
 
 from Functions import TrackedObjects
-from Functions import bdd_save
-from Functions import csv_manipulation
+from Functions import save_utils
 from Functions import utils
 
 log = logging.getLogger("main")
@@ -60,34 +59,6 @@ class YOLO:
             self.model.classes = classes
         detections = self.model(img, size=image_size)
         return detections
-
-
-def yolo_detections_to_norfair_detections(yolo_detections: torch.tensor) -> List[Detection]:
-    """
-    Convertit les résultats de la détection YOLOv5 en format Norfair
-    @param yolo_detections: Résultats de la détection YOLOv5
-    @return: Résultats de la détection Norfair
-    """
-    norfair_detections: List[Detection] = []
-
-    detections_as_xyxy = yolo_detections.xyxy[0]
-    for detection_as_xyxy in detections_as_xyxy:
-        bbox = np.array(
-            [
-                [detection_as_xyxy[0].item(), detection_as_xyxy[1].item()],
-                [detection_as_xyxy[2].item(), detection_as_xyxy[3].item()],
-            ]
-        )
-        scores = np.array(
-            [detection_as_xyxy[4].item(), detection_as_xyxy[4].item()]
-        )
-        norfair_detections.append(
-            Detection(
-                points=bbox, scores=scores, label=int(detection_as_xyxy[-1].item())
-            )
-        )
-
-    return norfair_detections
 
 
 def detect(
@@ -159,7 +130,7 @@ def detect(
             log.error("Erreur lors du traitement de l'image avec le modèle YOLOv5: {}".format(e))
             continue
 
-        detections = yolo_detections_to_norfair_detections(results)
+        detections = utils.yolo_detections_to_norfair_detections(results)
 
         try:
             # Utilisation de la librairie Sort pour suivre les personnes détectées
@@ -202,13 +173,13 @@ def detect(
 
         # Génération du fichier CSV
         if base_params["save_in_csv"]:
-            csv_manipulation.generate_csv(currents_id, tracked_objects_informations, output_folder, csv_name)
+            save_utils.save_csv(currents_id, tracked_objects_informations, output_folder, csv_name)
 
         # sauvegarde dans la base de données
         if bdd_params["save_in_bdd"]:
             if bdd_params["time_to_save"] == time.strftime("%H:%M:%S"):
                 csv_pah = os.path.join(output_folder, csv_name)
-                bdd_save.save_bdd(bdd_params["bdd_name"], bdd_params["table_name"], csv_pah, bdd_params["keep_csv"])
+                save_utils.save_bdd(bdd_params["bdd_name"], bdd_params["table_name"], csv_pah, bdd_params["keep_csv"])
 
         # Pause entre chaque détection si spécifiée
         if interval > 0:

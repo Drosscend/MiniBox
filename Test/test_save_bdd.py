@@ -4,7 +4,7 @@ import sqlite3
 import time
 import unittest
 
-from Functions import bdd_save
+from Functions import save_utils
 
 
 class TestSaveBDD(unittest.TestCase):
@@ -20,7 +20,7 @@ class TestSaveBDD(unittest.TestCase):
 
     def test_save_bdd(self):
         # Appeler la fonction à tester
-        bdd_save.save_bdd("test.db", "test_table", "test.csv", False)
+        save_utils.save_bdd("test.db", "test_table", "test.csv", False)
 
         # Vérifier que la base de données a été créée
         self.assertTrue(os.path.exists("test.db"))
@@ -37,12 +37,12 @@ class TestSaveBDD(unittest.TestCase):
     def test_file_not_found(self):
         # Vérifier que la fonction génère une exception lorsque le fichier csv n'existe pas
         with self.assertRaises(FileNotFoundError):
-            bdd_save.save_bdd("test.db", "test_table", "notfound.csv", False)
+            save_utils.save_bdd("test.db", "test_table", "notfound.csv", False)
 
     def test_save_csv(self):
         timeStart = time.strftime("%Y%m%d-%H%M%S")
         # faire une sauvegarde avec le paramètre keep_csv à True
-        bdd_save.save_bdd("test.db", "test_table", "test.csv", True)
+        save_utils.save_bdd("test.db", "test_table", "test.csv", True)
         # vérifier que le fichier csv de base n'existe plus
         self.assertFalse(os.path.exists("test.csv"))
         # vérifier qu'un nouveau fichier csv a été créé avec le nom du fichier de base + timeStart
