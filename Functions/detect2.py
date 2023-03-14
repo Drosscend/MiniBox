@@ -66,19 +66,29 @@ def yolo_detections_to_norfair_detections(yolo_detections: torch.tensor) -> List
 
 def detect(
         video_capture: cv2.VideoCapture,
-        object_types: list[int],
-        interval: float,
-        display_detection: bool,
-        display_fps: bool,
+        base_params: dict,
         yolov5_paramms: dict,
         bdd_params: dict
 ) -> None:
+    """
+    Détection des objets
+    @param video_capture: Flux vidéo
+    @param base_params: Paramètres de base
+    @param yolov5_paramms: Paramètres de la librairie Yolov5.
+    @param bdd_params: Paramètres de la base de données
+    """
     log.info("Début de la détection")
     model = YOLO(yolov5_paramms["weights"], yolov5_paramms["device"])
 
-    # for fps
-    prev_frame_time = 0
-    new_frame_time = 0
+    interval = base_params["interval"]
+
+    display_detection = base_params["display_detection"]
+    if display_detection:
+        # for fps
+        prev_frame_time = 0
+        new_frame_time = 0
+        display_fps = base_params["display_fps"]
+        log.info("Pour quitter l'application, appuyez sur la touche 'q'")
 
     tracker = Tracker(distance_function="iou", distance_threshold=0.7)
     box_annotator = sv.BoxAnnotator(
@@ -100,7 +110,7 @@ def detect(
                 conf_threshold=yolov5_paramms["conf_thres"],
                 iou_threshold=yolov5_paramms["iou_thres"],
                 image_size=640,
-                classes=object_types,
+                classes=base_params["classes"],
                 agnostic=yolov5_paramms["agnostic_nms"],
                 multi_label=yolov5_paramms["multi_label_nms"],
                 max_det=yolov5_paramms["max_det"],
@@ -163,20 +173,13 @@ def main(
     """
     # Initialisation de la caméra
     video_capture = cv2.VideoCapture(base_params["source"])
-    classes = base_params["classes"]
-    interval = base_params["interval"]
-    display_detection = base_params["display_detection"]
-    display_fps = base_params["display_fps"]
 
     # Vérification de l'ouverture de la caméra
     if not video_capture.isOpened():
         log.error("Impossible d'ouvrir la source, verifier le fichier de configuration")
         return
 
-    if display_detection:
-        log.info("Pour quitter l'application, appuyez sur la touche 'q'")
-    # Détection des personnes
     try:
-        detect(video_capture, classes, interval, display_detection, display_fps, yolov5_paramms, bdd_params)
+        detect(video_capture, base_params, yolov5_paramms, bdd_params)
     except Exception as e:
         log.error("Erreur lors de la détection: {}".format(e))
