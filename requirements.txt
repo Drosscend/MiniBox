@@ -13,3 +13,4 @@ PyYAML>=6.0
 tqdm>=4.65.0
 seaborn>=0.12.0
 opencv-python==4.5.5.64
+supervision>=0.3.0

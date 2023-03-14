@@ -1,8 +1,11 @@
 from typing import List, Optional, Union
 import numpy as np
 import torch
+import supervision as sv
 import cv2
 from norfair import Detection, Tracker, draw_boxes
+
+import time
 
 DISTANCE_THRESHOLD_BBOX: float = 0.7
 MAX_DISTANCE: int = 10000
@@ -57,19 +60,31 @@ iou_threshold=0.45
 model_name = "yolov5n"
 device = "cpu" # sinon 0
 distance_function = "iou"
-classes = [0,1]
+classes = [1]
 
 model = YOLO(model_name, device=device)
 
-cap = cv2.VideoCapture("2.mp4")
-# cap = cv2.VideoCapture(0)
+# cap = cv2.VideoCapture("2.mp4")
+cap = cv2.VideoCapture(0)
+
+# used to record the time when we processed last frame
+prev_frame_time = 0
+ 
+# used to record the time at which we processed current frame
+new_frame_time = 0
 
 distance_threshold = DISTANCE_THRESHOLD_BBOX
 tracker = Tracker(
     distance_function=distance_function,
     distance_threshold=distance_threshold,
 )
-    
+
+box_annotator = sv.BoxAnnotator(
+    thickness=2,
+    text_thickness=2,
+    text_scale=1
+)
+
 while(True):
     ret, frame = cap.read()
 
@@ -83,11 +98,23 @@ while(True):
     detections = yolo_detections_to_norfair_detections(yolo_detections)
     tracked_objects = tracker.update(detections=detections)
     
-    for a in tracked_objects:
-        print("id", a.id, "points", a.last_detection.points)
+    # for a in tracked_objects:
+    #     print("id", a.id, "points", a.last_detection.points)
 
-    draw_boxes(frame, tracked_objects, draw_ids=True)
+    labels = [f"{a.id}" for a in tracked_objects]
+    detections = sv.Detections.from_yolov5(yolo_detections)
+    frame = box_annotator.annotate(scene=frame, detections=detections, labels=labels)
+    # draw_boxes(frame, tracked_objects, draw_ids=True)
 
+    # time when we finish processing for this frame
+    new_frame_time = time.time()
+    fps = 1/(new_frame_time-prev_frame_time)
+    prev_frame_time = new_frame_time
+    fps = str(fps)
+ 
+    # putting the FPS count on the frame
+    cv2.putText(frame, fps, (7, 70), cv2.FONT_HERSHEY_SIMPLEX, 3, (100, 255, 0), 3, cv2.LINE_AA)
+    
     cv2.imshow('frame',frame)
     if cv2.waitKey(20) & 0xFF == ord('q'):
         break
