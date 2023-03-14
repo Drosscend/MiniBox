@@ -20,6 +20,11 @@ log = logging.getLogger("main")
 
 class YOLO:
     def __init__(self, model_name: str, device: str, verbose: bool):
+        """
+        @param model_name: Nom du modèle à charger
+        @param device: Device sur lequel le modèle doit être chargé
+        @param verbose: Afficher les informations de chargement du modèle
+        """
         # Vérification de la disponibilité de CUDA si nécessaire
         if device != "cpu":
             if not torch.cuda.is_available():
@@ -32,6 +37,18 @@ class YOLO:
     def __call__(self, img: Union[str, np.ndarray], conf_threshold: float = 0.25,
                  iou_threshold: float = 0.45, image_size: int = 720, agnostic: bool = False, multi_label: bool = True,
                  max_det: int = 50, amp: bool = True, classes: Optional[List[int]] = None) -> torch.tensor:
+        """
+        @param img: Image à traiter
+        @param conf_threshold: Seuil de confiance
+        @param iou_threshold: Seuil d'intersection sur union
+        @param image_size: Taille de l'image
+        @param agnostic: NMS class-agnostic
+        @param multi_label: NMS multiple labels per box
+        @param max_det: Maximum number of detections per image
+        @param amp: Automatic Mixed Precision (AMP) inference
+        @param classes: Classes à détecter
+        @return: Résultats de la détection
+        """
         self.model.conf = conf_threshold
         self.model.iou = iou_threshold
         self.model.agnostic = agnostic  # NMS class-agnostic
@@ -46,7 +63,11 @@ class YOLO:
 
 
 def yolo_detections_to_norfair_detections(yolo_detections: torch.tensor) -> List[Detection]:
-    """convert detections_as_xywh to norfair detections"""
+    """
+    Convertit les résultats de la détection YOLOv5 en format Norfair
+    @param yolo_detections: Résultats de la détection YOLOv5
+    @return: Résultats de la détection Norfair
+    """
     norfair_detections: List[Detection] = []
 
     detections_as_xyxy = yolo_detections.xyxy[0]
@@ -86,7 +107,7 @@ def detect(
     model = YOLO(yolov5_paramms["weights"], yolov5_paramms["device"], base_params["debug"])
 
     # Initialisation de la collection d'objets suivis
-    list_tracked_objects = TrackedObjects.TrackedObjects()
+    tracked_objects_informations = TrackedObjects.TrackedObjects()
 
     interval = base_params["interval"]
 
@@ -164,26 +185,26 @@ def detect(
 
             # Si l'objet n'a pas encore été suivi, c'est un nouvel objet
             found = False
-            for tracked_object2 in list_tracked_objects.tracked_objects:
-                if tracked_object2.obj_id == object_id:
+            for object in tracked_objects_informations.tracked_objects:
+                if object.obj_id == object_id:
                     found = True
-                    tracked_object2.update_position(object_conf, object_x1, object_y1, object_x2, object_y2)
+                    object.update_position(object_conf, object_x1, object_y1, object_x2, object_y2)
                     break
             if not found:
                 color = utils.get_random_color(object_id)
-                list_tracked_objects.add(object_id, object_conf, object_x1, object_y1, object_x2, object_y2,
-                                         object_classe, color)
+                tracked_objects_informations.add(object_id, object_conf, object_x1, object_y1, object_x2, object_y2,
+                                                 object_classe, color)
                 log.debug("Nouvel objet détecté: {}".format(object_id))
 
         # Supprime les objets qui n'ont pas été détectés dans le frame courant
-        for tracked_object in list_tracked_objects.tracked_objects:
+        for tracked_object in tracked_objects_informations.tracked_objects:
             if tracked_object.obj_id not in currentID:
-                list_tracked_objects.remove(tracked_object.obj_id)
+                tracked_objects_informations.remove(tracked_object.obj_id)
                 log.debug("Objet supprimé: {}".format(tracked_object.obj_id))
 
         # Génération du fichier CSV
         if base_params["save_in_csv"]:
-            csv_manipulation.generate_csv(currentID, list_tracked_objects, output_folder, csv_name)
+            csv_manipulation.generate_csv(currentID, tracked_objects_informations, output_folder, csv_name)
 
         # sauvegarde dans la base de données
         if bdd_params["save_in_bdd"]:
@@ -212,7 +233,7 @@ def detect(
                 labels = []
                 for tracked_object in tracked_objects:
                     id = tracked_object.id
-                    direction = list_tracked_objects.get(tracked_object.id).direction
+                    direction = tracked_objects_informations.get(tracked_object.id).direction
                     confidence = format(tracked_object.last_detection.scores[0], ".2f")
                     labels.append(f"id : {id} - {direction} - {confidence}")
 
