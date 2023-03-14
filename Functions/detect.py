@@ -1,5 +1,6 @@
 import logging
 import os
+import platform
 import time
 from typing import List, Optional, Union
 
@@ -95,6 +96,13 @@ def detect(
         prev_frame_time = 0
         new_frame_time = 0
         display_fps = base_params["display_fps"]
+
+        if platform.system() == 'Linux' and not os.getenv('DISPLAY', ''):
+            cv2.namedWindow("Video", cv2.WINDOW_NORMAL | cv2.WINDOW_KEEPRATIO)
+        else:
+            cv2.namedWindow("Video", cv2.WINDOW_NORMAL)
+            cv2.resizeWindow("Video", 640, 480)
+
         log.info("Pour quitter l'application, appuyez sur la touche 'q'")
 
     output_folder = yolov5_paramms["output_folder"]
@@ -196,14 +204,19 @@ def detect(
             prev_frame_time = new_frame_time
             fps = str(int(fps)) + " FPS"
 
-            detections = sv.Detections.from_yolov5(results)
-            labels = []
-            for tracked_object in tracked_objects:
-                id = tracked_object.id
-                direction = list_tracked_objects.get(tracked_object.id).direction
-                labels.append(f"id : {id} - {direction}")
+            # si pas de détection, affiche un message
+            if len(tracked_objects) == 0:
+                cv2.putText(frame, "Aucune détection", (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+            else:
+                detections = sv.Detections.from_yolov5(results)
+                labels = []
+                for tracked_object in tracked_objects:
+                    id = tracked_object.id
+                    direction = list_tracked_objects.get(tracked_object.id).direction
+                    confidence = format(tracked_object.last_detection.scores[0], ".2f")
+                    labels.append(f"id : {id} - {direction} - {confidence}")
 
-            frame = box_annotator.annotate(scene=frame, detections=detections, labels=labels)
+                frame = box_annotator.annotate(scene=frame, detections=detections, labels=labels)
 
             # Affichage des FPS si spécifié
             if display_fps:
@@ -241,9 +254,7 @@ def main(
         log.error("Impossible d'ouvrir la source, verifier le fichier de configuration")
         return
 
-    # try:
-    #     detect(video_capture, base_params, yolov5_paramms, bdd_params)
-    # except Exception as e:
-    #     log.error("Erreur lors de la détection: {}".format(e))
-
-    detect(video_capture, base_params, yolov5_paramms, bdd_params)
+    try:
+        detect(video_capture, base_params, yolov5_paramms, bdd_params)
+    except Exception as e:
+        log.error("Erreur lors de la détection: {}".format(e))
