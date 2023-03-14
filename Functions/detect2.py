@@ -69,7 +69,7 @@ def detect(
 ) -> None:
 
     log.info("Début de la détection")
-    model = YOLO(yolov5_paramms["weights"], device="cpu") # TODO : offrir la possibilité de choisir le device
+    model = YOLO(yolov5_paramms["weights"], yolov5_paramms["device"])
     
     # for fps
     prev_frame_time = 0

@@ -17,7 +17,7 @@ def check_params(config) -> bool:
     expected_options = {
         'PARAMS': ['source', 'classes', 'interval', 'display_detection', 'debug'],
         'YOLOV5_PARAMS': ['weights', 'conf_thres', 'iou_thres', 'agnostic_nms', 'multi_label_nms', 'max_det', 'amp',
-                          'output_folder', 'csv_name'],
+                          'output_folder', 'csv_name', 'device'],
         'BDD_PARAMS': ['save_in_bdd', 'bdd_name', 'table_name', 'time_to_save', 'keep_csv']
     }
 
@@ -168,6 +168,17 @@ def get_yolov5_params(config) -> dict:
         log.error("Erreur : la valeur de l'option csv_name doit être un chemin, verifier le fichier de configuration")
         exit(1)
 
+    try:
+        devise = config.get('YOLOV5_PARAMS', 'device')
+        if devise not in ["cpu", "0"]:
+            log.error(
+                "Erreur : la valeur de l'option device doit être cpu ou 0, verifier le fichier de configuration")
+            exit(1)
+        else:
+            yolov5_paramms['device'] = devise
+    except ValueError:
+        log.error("Erreur : la valeur de l'option device doit être cpu ou 0, verifier le fichier de configuration")
+        exit(1)
     return yolov5_paramms
 
 
@@ -276,4 +287,4 @@ def get_config(config_file) -> tuple[dict, dict, dict]:
     yolov5_params = get_yolov5_params(config)
     bdd_params = get_bdd_params(config)
     print_config(base_params, yolov5_params, bdd_params)
-    return (base_params, yolov5_params, bdd_params)
+    return base_params, yolov5_params, bdd_params
