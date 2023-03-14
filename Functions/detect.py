@@ -111,13 +111,13 @@ def detect(
 
     interval = base_params["interval"]
 
+    display_fps = base_params["display_fps"]
+    if display_fps:
+        new_frame_time = 0
+        prev_frame_time = 0
+
     display_detection = base_params["display_detection"]
     if display_detection:
-        # for fps
-        prev_frame_time = 0
-        new_frame_time = 0
-        display_fps = base_params["display_fps"]
-
         if platform.system() == 'Linux' and not os.getenv('DISPLAY', ''):
             cv2.namedWindow("Video", cv2.WINDOW_NORMAL | cv2.WINDOW_KEEPRATIO)
         else:
@@ -170,7 +170,7 @@ def detect(
             continue
 
         # Enregistre les objets détectés
-        currentID = []
+        currents_id = []
         for tracked_object in tracked_objects:
             # Récupère les informations sur l'objet
             object_x1 = int(tracked_object.last_detection.points[0][0])
@@ -181,14 +181,14 @@ def detect(
             object_conf = float(tracked_object.last_detection.scores[0])
             object_classe = int(tracked_object.label)
 
-            currentID.append(object_id)
+            currents_id.append(object_id)
 
             # Si l'objet n'a pas encore été suivi, c'est un nouvel objet
             found = False
-            for object in tracked_objects_informations.tracked_objects:
-                if object.obj_id == object_id:
+            for obj in tracked_objects_informations.tracked_objects:
+                if obj.obj_id == object_id:
                     found = True
-                    object.update_position(object_conf, object_x1, object_y1, object_x2, object_y2)
+                    obj.update_position(object_conf, object_x1, object_y1, object_x2, object_y2)
                     break
             if not found:
                 color = utils.get_random_color(object_id)
@@ -198,13 +198,13 @@ def detect(
 
         # Supprime les objets qui n'ont pas été détectés dans le frame courant
         for tracked_object in tracked_objects_informations.tracked_objects:
-            if tracked_object.obj_id not in currentID:
+            if tracked_object.obj_id not in currents_id:
                 tracked_objects_informations.remove(tracked_object.obj_id)
                 log.debug("Objet supprimé: {}".format(tracked_object.obj_id))
 
         # Génération du fichier CSV
         if base_params["save_in_csv"]:
-            csv_manipulation.generate_csv(currentID, tracked_objects_informations, output_folder, csv_name)
+            csv_manipulation.generate_csv(currents_id, tracked_objects_informations, output_folder, csv_name)
 
         # sauvegarde dans la base de données
         if bdd_params["save_in_bdd"]:
@@ -219,12 +219,6 @@ def detect(
 
         # Affichage des images si spécifié
         if display_detection:
-            # time when we finish processing for this frame
-            new_frame_time = time.time()
-            fps = 1 / (new_frame_time - prev_frame_time)
-            prev_frame_time = new_frame_time
-            fps = str(int(fps)) + " FPS"
-
             # si pas de détection, affiche un message
             if len(tracked_objects) == 0:
                 cv2.putText(frame, "Aucune détection", (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
@@ -232,15 +226,19 @@ def detect(
                 detections = sv.Detections.from_yolov5(results)
                 labels = []
                 for tracked_object in tracked_objects:
-                    id = tracked_object.id
-                    direction = tracked_objects_informations.get(tracked_object.id).direction
+                    current_id = tracked_object.id
+                    direction = tracked_objects_informations.get(current_id).direction
                     confidence = format(tracked_object.last_detection.scores[0], ".2f")
-                    labels.append(f"id : {id} - {direction} - {confidence}")
+                    labels.append(f"id : {current_id} - {direction} - {confidence}")
 
                 frame = box_annotator.annotate(scene=frame, detections=detections, labels=labels)
 
             # Affichage des FPS si spécifié
             if display_fps:
+                new_frame_time = time.time()
+                fps = 1 / (new_frame_time - prev_frame_time)
+                prev_frame_time = new_frame_time
+                fps = str(int(fps)) + " FPS"
                 cv2.putText(frame, fps, (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
 
             cv2.imshow('frame', frame)
