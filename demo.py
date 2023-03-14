@@ -90,7 +90,6 @@ def yolo_detections_to_norfair_detections(
 
 
 parser = argparse.ArgumentParser(description="Track objects in a video.")
-parser.add_argument("files", type=str, nargs="+", help="Video files to process")
 parser.add_argument(
     "--model-name", type=str, default="yolov5m6", help="YOLOv5 model name"
 )
@@ -157,24 +156,19 @@ while(True):
     # Display the id of the tracked object
     for d in detections:
         print(
-            d.label, "label",
-            d.points, "points",
-            d.data, "data",
-            d.scores, "scores",
-            d.absolute_points, "absolute_points",
-            d.age,  "age",
-            d.embedding, "embedding"
+            "label:", d.label,
+            "points:", d.points,
+            "data:", d.data,
+            "scores:", d.scores,
+            "absolute_points:", d.absolute_points,
+            "age:", d.age,
+            "embedding:", d.embedding
         )
-        break
-    break
-
-    tracked_objects = tracker.update(detections=detections)
 
     if args.track_points == "centroid":
         norfair.draw_points(frame, detections)
     elif args.track_points == "bbox":
         norfair.draw_boxes(frame, detections, draw_labels=True, draw_ids=True, draw_scores=True)
-
 
     cv2.imshow('frame',frame)
     if cv2.waitKey(20) & 0xFF == ord('q'):
