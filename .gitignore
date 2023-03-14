@@ -174,3 +174,4 @@ custom_config.ini
 OUTPUT
 detect_save.db
 *.mp4
+.csv

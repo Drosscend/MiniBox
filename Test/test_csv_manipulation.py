@@ -14,10 +14,10 @@ class TestGenerateCSV(unittest.TestCase):
     def setUp(self):
         # Initialisation des objets suivis
         self.tracked_objects = TrackedObjects.TrackedObjects()
-        self.tracked_objects.add(1, 0.99, 50, 50, 100, 100, 0, (0, 0, 0))
-        self.tracked_objects.add(2, 0.99, 50, 50, 100, 100, 0, (0, 0, 0))
-        self.tracked_objects.add(3, 0.99, 50, 50, 100, 100, 0, (0, 0, 0))
-        self.tracked_objects.add(4, 0.99, 50, 50, 100, 100, 0, (0, 0, 0))
+        self.tracked_objects.add(1, 50, 50, 100, 100, 0, (0, 0, 0))
+        self.tracked_objects.add(2, 50, 50, 100, 100, 0, (0, 0, 0))
+        self.tracked_objects.add(3, 50, 50, 100, 100, 0, (0, 0, 0))
+        self.tracked_objects.add(4, 50, 50, 100, 100, 0, (0, 0, 0))
 
         # Création des objets à ajouter au fichier CSV
         obj1 = self.tracked_objects.get(1)
@@ -55,11 +55,11 @@ class TestGenerateCSV(unittest.TestCase):
         open(self.csv_folder_name + '/' + self.csv_file_name, 'w').close()
         new_date = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
         new_tracking = TrackedObjects.TrackedObjects()
-        new_tracking.add(1, 0.99, 50, 50, 100, 100, 1, (0, 0, 0))
-        new_tracking.add(2, 0.99, 50, 50, 100, 100, 1, (0, 0, 0))
-        new_tracking.add(3, 0.99, 50, 50, 100, 100, 0, (0, 0, 0))
-        new_tracking.add(4, 0.99, 50, 50, 100, 100, 0, (0, 0, 0))
-        new_tracking.add(5, 0.99, 50, 50, 100, 100, 1, (0, 0, 0))
+        new_tracking.add(1, 50, 50, 100, 100, 1, (0, 0, 0))
+        new_tracking.add(2, 50, 50, 100, 100, 1, (0, 0, 0))
+        new_tracking.add(3, 50, 50, 100, 100, 0, (0, 0, 0))
+        new_tracking.add(4, 50, 50, 100, 100, 0, (0, 0, 0))
+        new_tracking.add(5, 50, 50, 100, 100, 1, (0, 0, 0))
 
         obj1 = new_tracking.get(1)
         obj1.direction = "top-left"

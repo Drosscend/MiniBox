@@ -113,16 +113,15 @@ def detect(
 
     display_fps = base_params["display_fps"]
     if display_fps:
-        new_frame_time = 0
         prev_frame_time = 0
 
     display_detection = base_params["display_detection"]
     if display_detection:
         if platform.system() == 'Linux' and not os.getenv('DISPLAY', ''):
-            cv2.namedWindow("Video", cv2.WINDOW_NORMAL | cv2.WINDOW_KEEPRATIO)
+            cv2.namedWindow("Minibox", cv2.WINDOW_NORMAL | cv2.WINDOW_KEEPRATIO)
         else:
-            cv2.namedWindow("Video", cv2.WINDOW_NORMAL)
-            cv2.resizeWindow("Video", 640, 480)
+            cv2.namedWindow("Minibox", cv2.WINDOW_NORMAL)
+            cv2.resizeWindow("Minibox", 640, 480)
 
         log.info("Pour quitter l'application, appuyez sur la touche 'q'")
 
@@ -178,7 +177,6 @@ def detect(
             object_x2 = int(tracked_object.last_detection.points[1][0])
             object_y2 = int(tracked_object.last_detection.points[1][1])
             object_id = int(tracked_object.id)
-            object_conf = float(tracked_object.last_detection.scores[0])
             object_classe = int(tracked_object.label)
 
             currents_id.append(object_id)
@@ -188,11 +186,11 @@ def detect(
             for obj in tracked_objects_informations.tracked_objects:
                 if obj.obj_id == object_id:
                     found = True
-                    obj.update_position(object_conf, object_x1, object_y1, object_x2, object_y2)
+                    obj.update_position(object_x1, object_y1, object_x2, object_y2)
                     break
             if not found:
                 color = utils.get_random_color(object_id)
-                tracked_objects_informations.add(object_id, object_conf, object_x1, object_y1, object_x2, object_y2,
+                tracked_objects_informations.add(object_id, object_x1, object_y1, object_x2, object_y2,
                                                  object_classe, color)
                 log.debug("Nouvel objet détecté: {}".format(object_id))
 
@@ -221,7 +219,7 @@ def detect(
         if display_detection:
             # si pas de détection, affiche un message
             if len(tracked_objects) == 0:
-                cv2.putText(frame, "Aucune détection", (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+                cv2.putText(frame, "Aucune detection", (10, 100), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
             else:
                 detections = sv.Detections.from_yolov5(results)
                 labels = []
@@ -241,7 +239,7 @@ def detect(
                 fps = str(int(fps)) + " FPS"
                 cv2.putText(frame, fps, (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
 
-            cv2.imshow('frame', frame)
+            cv2.imshow("Minibox", frame)
 
             key = cv2.waitKey(10)
             if key == ord('q'):
