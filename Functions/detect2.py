@@ -1,4 +1,6 @@
 import logging
+import os
+import time
 from typing import List, Optional, Union
 
 import cv2
@@ -7,22 +9,24 @@ import supervision as sv
 import torch
 from norfair import Detection, Tracker
 
-log = logging.getLogger("main")
-import time
+from Functions import TrackedObjects
+from Functions import bdd_save
+from Functions import csv_manipulation
+from Functions import utils
 
-MAX_DISTANCE: int = 10000
+log = logging.getLogger("main")
 
 
 class YOLO:
-    def __init__(self, model_name: str, device: Optional[str] = None):
+    def __init__(self, model_name: str, device: str, verbose: bool):
         # Vérification de la disponibilité de CUDA si nécessaire
-        if device is not None and "cuda" in device and not torch.cuda.is_available():
-            raise Exception("Vous avez demandé un device CUDA, mais il n'est pas disponible")
-        elif device is None:
-            device = "cuda:0" if torch.cuda.is_available() else "cpu"
+        if device != "cpu":
+            if not torch.cuda.is_available():
+                log.error("Vous avez demandé un device CUDA, mais il n'est pas disponible")
+                raise Exception("Vous avez demandé un device CUDA, mais il n'est pas disponible")
 
         # Chargement du modèle
-        self.model = torch.hub.load("ultralytics/yolov5", model_name, device=device)
+        self.model = torch.hub.load("ultralytics/yolov5", model_name, device=device, verbose=verbose)
 
     def __call__(self, img: Union[str, np.ndarray], conf_threshold: float = 0.25,
                  iou_threshold: float = 0.45, image_size: int = 720, agnostic: bool = False, multi_label: bool = True,
@@ -78,7 +82,10 @@ def detect(
     @param bdd_params: Paramètres de la base de données
     """
     log.info("Début de la détection")
-    model = YOLO(yolov5_paramms["weights"], yolov5_paramms["device"])
+    model = YOLO(yolov5_paramms["weights"], yolov5_paramms["device"], base_params["debug"])
+
+    # Initialisation de la collection d'objets suivis
+    list_tracked_objects = TrackedObjects.TrackedObjects()
 
     interval = base_params["interval"]
 
@@ -90,7 +97,11 @@ def detect(
         display_fps = base_params["display_fps"]
         log.info("Pour quitter l'application, appuyez sur la touche 'q'")
 
+    output_folder = yolov5_paramms["output_folder"]
+    csv_name = yolov5_paramms["csv_name"]
+
     tracker = Tracker(distance_function="iou", distance_threshold=0.7)
+
     box_annotator = sv.BoxAnnotator(
         thickness=2,
         text_thickness=2,
@@ -129,7 +140,47 @@ def detect(
             log.error("Erreur lors du suivie des objets: {}".format(e))
             continue
 
-        labels = [f"{a.id}" for a in tracked_objects]
+        # Enregistre les objets détectés
+        currentID = []
+        for tracked_object in tracked_objects:
+            # Récupère les informations sur l'objet
+            object_x1 = int(tracked_object.last_detection.points[0][0])
+            object_y1 = int(tracked_object.last_detection.points[0][1])
+            object_x2 = int(tracked_object.last_detection.points[1][0])
+            object_y2 = int(tracked_object.last_detection.points[1][1])
+            object_id = int(tracked_object.id)
+            object_conf = float(tracked_object.last_detection.scores[0])
+            object_classe = int(tracked_object.label)
+
+            currentID.append(object_id)
+
+            # Si l'objet n'a pas encore été suivi, c'est un nouvel objet
+            found = False
+            for tracked_object2 in list_tracked_objects.tracked_objects:
+                if tracked_object2.obj_id == object_id:
+                    found = True
+                    tracked_object2.update_position(object_conf, object_x1, object_y1, object_x2, object_y2)
+                    break
+            if not found:
+                color = utils.get_random_color(object_id)
+                list_tracked_objects.add(object_id, object_conf, object_x1, object_y1, object_x2, object_y2,
+                                         object_classe, color)
+                log.debug("Nouvel objet détecté: {}".format(object_id))
+
+        # Supprime les objets qui n'ont pas été détectés dans le frame courant
+        for tracked_object in list_tracked_objects.tracked_objects:
+            if tracked_object.obj_id not in currentID:
+                list_tracked_objects.remove(tracked_object.obj_id)
+                log.debug("Objet supprimé: {}".format(tracked_object.obj_id))
+
+        # Génération du fichier CSV
+        csv_manipulation.generate_csv(currentID, list_tracked_objects, output_folder, csv_name)
+
+        # sauvegarde dans la base de données
+        if bdd_params["save_in_bdd"]:
+            if bdd_params["time_to_save"] == time.strftime("%H:%M:%S"):
+                csv_pah = os.path.join(output_folder, csv_name)
+                bdd_save.save_bdd(bdd_params["bdd_name"], bdd_params["table_name"], csv_pah, bdd_params["keep_csv"])
 
         # Pause entre chaque détection si spécifiée
         if interval > 0:
@@ -145,6 +196,7 @@ def detect(
             fps = str(int(fps)) + " FPS"
 
             detections = sv.Detections.from_yolov5(results)
+            labels = [f"{a.id}" for a in tracked_objects]
             frame = box_annotator.annotate(scene=frame, detections=detections, labels=labels)
 
             # Affichage des FPS si spécifié
@@ -153,11 +205,15 @@ def detect(
 
             cv2.imshow('frame', frame)
 
-            if cv2.waitKey(20) & 0xFF == ord('q'):
+            key = cv2.waitKey(10)
+            if key == ord('q'):
                 break
+            elif key == -1:
+                continue
 
     video_capture.release()
     cv2.destroyAllWindows()
+    log.info("Detection terminée")
 
 
 def main(
@@ -179,7 +235,9 @@ def main(
         log.error("Impossible d'ouvrir la source, verifier le fichier de configuration")
         return
 
-    try:
-        detect(video_capture, base_params, yolov5_paramms, bdd_params)
-    except Exception as e:
-        log.error("Erreur lors de la détection: {}".format(e))
+    # try:
+    #     detect(video_capture, base_params, yolov5_paramms, bdd_params)
+    # except Exception as e:
+    #     log.error("Erreur lors de la détection: {}".format(e))
+
+    detect(video_capture, base_params, yolov5_paramms, bdd_params)
