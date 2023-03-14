@@ -15,7 +15,7 @@ def check_params(config) -> bool:
     # Vérifier que le fichier de configuration est valide
     expected_sections = ['PARAMS', 'YOLOV5_PARAMS', 'BDD_PARAMS']
     expected_options = {
-        'PARAMS': ['source', 'classes', 'interval', 'display_detection', 'debug'],
+        'PARAMS': ['source', 'classes', 'interval', 'display_detection', 'display_fps', 'debug'],
         'YOLOV5_PARAMS': ['weights', 'conf_thres', 'iou_thres', 'agnostic_nms', 'multi_label_nms', 'max_det', 'amp',
                           'output_folder', 'csv_name', 'device'],
         'BDD_PARAMS': ['save_in_bdd', 'bdd_name', 'table_name', 'time_to_save', 'keep_csv']
@@ -72,6 +72,13 @@ def get_base_params(config) -> dict:
         base_params['display_detection'] = config.getboolean('PARAMS', 'display_detection')
     except ValueError:
         log.error("Erreur : la valeur de l'option display_detection doit être un boolean, verifier le fichier de "
+                  "configuration")
+        exit(1)
+
+    try:
+        base_params['display_fps'] = config.getboolean('PARAMS', 'display_fps')
+    except ValueError:
+        log.error("Erreur : la valeur de l'option display_fps doit être un boolean, verifier le fichier de "
                   "configuration")
         exit(1)
 

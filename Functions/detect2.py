@@ -1,14 +1,17 @@
-from typing import List, Optional, Union
-import numpy as np
-import torch
-import supervision as sv
-import cv2
-from norfair import Detection, Tracker
 import logging
+from typing import List, Optional, Union
+
+import cv2
+import numpy as np
+import supervision as sv
+import torch
+from norfair import Detection, Tracker
+
 log = logging.getLogger("main")
 import time
 
 MAX_DISTANCE: int = 10000
+
 
 class YOLO:
     def __init__(self, model_name: str, device: Optional[str] = None):
@@ -21,19 +24,21 @@ class YOLO:
         # Chargement du modèle
         self.model = torch.hub.load("ultralytics/yolov5", model_name, device=device)
 
-    def __call__(self, img: Union[str, np.ndarray], conf_threshold: float = 0.25, 
-                 iou_threshold: float = 0.45, image_size: int = 720, agnostic: bool = False, multi_label: bool = True, max_det: int = 50, amp: bool = True, classes: Optional[List[int]] = None ) -> torch.tensor:
+    def __call__(self, img: Union[str, np.ndarray], conf_threshold: float = 0.25,
+                 iou_threshold: float = 0.45, image_size: int = 720, agnostic: bool = False, multi_label: bool = True,
+                 max_det: int = 50, amp: bool = True, classes: Optional[List[int]] = None) -> torch.tensor:
         self.model.conf = conf_threshold
         self.model.iou = iou_threshold
         self.model.agnostic = agnostic  # NMS class-agnostic
         self.model.multi_label = multi_label  # NMS multiple labels per box
         self.model.max_det = max_det  # maximum number of detections per image
         self.model.amp = amp  # Automatic Mixed Precision (AMP) inference
-        
+
         if classes is not None:
             self.model.classes = classes
         detections = self.model(img, size=image_size)
         return detections
+
 
 def yolo_detections_to_norfair_detections(yolo_detections: torch.tensor) -> List[Detection]:
     """convert detections_as_xywh to norfair detections"""
@@ -64,18 +69,18 @@ def detect(
         object_types: list[int],
         interval: float,
         display_detection: bool,
+        display_fps: bool,
         yolov5_paramms: dict,
         bdd_params: dict
 ) -> None:
-
     log.info("Début de la détection")
     model = YOLO(yolov5_paramms["weights"], yolov5_paramms["device"])
-    
+
     # for fps
     prev_frame_time = 0
     new_frame_time = 0
 
-    tracker = Tracker(distance_function="iou",distance_threshold=0.7)
+    tracker = Tracker(distance_function="iou", distance_threshold=0.7)
     box_annotator = sv.BoxAnnotator(
         thickness=2,
         text_thickness=2,
@@ -121,22 +126,22 @@ def detect(
             log.debug("Pause de " + str(interval) + " secondes")
             time.sleep(interval)
 
-        # affichage des images si spécifié
+        # Affichage des images si spécifié
         if display_detection:
             # time when we finish processing for this frame
             new_frame_time = time.time()
-            fps = 1/(new_frame_time-prev_frame_time)
+            fps = 1 / (new_frame_time - prev_frame_time)
             prev_frame_time = new_frame_time
             fps = str(int(fps)) + " FPS"
 
             detections = sv.Detections.from_yolov5(results)
             frame = box_annotator.annotate(scene=frame, detections=detections, labels=labels)
 
-            # Ajout du FPS
-            # TODO : Offrir la possibilité de choisir si on affiche le FPS ou non
-            cv2.putText(frame, fps, (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+            # Affichage des FPS si spécifié
+            if display_fps:
+                cv2.putText(frame, fps, (10, 50), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
 
-            cv2.imshow('frame',frame)
+            cv2.imshow('frame', frame)
 
             if cv2.waitKey(20) & 0xFF == ord('q'):
                 break
@@ -161,6 +166,7 @@ def main(
     classes = base_params["classes"]
     interval = base_params["interval"]
     display_detection = base_params["display_detection"]
+    display_fps = base_params["display_fps"]
 
     # Vérification de l'ouverture de la caméra
     if not video_capture.isOpened():
@@ -169,9 +175,8 @@ def main(
 
     if display_detection:
         log.info("Pour quitter l'application, appuyez sur la touche 'q'")
-
     # Détection des personnes
     try:
-        detect(video_capture, classes, interval, display_detection, yolov5_paramms, bdd_params)
+        detect(video_capture, classes, interval, display_detection, display_fps, yolov5_paramms, bdd_params)
     except Exception as e:
         log.error("Erreur lors de la détection: {}".format(e))
