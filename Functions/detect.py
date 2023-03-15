@@ -30,6 +30,23 @@ def detect(
     """
     log.info("Début de la détection")
 
+    # Initialisation du modèle YOLOv5
+    try:
+        model = Yolo.YOLO(yolov5_paramms["weights"], yolov5_paramms["device"], base_params["debug"])
+    except Exception as e:
+        log.error("Erreur lors de l'initialisation du modèle YOLOv5: {}".format(e))
+        exit(1)
+
+    # Initialisation du tracker
+    try:
+        tracker = Tracker(distance_function="iou", distance_threshold=0.7)
+    except Exception as e:
+        log.error("Erreur lors de l'initialisation du tracker: {}".format(e))
+        exit(1)
+
+    # Initialisation de la collection d'objets suivis pour caluler la direction et faire l'enregistrement
+    tracked_objects_informations = TrackedObjects.TrackedObjects()
+
     # interval entre chaque détection
     interval = base_params["interval"]
 
@@ -68,23 +85,6 @@ def detect(
             "total": 0
         }
         last_csv_save = time.time()
-
-    # Initialisation du modèle YOLOv5
-    try:
-        model = Yolo.YOLO(yolov5_paramms["weights"], yolov5_paramms["device"], base_params["debug"])
-    except Exception as e:
-        log.error("Erreur lors de l'initialisation du modèle YOLOv5: {}".format(e))
-        exit(1)
-
-    # Initialisation du tracker
-    try:
-        tracker = Tracker(distance_function="iou", distance_threshold=0.7)
-    except Exception as e:
-        log.error("Erreur lors de l'initialisation du tracker: {}".format(e))
-        exit(1)
-
-    # Initialisation de la collection d'objets suivis pour caluler la direction et faire l'enregistrement
-    tracked_objects_informations = TrackedObjects.TrackedObjects()
 
     # début de la boucle de détection
     while video_capture.isOpened():
