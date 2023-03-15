@@ -227,6 +227,12 @@ def detect(
 
     video_capture.release()
     cv2.destroyAllWindows()
+
+    # si la détection est terminée, mais que list_of_directions n'est pas vide, on enregistre les données restantes
+    if base_params["save_in_csv"] and list_of_directions["total"] != 0:
+        log.debug("Enregistrement des données dans le CSV")
+        save_utils.save_csv2(list_of_directions, base_params["classes"][0], output_folder, csv_name)
+
     log.info("Detection terminée")
 
 
