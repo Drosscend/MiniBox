@@ -125,7 +125,7 @@ def detect(
                     obj.update_position(object_x1, object_y1, object_x2, object_y2)
                     break
 
-            # Si l'objet n'a pas encore été suivi, nous créons une nouvelle entrée dans la collection 
+            # Si l'objet n'a pas encore été suivi, nous créons une nouvelle entrée dans la collection
             if not found:
                 object_classe = int(tracked_object.label)
                 tracked_objects_informations.add(

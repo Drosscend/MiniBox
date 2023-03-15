@@ -28,7 +28,7 @@ class YOLO:
                  agnostic: bool = False,
                  multi_label: bool = True,
                  max_det: int = 50,
-                 amp: bool = True, 
+                 amp: bool = True,
                  classes: Optional[List[int]] = None
                 ) -> torch.tensor:
         """
@@ -45,7 +45,7 @@ class YOLO:
         """
         self.model.conf = conf_threshold
         self.model.iou = iou_threshold
-        self.model.agnostic = agnostic 
+        self.model.agnostic = agnostic
         self.model.multi_label = multi_label
         self.model.max_det = max_det
         self.model.amp = amp
