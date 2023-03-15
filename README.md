@@ -66,11 +66,17 @@ Installation des dépendances du projet
 pip install -r requirements.txt
 ```
 
-Si vous voulez utilser la carte graphique pour accélérer le calcul, vous devez vous rendre sur le site de PyTorch et suivre les instructions pour installer la version CUDA de PyTorch : https://pytorch.org/get-started/locally/. 
+Si vous voulez utilser la carte graphique pour accélérer le calcul, vous devez :
+1. Exécuter la commande suivante :
+```bash
+pip3 install -U t
+orch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu117
+```
+2. Changer la valeur de `device` à `0` dans le fichier `config.ini`
 
-Attention vous devez avoir une carte graphique NVIDIA pour pouvoir utiliser CUDA.
+⚠️ Attention vous devez avoir une carte graphique NVIDIA pour pouvoir utiliser CUDA.
 
-Ensuite changer la valeur de `device` à `0` dans le fichier `config.ini`
+Site de PyTorch : https://pytorch.org/get-started/locally/.
 
 </details>
 
