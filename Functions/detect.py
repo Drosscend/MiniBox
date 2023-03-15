@@ -77,13 +77,22 @@ def detect(
         output_folder = yolov5_paramms["output_folder"]
         csv_name = yolov5_paramms["csv_name"]
         # Initialisation de la liste des positions pour l'enregistrement dans le CSV
-        list_of_directions = {
+        info_for_class = {
+            "total": 0,
             "top-left": 0,
             "top-right": 0,
             "bottom-left": 0,
-            "bottom-right": 0,
-            "total": 0
+            "bottom-right": 0
         }
+        list_of_directions = {}
+        for classe in base_params["classes"]:
+            list_of_directions[classe] = info_for_class.copy()
+        total_all = 0
+
+        # copie de la liste pour la sauvegarde
+        list_of_directions_for_save = list_of_directions.copy()
+
+        # Initialisation du temps de la dernière sauvegarde
         last_csv_save = time.time()
 
     # début de la boucle de détection
@@ -149,16 +158,18 @@ def detect(
             if tracked_object.obj_id not in currents_id:
                 if base_params["save_in_csv"]:
                     # Enregistrement des directions dans l'ojet de la collection pour le CSV
+                    classe = tracked_object.classe
                     direction = tracked_object.direction
                     if direction == "top-left":
-                        list_of_directions["top-left"] += 1
+                        list_of_directions[classe]["top-left"] += 1
                     elif direction == "top-right":
-                        list_of_directions["top-right"] += 1
+                        list_of_directions[classe]["top-right"] += 1
                     elif direction == "bottom-left":
-                        list_of_directions["bottom-left"] += 1
+                        list_of_directions[classe]["bottom-left"] += 1
                     elif direction == "bottom-right":
-                        list_of_directions["bottom-right"] += 1
-                    list_of_directions["total"] += 1
+                        list_of_directions[classe]["bottom-right"] += 1
+                    list_of_directions[classe]["total"] += 1
+                    total_all += 1
                 # Suppression de l'objet de la collection
                 tracked_objects_informations.remove(tracked_object.obj_id)
                 log.debug("Objet supprimé: {}".format(tracked_object.obj_id))
@@ -168,19 +179,14 @@ def detect(
             # save_utils.save_csv(currents_id, tracked_objects_informations, output_folder, csv_name)
             # enregistrement dans le CSV toutes les 1 minutes
             if time.time() - last_csv_save > 60:
-                if list_of_directions["total"] == 0:
+                if total_all == 0:
                     log.debug("Aucune donnée à enregistrer dans le CSV")
                 else:
                     log.debug("Enregistrement des données dans le CSV")
-                    save_utils.save_csv2(list_of_directions, base_params["classes"][0], output_folder, csv_name)
-                # réinitialisation des directions
-                list_of_directions = {
-                    "top-left": 0,
-                    "top-right": 0,
-                    "bottom-left": 0,
-                    "bottom-right": 0,
-                    "total": 0
-                }
+                    save_utils.save_csv2(list_of_directions, output_folder, csv_name)
+                # réinitialisation des variables pour la sauvegarde
+                list_of_directions = list_of_directions_for_save.copy()
+                total_all = 0
                 last_csv_save = time.time()
 
             # sauvegarde dans la base de données si demandé
@@ -229,9 +235,9 @@ def detect(
     cv2.destroyAllWindows()
 
     # si la détection est terminée, mais que list_of_directions n'est pas vide, on enregistre les données restantes
-    if base_params["save_in_csv"] and list_of_directions["total"] != 0:
+    if base_params["save_in_csv"] and total_all != 0:
         log.debug("Enregistrement des données dans le CSV")
-        save_utils.save_csv2(list_of_directions, base_params["classes"][0], output_folder, csv_name)
+        save_utils.save_csv2(list_of_directions, output_folder, csv_name)
 
     log.info("Detection terminée")
 

@@ -59,7 +59,8 @@ def get_base_params(config) -> dict:
     try:
         base_params['classes'] = [int(x) for x in config.get('PARAMS', 'classes').split(',')]
     except ValueError:
-        log.error("Erreur : la valeur de l'option classes doit être un tableau, verifier le fichier de configuration")
+        log.error("Erreur : la valeur de l'option classes doit être un entier ou tableau, verifier le fichier de "
+                  "configuration")
         exit(1)
 
     try:

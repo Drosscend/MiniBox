@@ -87,18 +87,18 @@ class TestGenerateCSV(unittest.TestCase):
 
 class TestSaveCsv2(unittest.TestCase):
     def setUp(self):
-        self.list_of_directions = {
+        self.list_of_directions = {0: {
             "total": 5,
             "top-left": 2,
             "top-right": 1,
             "bottom-left": 1,
             "bottom-right": 1
-        }
-        self.classe = 1
+        }}
+        self.classe = 0
         self.csv_folder_name = "test_folder"
         self.csv_file_name = "test_file.csv"
         self.date = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-        save_utils.save_csv2(self.list_of_directions, self.classe, self.csv_folder_name, self.csv_file_name)
+        save_utils.save_csv2(self.list_of_directions, self.csv_folder_name, self.csv_file_name)
 
     def test_createFolder(self):
         self.assertTrue(os.path.isdir(self.csv_folder_name))
@@ -114,7 +114,7 @@ class TestSaveCsv2(unittest.TestCase):
     def test_writeFileContent(self):
         with open(self.csv_folder_name + '/' + self.csv_file_name, 'r') as file:
             lines = file.readlines()
-            self.assertEqual(lines[1], self.date + ",5,2,1,1,1,1\n")
+            self.assertEqual(lines[1], self.date + ",5,2,1,1,1,0\n")
 
     def tearDown(self):
         # Suppression du dossier créé pour les tests

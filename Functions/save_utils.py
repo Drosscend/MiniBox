@@ -4,6 +4,7 @@ import os
 import sqlite3
 import time
 from datetime import datetime
+from typing import Any
 
 log = logging.getLogger("main")
 
@@ -149,11 +150,10 @@ def save_csv(current: list[int], tracked_objects: TrackedObjects.TrackedObjects,
         log.warning("Erreur lors de l'écriture dans le fichier CSV: " + str(e))
 
 
-def save_csv2(list_of_directions: dict[str, int], classe: int, csv_folder_name: str, csv_file_name: str) -> None:
+def save_csv2(list_of_directions: dict[Any, dict[str, int]], csv_folder_name: str, csv_file_name: str) -> None:
     """
     Génère un fichier CSV contenant le nombre d'occurence total et par direction
-    @param list_of_directions: Liste des directions des objets détectés à l'instant t
-    @param classe: Classe de l'objet détecté
+    @param list_of_directions: Liste des directions des objets détectés par classe
     @param csv_folder_name: Nom du dossier dans lequel enregistrer le fichier CSV
     @param csv_file_name: Nom du fichier CSV
     """
@@ -163,6 +163,7 @@ def save_csv2(list_of_directions: dict[str, int], classe: int, csv_folder_name: 
         os.makedirs(csv_folder_name)
 
     date = datetime.now()
+    dateString = date.strftime("%d/%m/%Y %H:%M:%S")
     # enregistrement des données dans un fichier csv
     try:
         path = os.path.join(csv_folder_name, csv_file_name)
@@ -171,14 +172,15 @@ def save_csv2(list_of_directions: dict[str, int], classe: int, csv_folder_name: 
             # si le fichier est vide, on écrit l'entête
             if os.path.getsize(path) == 0:
                 writer.writerow(["date", "occurence", "top-left", "top-right", "bottom-left", "bottom-right", "classe"])
-            writer.writerow([
-                date.strftime("%d/%m/%Y %H:%M:%S"),
-                list_of_directions["total"],
-                list_of_directions["top-left"],
-                list_of_directions["top-right"],
-                list_of_directions["bottom-left"],
-                list_of_directions["bottom-right"],
-                classe
-            ])
+            for classe, infos in list_of_directions.items():
+                writer.writerow([
+                    dateString,
+                    infos["total"],
+                    infos["top-left"],
+                    infos["top-right"],
+                    infos["bottom-left"],
+                    infos["bottom-right"],
+                    classe
+                ])
     except IOError as e:
         log.warning("Erreur lors de l'écriture dans le fichier CSV: " + str(e))
