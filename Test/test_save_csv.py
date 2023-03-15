@@ -1,6 +1,7 @@
 import os
 import shutil
 import unittest
+from unittest.mock import mock_open, patch
 from datetime import datetime
 
 from Functions import TrackedObjects
@@ -79,6 +80,41 @@ class TestGenerateCSV(unittest.TestCase):
             self.assertEqual(lines[1], new_date + ",3,2,1,0,0,1\n")
             self.assertEqual(lines[2], new_date + ",2,0,0,1,1,0\n")
             self.assertEqual(len(lines), 3)
+
+    def tearDown(self):
+        # Suppression du dossier créé pour les tests
+        shutil.rmtree(self.csv_folder_name)
+
+class TestSaveCsv2(unittest.TestCase):
+    def setUp(self):
+        self.list_of_directions = {
+            "total": 5,
+            "top-left": 2,
+            "top-right": 1,
+            "bottom-left": 1,
+            "bottom-right": 1
+        }
+        self.classe = 1
+        self.csv_folder_name = "test_folder"
+        self.csv_file_name = "test_file.csv"
+        self.date = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        save_utils.save_csv2(self.list_of_directions, self.classe, self.csv_folder_name, self.csv_file_name)
+
+    def test_createFolder(self):
+        self.assertTrue(os.path.isdir(self.csv_folder_name))
+
+    def test_createFile(self):
+        self.assertTrue(os.path.isfile(self.csv_folder_name + '/' + self.csv_file_name))
+
+    def test_writeFileHeader(self):
+        with open(self.csv_folder_name + '/' + self.csv_file_name, 'r') as file:
+            lines = file.readlines()
+            self.assertEqual(lines[0], "date,occurence,top-left,top-right,bottom-left,bottom-right,classe\n")
+
+    def test_writeFileContent(self):
+        with open(self.csv_folder_name + '/' + self.csv_file_name, 'r') as file:
+            lines = file.readlines()
+            self.assertEqual(lines[1], self.date + ",5,2,1,1,1,1\n")
 
     def tearDown(self):
         # Suppression du dossier créé pour les tests

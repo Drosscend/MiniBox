@@ -59,6 +59,15 @@ def detect(
     if base_params["save_in_csv"]:
         output_folder = yolov5_paramms["output_folder"]
         csv_name = yolov5_paramms["csv_name"]
+        # Initialisation de la liste des positions pour l'enregistrement dans le CSV
+        list_of_directions = {
+            "top-left": 0,
+            "top-right": 0,
+            "bottom-left": 0,
+            "bottom-right": 0,
+            "total": 0
+        }
+        last_csv_save = time.time()
 
     # Initialisation du modèle YOLOv5
     try:
@@ -137,12 +146,42 @@ def detect(
         # Supprime les objets qui n'ont pas été détectés dans le frame courant
         for tracked_object in tracked_objects_informations.tracked_objects:
             if tracked_object.obj_id not in currents_id:
+                if base_params["save_in_csv"]:
+                    # Enregistrement des directions dans l'ojet de la collection pour le CSV
+                    direction = tracked_object.direction
+                    if direction == "top-left":
+                        list_of_directions["top-left"] += 1
+                    elif direction == "top-right":
+                        list_of_directions["top-right"] += 1
+                    elif direction == "bottom-left":
+                        list_of_directions["bottom-left"] += 1
+                    elif direction == "bottom-right":
+                        list_of_directions["bottom-right"] += 1
+                    list_of_directions["total"] += 1
+                # Suppression de l'objet de la collection
                 tracked_objects_informations.remove(tracked_object.obj_id)
                 log.debug("Objet supprimé: {}".format(tracked_object.obj_id))
 
         # Génération du fichier CSV et de la base de données si demandé
         if base_params["save_in_csv"]:
-            save_utils.save_csv(currents_id, tracked_objects_informations, output_folder, csv_name)
+            #save_utils.save_csv(currents_id, tracked_objects_informations, output_folder, csv_name)
+            # enregistrement dans le CSV toutes les 1 minutes
+            if time.time() - last_csv_save > 60:
+                if list_of_directions["total"] == 0:
+                    log.debug("Aucune donnée à enregistrer dans le CSV")
+                else:
+                    log.debug("Enregistrement des données dans le CSV")
+                    save_utils.save_csv2(list_of_directions, base_params["classes"][0], output_folder, csv_name)
+                # réinitialisation des directions
+                list_of_directions = {
+                    "top-left": 0,
+                    "top-right": 0,
+                    "bottom-left": 0,
+                    "bottom-right": 0,
+                    "total": 0
+                }
+                last_csv_save = time.time()
+
             # sauvegarde dans la base de données si demandé
             if bdd_params["save_in_bdd"] and bdd_params["time_to_save"] == time.strftime("%H:%M:%S"):
                     csv_pah = os.path.join(output_folder, csv_name)

@@ -147,3 +147,37 @@ def save_csv(current: list[int], tracked_objects: TrackedObjects.TrackedObjects,
                 ])
     except IOError as e:
         log.warning("Erreur lors de l'écriture dans le fichier CSV: " + str(e))
+
+def save_csv2(list_of_directions : dict[str,int], classe:int, csv_folder_name: str, csv_file_name: str) -> None:
+    """
+    Génère un fichier CSV contenant le nombre d'occurence total et par direction
+    @param list_of_directions: Liste des directions des objets détectés à l'instant t
+    @param classe: Classe de l'objet détecté
+    @param csv_folder_name: Nom du dossier dans lequel enregistrer le fichier CSV
+    @param csv_file_name: Nom du fichier CSV
+    """
+    # verifie que le dosser csv_folder_name existe et le crée si ce n'est pas le cas
+    if not os.path.exists(csv_folder_name):
+        log.info("Création du dossier {}".format(csv_folder_name))
+        os.makedirs(csv_folder_name)
+
+    date = datetime.now()
+    # enregistrement des données dans un fichier csv
+    try:
+        path = os.path.join(csv_folder_name, csv_file_name)
+        with open(path, 'a', newline='') as f:
+            writer = csv.writer(f)
+            # si le fichier est vide, on écrit l'entête
+            if os.path.getsize(path) == 0:
+                writer.writerow(["date", "occurence", "top-left", "top-right", "bottom-left", "bottom-right", "classe"])
+            writer.writerow([
+                date.strftime("%d/%m/%Y %H:%M:%S"),
+                list_of_directions["total"],
+                list_of_directions["top-left"],
+                list_of_directions["top-right"],
+                list_of_directions["bottom-left"],
+                list_of_directions["bottom-right"],
+                classe
+            ])
+    except IOError as e:
+        log.warning("Erreur lors de l'écriture dans le fichier CSV: " + str(e))
