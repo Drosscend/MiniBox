@@ -93,7 +93,7 @@ python main.py
 Le programme sera lancé avec les paramètres par défaut.
 - source = 0 (webcam)
 - classes de détection = 1 (vélo)
-- intervalle de détection = 1
+- intervalle de détection = 0
 - affichage de la vidéo = False
 - affichage des fps = False
 - débug = False
