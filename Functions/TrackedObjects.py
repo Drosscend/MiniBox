@@ -107,7 +107,8 @@ class TrackedObject:
         Détermine la direction de l'objet en fonction de ses dernières positions.
         """
         direction = calculate_direction(self.positions)
-        self.direction = direction
+        if direction:
+            self.direction = direction
 
     def __str__(self) -> str:
         """
