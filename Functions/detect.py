@@ -211,7 +211,8 @@ def detect(
                     current_id = tracked_object.id
                     direction = tracked_objects_informations.get(current_id).direction
                     confidence = format(tracked_object.last_detection.scores[0], ".2f")
-                    labels.append(f"id : {current_id} - {direction} - {confidence}")
+                    label = utils.getLabelName(tracked_object.label)
+                    labels.append(f"id : {current_id} - {label} - {direction} - {confidence}")
 
                 frame = box_annotator.annotate(scene=frame, detections=detections, labels=labels)
 
