@@ -148,7 +148,8 @@ def save_csv(current: list[int], tracked_objects: TrackedObjects.TrackedObjects,
     except IOError as e:
         log.warning("Erreur lors de l'écriture dans le fichier CSV: " + str(e))
 
-def save_csv2(list_of_directions : dict[str,int], classe:int, csv_folder_name: str, csv_file_name: str) -> None:
+
+def save_csv2(list_of_directions: dict[str, int], classe: int, csv_folder_name: str, csv_file_name: str) -> None:
     """
     Génère un fichier CSV contenant le nombre d'occurence total et par direction
     @param list_of_directions: Liste des directions des objets détectés à l'instant t

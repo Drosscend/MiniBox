@@ -8,9 +8,9 @@ import supervision as sv
 from norfair import Tracker
 
 from Functions import TrackedObjects
+from Functions import Yolo
 from Functions import save_utils
 from Functions import utils
-from Functions import Yolo
 
 log = logging.getLogger("main")
 
@@ -122,7 +122,8 @@ def detect(
         currents_id = []
         for tracked_object in tracked_objects:
             # Récupère les informations sur l'objet
-            (object_x1, object_y1), (object_x2, object_y2) = map(lambda p: (int(p[0]), int(p[1])), tracked_object.last_detection.points)
+            (object_x1, object_y1), (object_x2, object_y2) = map(lambda p: (int(p[0]), int(p[1])),
+                                                                 tracked_object.last_detection.points)
             object_id = int(tracked_object.id)
             currents_id.append(object_id)
 
@@ -164,7 +165,7 @@ def detect(
 
         # Génération du fichier CSV et de la base de données si demandé
         if base_params["save_in_csv"]:
-            #save_utils.save_csv(currents_id, tracked_objects_informations, output_folder, csv_name)
+            # save_utils.save_csv(currents_id, tracked_objects_informations, output_folder, csv_name)
             # enregistrement dans le CSV toutes les 1 minutes
             if time.time() - last_csv_save > 60:
                 if list_of_directions["total"] == 0:
@@ -184,8 +185,8 @@ def detect(
 
             # sauvegarde dans la base de données si demandé
             if bdd_params["save_in_bdd"] and bdd_params["time_to_save"] == time.strftime("%H:%M:%S"):
-                    csv_pah = os.path.join(output_folder, csv_name)
-                    save_utils.save_bdd(bdd_params["bdd_name"], bdd_params["table_name"], csv_pah, bdd_params["keep_csv"])
+                csv_pah = os.path.join(output_folder, csv_name)
+                save_utils.save_bdd(bdd_params["bdd_name"], bdd_params["table_name"], csv_pah, bdd_params["keep_csv"])
 
         # Pause entre chaque détection si spécifiée
         if interval > 0:

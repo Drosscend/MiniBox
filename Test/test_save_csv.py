@@ -84,6 +84,7 @@ class TestGenerateCSV(unittest.TestCase):
         # Suppression du dossier créé pour les tests
         shutil.rmtree(self.csv_folder_name)
 
+
 class TestSaveCsv2(unittest.TestCase):
     def setUp(self):
         self.list_of_directions = {

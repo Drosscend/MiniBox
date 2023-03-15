@@ -1,5 +1,6 @@
 import logging
 from typing import List, Optional, Union
+
 import numpy as np
 import torch
 
@@ -14,7 +15,7 @@ class YOLO:
         @param verbose: Afficher les informations de chargement du modèle
         """
         # Vérification de la disponibilité de CUDA si nécessaire
-        if device != "cpu"and not torch.cuda.is_available():
+        if device != "cpu" and not torch.cuda.is_available():
             log.error("Vous avez demandé un device CUDA, mais il n'est pas disponible")
             exit(1)
 
@@ -30,7 +31,7 @@ class YOLO:
                  max_det: int = 50,
                  amp: bool = True,
                  classes: Optional[List[int]] = None
-                ) -> torch.tensor:
+                 ) -> torch.tensor:
         """
         @param img: Image à traiter
         @param conf_threshold: Seuil de confiance
