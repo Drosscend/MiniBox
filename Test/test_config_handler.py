@@ -27,7 +27,7 @@ class TestConfigHandler(unittest.TestCase):
 
     def test_get_yolov5_params(self):
         yolov5_params = get_yolov5_params(self.valid_config)
-        self.assertEqual(yolov5_params['weights'], "yolov5m")
+        self.assertEqual(yolov5_params['weights'], "yolov5s")
         self.assertEqual(yolov5_params['conf_thres'], 0.45)
         self.assertEqual(yolov5_params['iou_thres'], 0.45)
         self.assertFalse(yolov5_params['agnostic_nms'])

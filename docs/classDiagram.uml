@@ -23,7 +23,6 @@ package Function <<Functions>> {
     +float x2
     +float y2
     +str classe
-    +tuple color
     +array[x1, y1, x2, y2] : positions
     +str direction
     +void update_position()
@@ -39,7 +38,6 @@ package Function <<Functions>> {
 
   class Utils {
     Fonction utiles pour le programme
-    +get_random_color()
     +yolo_detections_to_norfair_detections()
   }
 

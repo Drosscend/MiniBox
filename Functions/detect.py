@@ -2,63 +2,17 @@ import logging
 import os
 import platform
 import time
-from typing import List, Optional, Union
 
 import cv2
-import numpy as np
 import supervision as sv
-import torch
 from norfair import Tracker
 
 from Functions import TrackedObjects
 from Functions import save_utils
 from Functions import utils
+from Functions import Yolo
 
 log = logging.getLogger("main")
-
-
-class YOLO:
-    def __init__(self, model_name: str, device: str, verbose: bool):
-        """
-        @param model_name: Nom du modèle à charger
-        @param device: Device sur lequel le modèle doit être chargé
-        @param verbose: Afficher les informations de chargement du modèle
-        """
-        # Vérification de la disponibilité de CUDA si nécessaire
-        if device != "cpu":
-            if not torch.cuda.is_available():
-                log.error("Vous avez demandé un device CUDA, mais il n'est pas disponible")
-                raise Exception("Vous avez demandé un device CUDA, mais il n'est pas disponible")
-
-        # Chargement du modèle
-        self.model = torch.hub.load("ultralytics/yolov5", model_name, device=device, verbose=verbose)
-
-    def __call__(self, img: Union[str, np.ndarray], conf_threshold: float = 0.25,
-                 iou_threshold: float = 0.45, image_size: int = 720, agnostic: bool = False, multi_label: bool = True,
-                 max_det: int = 50, amp: bool = True, classes: Optional[List[int]] = None) -> torch.tensor:
-        """
-        @param img: Image à traiter
-        @param conf_threshold: Seuil de confiance
-        @param iou_threshold: Seuil d'intersection sur union
-        @param image_size: Taille de l'image
-        @param agnostic: NMS class-agnostic
-        @param multi_label: NMS multiple labels per box
-        @param max_det: Maximum number of detections per image
-        @param amp: Automatic Mixed Precision (AMP) inference
-        @param classes: Classes à détecter
-        @return: Résultats de la détection
-        """
-        self.model.conf = conf_threshold
-        self.model.iou = iou_threshold
-        self.model.agnostic = agnostic  # NMS class-agnostic
-        self.model.multi_label = multi_label  # NMS multiple labels per box
-        self.model.max_det = max_det  # maximum number of detections per image
-        self.model.amp = amp  # Automatic Mixed Precision (AMP) inference
-
-        if classes is not None:
-            self.model.classes = classes
-        detections = self.model(img, size=image_size)
-        return detections
 
 
 def detect(
@@ -75,17 +29,16 @@ def detect(
     @param bdd_params: Paramètres de la base de données
     """
     log.info("Début de la détection")
-    model = YOLO(yolov5_paramms["weights"], yolov5_paramms["device"], base_params["debug"])
 
-    # Initialisation de la collection d'objets suivis
-    tracked_objects_informations = TrackedObjects.TrackedObjects()
-
+    # interval entre chaque détection
     interval = base_params["interval"]
 
+    # Pour afficher le FPS
     display_fps = base_params["display_fps"]
     if display_fps:
         prev_frame_time = 0
 
+    # Pour afficher les détections, si demandé
     display_detection = base_params["display_detection"]
     if display_detection:
         if platform.system() == 'Linux' and not os.getenv('DISPLAY', ''):
@@ -94,19 +47,37 @@ def detect(
             cv2.namedWindow("Minibox", cv2.WINDOW_NORMAL)
             cv2.resizeWindow("Minibox", 640, 480)
 
+        box_annotator = sv.BoxAnnotator(
+            thickness=2,
+            text_thickness=2,
+            text_scale=1
+        )
+
         log.info("Pour quitter l'application, appuyez sur la touche 'q'")
 
-    output_folder = yolov5_paramms["output_folder"]
-    csv_name = yolov5_paramms["csv_name"]
+    # Pour enregistrer les détections, si demandé
+    if base_params["save_in_csv"]:
+        output_folder = yolov5_paramms["output_folder"]
+        csv_name = yolov5_paramms["csv_name"]
 
-    tracker = Tracker(distance_function="iou", distance_threshold=0.7)
+    # Initialisation du modèle YOLOv5
+    try:
+        model = Yolo.YOLO(yolov5_paramms["weights"], yolov5_paramms["device"], base_params["debug"])
+    except Exception as e:
+        log.error("Erreur lors de l'initialisation du modèle YOLOv5: {}".format(e))
+        exit(1)
 
-    box_annotator = sv.BoxAnnotator(
-        thickness=2,
-        text_thickness=2,
-        text_scale=1
-    )
+    # Initialisation du tracker
+    try:
+        tracker = Tracker(distance_function="iou", distance_threshold=0.7)
+    except Exception as e:
+        log.error("Erreur lors de l'initialisation du tracker: {}".format(e))
+        exit(1)
 
+    # Initialisation de la collection d'objets suivis pour caluler la direction et faire l'enregistrement
+    tracked_objects_informations = TrackedObjects.TrackedObjects()
+
+    # début de la boucle de détection
     while video_capture.isOpened():
         success, frame = video_capture.read()
         # Si le frame n'a pas pu être récupéré ou si la vidéo est terminée, quitte la boucle
@@ -119,7 +90,6 @@ def detect(
                 frame,
                 conf_threshold=yolov5_paramms["conf_thres"],
                 iou_threshold=yolov5_paramms["iou_thres"],
-                image_size=640,
                 classes=base_params["classes"],
                 agnostic=yolov5_paramms["agnostic_nms"],
                 multi_label=yolov5_paramms["multi_label_nms"],
@@ -143,26 +113,25 @@ def detect(
         currents_id = []
         for tracked_object in tracked_objects:
             # Récupère les informations sur l'objet
-            object_x1 = int(tracked_object.last_detection.points[0][0])
-            object_y1 = int(tracked_object.last_detection.points[0][1])
-            object_x2 = int(tracked_object.last_detection.points[1][0])
-            object_y2 = int(tracked_object.last_detection.points[1][1])
+            (object_x1, object_y1), (object_x2, object_y2) = map(lambda p: (int(p[0]), int(p[1])), tracked_object.last_detection.points)
             object_id = int(tracked_object.id)
-            object_classe = int(tracked_object.label)
-
             currents_id.append(object_id)
 
-            # Si l'objet n'a pas encore été suivi, c'est un nouvel objet
+            # Si l'objet est suivi, nous mettons à jour les positions
             found = False
             for obj in tracked_objects_informations.tracked_objects:
                 if obj.obj_id == object_id:
                     found = True
                     obj.update_position(object_x1, object_y1, object_x2, object_y2)
                     break
+
+            # Si l'objet n'a pas encore été suivi, nous créons une nouvelle entrée dans la collection 
             if not found:
-                color = utils.get_random_color(object_id)
-                tracked_objects_informations.add(object_id, object_x1, object_y1, object_x2, object_y2,
-                                                 object_classe, color)
+                object_classe = int(tracked_object.label)
+                tracked_objects_informations.add(
+                    object_id, object_x1, object_y1,
+                    object_x2, object_y2, object_classe
+                )
                 log.debug("Nouvel objet détecté: {}".format(object_id))
 
         # Supprime les objets qui n'ont pas été détectés dans le frame courant
@@ -171,15 +140,13 @@ def detect(
                 tracked_objects_informations.remove(tracked_object.obj_id)
                 log.debug("Objet supprimé: {}".format(tracked_object.obj_id))
 
-        # Génération du fichier CSV
+        # Génération du fichier CSV et de la base de données si demandé
         if base_params["save_in_csv"]:
             save_utils.save_csv(currents_id, tracked_objects_informations, output_folder, csv_name)
-
-        # sauvegarde dans la base de données
-        if bdd_params["save_in_bdd"]:
-            if bdd_params["time_to_save"] == time.strftime("%H:%M:%S"):
-                csv_pah = os.path.join(output_folder, csv_name)
-                save_utils.save_bdd(bdd_params["bdd_name"], bdd_params["table_name"], csv_pah, bdd_params["keep_csv"])
+            # sauvegarde dans la base de données si demandé
+            if bdd_params["save_in_bdd"] and bdd_params["time_to_save"] == time.strftime("%H:%M:%S"):
+                    csv_pah = os.path.join(output_folder, csv_name)
+                    save_utils.save_bdd(bdd_params["bdd_name"], bdd_params["table_name"], csv_pah, bdd_params["keep_csv"])
 
         # Pause entre chaque détection si spécifiée
         if interval > 0:
@@ -242,7 +209,4 @@ def main(
         log.error("Impossible d'ouvrir la source, verifier le fichier de configuration")
         return
 
-    try:
-        detect(video_capture, base_params, yolov5_paramms, bdd_params)
-    except Exception as e:
-        log.error("Erreur lors de la détection: {}".format(e))
+    detect(video_capture, base_params, yolov5_paramms, bdd_params)

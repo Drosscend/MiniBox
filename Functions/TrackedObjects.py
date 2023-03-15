@@ -65,7 +65,7 @@ class TrackedObject:
     """Classe représentant un objet suivi dans une vidéo.
     """
 
-    def __init__(self, obj_id: int, x1: int, y1: int, x2: int, y2: int, classe: int, color: tuple) \
+    def __init__(self, obj_id: int, x1: int, y1: int, x2: int, y2: int, classe: int) \
             -> None:
         """Constructeur de la classe `TrackedObject`.
 
@@ -75,7 +75,6 @@ class TrackedObject:
         @param x2: coordonnée x du point en bas à droite du rectangle englobant l'objet
         @param y2: coordonnée y du point en bas à droite du rectangle englobant l'objet
         @param classe: classe de l'objet
-        @param color: couleur de l'objet
         """
         self.obj_id = obj_id
         self.x1 = x1
@@ -83,7 +82,6 @@ class TrackedObject:
         self.x2 = x2
         self.y2 = y2
         self.classe = classe
-        self.color = color
         self.positions = [(x1, y1, x2, y2)]
         self.direction = None
 
@@ -118,7 +116,7 @@ class TrackedObject:
         """
         direction = self.direction
         text = f"\n id: {self.obj_id},\n positions: {self.x1}, {self.y1}, " \
-               f"{self.x2}, {self.y2},\n classe: {self.classe},\n couleur: {self.color}"
+               f"{self.x2}, {self.y2},\n classe: {self.classe}"
         if direction:
             text += f",\n direction: {direction}"
         return text
@@ -134,7 +132,7 @@ class TrackedObjects:
         """
         self.tracked_objects = []
 
-    def add(self, obj_id: int, x1: int, y1: int, x2: int, y2: int, classe: int, color: tuple) \
+    def add(self, obj_id: int, x1: int, y1: int, x2: int, y2: int, classe: int) \
             -> None:
         """
         Ajoute un objet à la liste des objets suivis.
@@ -144,9 +142,8 @@ class TrackedObjects:
         @param x2: coordonnée x du point en bas à droite du rectangle englobant l'objet
         @param y2: coordonnée y du point en bas à droite du rectangle englobant l'objet
         @param classe: classe de l'objet
-        @param color: couleur de l'objet
         """
-        tracked_object = TrackedObject(obj_id, x1, y1, x2, y2, classe, color)
+        tracked_object = TrackedObject(obj_id, x1, y1, x2, y2, classe)
         self.tracked_objects.append(tracked_object)
 
     def get(self, obj_id: int) -> Optional[TrackedObject]:
