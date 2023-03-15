@@ -40,11 +40,6 @@ python --version
 
 Lien pour l'installation de python 3.9.13 : https://www.python.org/downloads/release/python-3913/
 
-Vous devez par ailleurs si vous êtes sur windows autoriser l'installation de paquets non signés. Pour cela, il faut lancer la commande suivante dans un powershell en tant qu'administrateur :
-
-```bash
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-```
 </details>
 
 <details open>
