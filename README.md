@@ -1,3 +1,4 @@
+![Bannière](/docs/banner.png)
 # <h1 align="center">Projet de mémoire LP APSIO : Mini Box IOT</h1>
 ![GitHub contributors](https://img.shields.io/github/contributors/Drosscend/MiniBox?label=Contributeurs)
 ![GitHub](https://img.shields.io/github/license/Drosscend/MiniBox)
@@ -135,8 +136,8 @@ Pour faire remonter des bugs ou des demandes de fonctionnalités, veuillez consu
 
 ### <h2 align="center">Remerciements</h2>
 
-- [ultralytics](https://github.com/ultralytics/yolov5) pour le code de détection d'objets
-- [Norfair](https://github.com/tryolabs/norfair) pour le code de suivi d'objets
+- [Ultralytics](https://github.com/ultralytics/yolov5) Utilisation de YOLOV5 pour la détection d'objets dans une vidéo
+- [Norfair](https://github.com/tryolabs/norfair) Utilisation de Norfair pour le suivi d'objets dans une vidéo
 
 ### <h2 align="center">Contributeurs</h2>
 
@@ -144,4 +145,4 @@ Pour faire remonter des bugs ou des demandes de fonctionnalités, veuillez consu
   <img src = "https://contrib.rocks/image?repo=Drosscend/MiniBox"/>
 </a>
 
-Made with [contributors-img](https://contrib.rocks).
+Réalisé avec [contributors-img](https://contrib.rocks).
