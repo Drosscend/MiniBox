@@ -1,7 +1,6 @@
 import os
 import shutil
 import unittest
-from unittest.mock import mock_open, patch
 from datetime import datetime
 
 from Functions import TrackedObjects
