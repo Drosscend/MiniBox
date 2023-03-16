@@ -7,11 +7,32 @@ class Main {
 
 package Function <<Functions>> {
 
+  class Config_handler {
+    Permet de générer des dictionnaires contenant les paramètres
+    +check_params()
+    +get_base_params()
+    +get_yolov5_params()
+    +get_bdd_params()
+    +print_config()
+    +get_config()
+  }
+
+  class CustomFormater {
+    Permet d'afficher les logs
+    +format()
+  }
+
   class Detect {
     Fonction principale du code
-    - YOLO
+    +detection()
+    +init_detection()
     +main()
-    +detect()
+  }
+
+  class Save_utils {
+    Crée le fichier csv/ la base de données
+    +save_bdd()
+    +save_csv()
   }
 
   class TrackedObjects {
@@ -30,32 +51,28 @@ package Function <<Functions>> {
     +void calculate_direction()
   }
 
-  class Save_utils {
-    Crée le fichier csv/ la base de données
-    +generate_csv()
-    +save_bdd()
-  }
-
   class Utils {
-    Fonction utiles pour le programme
+    Différentes fonction utiles pour le programme
     +yolo_detections_to_norfair_detections()
+    +get_label_by_name()
   }
 
-
-  class CustomFormater {
-    +format()
+  class YOLO {
+    Classe permettant d'intialiser le modèle YOLO
+    +__init__()
+    +__call__()
   }
 
 }
 
 Main *-left- Detect: Passage des paramètres
-Main *-right- CustomFormater: Mise en forme des logs
+Main *-up- CustomFormater: Mise en forme des logs
+Main *-up- Config_handler: Récupération des paramètres
 
 TrackedObjects *-up- Detect: Enregistrement des données dans des classes
 
 Detect *-up- Utils: Appel de fonctions utilitaires
-Detect *-down- Save_utils: Enregistrement des données dans le CSV/BDD
-
-TrackedObjects *-right- Save_utils: Récupérer les infos
+Detect *-left- Save_utils: Enregistrement des données dans le CSV/BDD
+Detect *-down- YOLO: Initialisation du modèle YOLO
 
 @enduml
