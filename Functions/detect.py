@@ -251,6 +251,9 @@ def init_detection(
         )
 
         log.info("Pour quitter l'application, appuyez sur la touche 'q'")
+    else :
+        cv2.destroyAllWindows()
+        box_annotator = None
 
     # Initialisation des variables pour enregistrer les détections dans un CSV si demandé
     if base_params["save_in_csv"]:
