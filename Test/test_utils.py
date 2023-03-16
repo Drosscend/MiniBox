@@ -1,8 +1,5 @@
 import unittest
-import numpy as np
-import torch
-from norfair import Detection
-from Functions.utils import get_label_by_name, yolo_detections_to_norfair_detections
+from Functions.utils import get_label_by_name
 
 
 class TestYOLOToNorfair(unittest.TestCase):
