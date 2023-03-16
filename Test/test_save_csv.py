@@ -19,8 +19,8 @@ class TestSaveCsv(unittest.TestCase):
         self.csv_folder_name = "test_folder"
         self.csv_file_name = "test_file.csv"
         self.params = {
-            "output_folder" : self.csv_folder_name,
-            "csv_name" : self.csv_file_name,
+            "output_folder": self.csv_folder_name,
+            "csv_name": self.csv_file_name,
         }
         self.date = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
         save_utils.save_csv(self.list_of_directions, self.params)

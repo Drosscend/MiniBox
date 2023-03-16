@@ -15,13 +15,13 @@ class TestSaveBDD(unittest.TestCase):
         self.csv_folder_name = "test_folder"
         self.csv_file_name = "test_file.csv"
         self.yolov5Params = {
-            "output_folder" : self.csv_folder_name,
-            "csv_name" : self.csv_file_name,
+            "output_folder": self.csv_folder_name,
+            "csv_name": self.csv_file_name,
         }
         self.bddParams = {
-            "bdd_name" : "test_table.db",
-            "table_name" : "test_table",
-            "keep_csv" : False,
+            "bdd_name": "test_table.db",
+            "table_name": "test_table",
+            "keep_csv": False,
         }
 
         # Créer un fichier csv de test
@@ -64,7 +64,8 @@ class TestSaveBDD(unittest.TestCase):
         # vérifier que le fichier csv de base n'existe plus
         self.assertFalse(os.path.exists(os.path.join(self.csv_folder_name, self.csv_file_name)))
         # vérifier qu'un nouveau fichier csv a été créé avec le nom du fichier de base + timeStart
-        self.assertTrue(os.path.exists(os.path.join(self.csv_folder_name, self.csv_file_name.replace(".csv", "_" + timeStart + ".csv"))))
+        self.assertTrue(os.path.exists(
+            os.path.join(self.csv_folder_name, self.csv_file_name.replace(".csv", "_" + timeStart + ".csv"))))
         # suppression du fichier csv de test
         os.remove(os.path.join(self.csv_folder_name, self.csv_file_name.replace(".csv", "_" + timeStart + ".csv")))
 

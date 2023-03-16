@@ -18,23 +18,23 @@ log = logging.getLogger("main")
 
 
 def detection(
-    video_capture: cv2.VideoCapture,
-    progress_bar: Optional[tqdm],
-    model: Yolo.YOLO,
-    yolov5_paramms: dict,
-    base_params: dict,
-    tracker: Tracker,
-    tracked_objects_informations: TrackedObjects.TrackedObjects,
-    list_of_directions: Optional[dict],
-    last_csv_save: Optional[float],
-    new_objects: Optional[bool],
-    list_of_directions_for_save: Optional[dict],
-    bdd_params: dict,
-    interval: float,
-    display_detection: bool,
-    box_annotator: Optional[sv.BoxAnnotator],
-    display_fps: bool,
-    prev_frame_time: float,
+        video_capture: cv2.VideoCapture,
+        progress_bar: Optional[tqdm],
+        model: Yolo.YOLO,
+        yolov5_paramms: dict,
+        base_params: dict,
+        tracker: Tracker,
+        tracked_objects_informations: TrackedObjects.TrackedObjects,
+        list_of_directions: Optional[dict],
+        last_csv_save: Optional[float],
+        new_objects: Optional[bool],
+        list_of_directions_for_save: Optional[dict],
+        bdd_params: dict,
+        interval: float,
+        display_detection: bool,
+        box_annotator: Optional[sv.BoxAnnotator],
+        display_fps: bool,
+        prev_frame_time: float,
 ) -> None:
     """
     Fonction permettant de détecter les personnes dans une vidéo et de les suivre.
@@ -252,7 +252,7 @@ def init_detection(
         )
 
         log.info("Pour quitter l'application, appuyez sur la touche 'q'")
-    else :
+    else:
         cv2.destroyAllWindows()
         box_annotator = None
 
@@ -275,7 +275,7 @@ def init_detection(
 
         # Initialisation du temps de la dernière sauvegarde du CSV
         last_csv_save = time.time()
-    else :
+    else:
         list_of_directions = None
         last_csv_save = None
         new_objects = None
@@ -288,7 +288,9 @@ def init_detection(
     else:
         progress_bar = None
 
-    detection(video_capture, progress_bar, model, yolov5_paramms, base_params, tracker, tracked_objects_informations, list_of_directions, last_csv_save, new_objects, list_of_directions_for_save, bdd_params, interval, display_detection, box_annotator, display_fps, prev_frame_time)
+    detection(video_capture, progress_bar, model, yolov5_paramms, base_params, tracker, tracked_objects_informations,
+              list_of_directions, last_csv_save, new_objects, list_of_directions_for_save, bdd_params, interval,
+              display_detection, box_annotator, display_fps, prev_frame_time)
 
     if progress_bar:
         progress_bar.close()

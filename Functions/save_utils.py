@@ -23,7 +23,7 @@ def save_bdd(bdd_params: dict, yolov5_paramms: dict) -> None:
     output_folder = yolov5_paramms["output_folder"]
     csv_name = yolov5_paramms["csv_name"]
     csv_file = os.path.join(output_folder, csv_name)
-    keep_csv =  bdd_params["keep_csv"]
+    keep_csv = bdd_params["keep_csv"]
 
     # calcul du temps d'execution
     start_time = time.time()
