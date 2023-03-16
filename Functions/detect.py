@@ -34,7 +34,6 @@ def detection(
     box_annotator: sv.BoxAnnotator,
     display_fps: bool,
     prev_frame_time: float,
-    total_all: int,
 ) -> None:
     """
     Fonction permettant de détecter les personnes dans une vidéo et de les suivre.
@@ -55,7 +54,6 @@ def detection(
     @param box_annotator: Annotateur de boîtes pour l'affichage des détections si l'affichage est activé
     @param display_fps: Affichage des FPS si l'affichage est activé
     @param prev_frame_time: Temps du frame précédent pour le calcul des FPS si l'affichage est activé
-    @param total_all: Nombre total de frames pour la barre de progression si la source est une vidéo
     """
     # début de la boucle de détection
     while video_capture.isOpened():
@@ -189,8 +187,9 @@ def detection(
                 break
             elif key == -1:
                 continue
+
     # si la détection est terminée, mais que list_of_directions n'est pas vide, on enregistre les données restantes
-    if base_params["save_in_csv"] and total_all != 0:
+    if base_params["save_in_csv"] and new_objects:
         save_utils.save_csv(list_of_directions, yolov5_paramms)
 
 
@@ -285,7 +284,7 @@ def init_detection(
     else:
         progress_bar = None
 
-    detection(video_capture, progress_bar, model, yolov5_paramms, base_params, tracker, tracked_objects_informations, list_of_directions, last_csv_save, new_objects, list_of_directions_for_save, bdd_params, interval, display_detection, box_annotator, display_fps, prev_frame_time, nbFrames)
+    detection(video_capture, progress_bar, model, yolov5_paramms, base_params, tracker, tracked_objects_informations, list_of_directions, last_csv_save, new_objects, list_of_directions_for_save, bdd_params, interval, display_detection, box_annotator, display_fps, prev_frame_time)
 
     if progress_bar:
         progress_bar.close()

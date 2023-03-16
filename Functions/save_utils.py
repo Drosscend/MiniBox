@@ -8,8 +8,6 @@ from typing import Any
 
 log = logging.getLogger("main")
 
-from Functions import TrackedObjects
-
 
 def save_bdd(bdd_params: dict, yolov5_paramms: dict) -> None:
     """

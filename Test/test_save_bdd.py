@@ -44,7 +44,7 @@ class TestSaveBDD(unittest.TestCase):
         # Vérifier que les données du fichier csv ont été sauvegardées dans la base de données
         conn = sqlite3.connect(self.bddParams["bdd_name"])
         cursor = conn.cursor()
-        cursor.execute("SELECT * FROM " + self.bddParams["table_name"])
+        cursor.execute("SELECT * FROM test_table")
         rows = cursor.fetchall()
         self.assertEqual(len(rows), 2)
         self.assertEqual(rows[0], ("2022-01-01", 1, 2, 3, 4, 5, 6))
