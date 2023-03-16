@@ -33,7 +33,7 @@ def yolo_detections_to_norfair_detections(yolo_detections: torch.tensor) -> List
     return norfair_detections
 
 
-def getLabelName(label_id: int) -> str:
+def get_label_by_name(label_id: int) -> str:
     """
     Retourne le nom de la classe à partir de son ID
     @param label_id: ID de la classe
