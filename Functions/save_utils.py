@@ -96,6 +96,7 @@ def save_csv(current: list[int], tracked_objects: TrackedObjects.TrackedObjects,
     @param csv_folder_name: Nom du dossier dans lequel enregistrer le fichier CSV
     @param csv_file_name: Nom du fichier CSV
     """
+    log.info("Cette version est dépréciée, utilisez save_csv_v2")
     # verifie que le dosser csv_folder_name existe et le crée si ce n'est pas le cas
     if not os.path.exists(csv_folder_name):
         log.info("Création du dossier {}".format(csv_folder_name))
