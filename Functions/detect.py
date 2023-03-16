@@ -2,6 +2,7 @@ import logging
 import os
 import platform
 import time
+from typing import Optional
 
 import cv2
 import supervision as sv
@@ -18,20 +19,20 @@ log = logging.getLogger("main")
 
 def detection(
     video_capture: cv2.VideoCapture,
-    progress_bar: tqdm,
+    progress_bar: Optional[tqdm],
     model: Yolo.YOLO,
     yolov5_paramms: dict,
     base_params: dict,
     tracker: Tracker,
     tracked_objects_informations: TrackedObjects.TrackedObjects,
-    list_of_directions: dict,
-    last_csv_save: float,
-    new_objects: bool,
-    list_of_directions_for_save: dict,
+    list_of_directions: Optional[dict],
+    last_csv_save: Optional[float],
+    new_objects: Optional[bool],
+    list_of_directions_for_save: Optional[dict],
     bdd_params: dict,
     interval: float,
     display_detection: bool,
-    box_annotator: sv.BoxAnnotator,
+    box_annotator: Optional[sv.BoxAnnotator],
     display_fps: bool,
     prev_frame_time: float,
 ) -> None:
