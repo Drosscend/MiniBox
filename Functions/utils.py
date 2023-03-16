@@ -121,4 +121,5 @@ def getLabelName(label_id: int) -> str:
         78: "hair drier",
         79: "toothbrush",
     }
-    return names[label_id]
+    # retourne le nom de la classe avec la première lettre en majuscule
+    return names[label_id].capitalize()
