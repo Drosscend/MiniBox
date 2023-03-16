@@ -267,25 +267,28 @@ def print_config(base_params, yolov5_params, bdd_params) -> None:
     """
     log.info("Source : " + str(base_params["source"]))
     log.info("Classes : " + str(base_params["classes"]))
-    log.info("Intervalle : " + str(base_params["interval"]) + " seconde(s)")
-    log.info("Affichage : " + str(base_params["display_detection"]))
+    log.info("Interval : " + str(base_params["interval"]) + " seconde(s)")
+    log.info("Affichage de la source : " + str(base_params["display_detection"]))
     log.info("Debug : " + str(base_params["debug"]))
+    log.info("Sauvegarde des résultat dans le csv : " + str(base_params["save_in_csv"]))
 
-    log.info("weights : " + str(yolov5_params["weights"]))
-    log.info("conf_thres : " + str(yolov5_params["conf_thres"]))
-    log.info("iou_thres : " + str(yolov5_params["iou_thres"]))
-    log.info("agnostic_nms : " + str(yolov5_params["agnostic_nms"]))
-    log.info("multi_label_nms : " + str(yolov5_params["multi_label_nms"]))
-    log.info("max_det : " + str(yolov5_params["max_det"]))
-    log.info("amp : " + str(yolov5_params["amp"]))
-    log.info("output_folder : " + str(yolov5_params["output_folder"]))
-    log.info("csv_name : " + str(yolov5_params["csv_name"]))
+    log.info("Model à utiliser pour la détection : " + str(yolov5_params["weights"]))
+    log.info("Seuil de confiance : " + str(yolov5_params["conf_thres"]))
+    log.info("Seuil de recouvrement : " + str(yolov5_params["iou_thres"]))
+    log.info("Suppression des doublons agnostic nms : " + str(yolov5_params["agnostic_nms"]))
+    log.info("Suppression des doublons multi label nms : " + str(yolov5_params["multi_label_nms"]))
+    log.info("Nombre de détection maximale : " + str(yolov5_params["max_det"]))
+    log.info("Utilisation de l'accélérateur graphique : " + str(yolov5_params["amp"]))
+    if base_params["save_in_csv"]:
+        log.info("Dossier où le fichier csv sera enregistré : " + str(yolov5_params["output_folder"]))
+        log.info("Nom souhaité pour le fichier csv : " + str(yolov5_params["csv_name"]))
+    log.info("Appareil utilisé pour la détection : " + str(yolov5_params["device"]))
 
     if bdd_params['save_in_bdd']:
-        log.info("bdd_name : " + str(bdd_params["bdd_name"]))
-        log.info("table_name : " + str(bdd_params["table_name"]))
-        log.info("time_to_save : " + str(bdd_params["time_to_save"]))
-        log.info("keep_csv : " + str(bdd_params["keep_csv"]))
+        log.info("Nom de la base de donnée : " + str(bdd_params["bdd_name"]))
+        log.info("Nom de la table : " + str(bdd_params["table_name"]))
+        log.info("Heure à laquelle les résultats seront sauvegardés : " + str(bdd_params["time_to_save"]))
+        log.info("Suppression du csv après l'enregsitremetn dans la base de donnée: " + str(bdd_params["keep_csv"]))
 
 
 def get_config(config_file) -> tuple[dict, dict, dict]:
