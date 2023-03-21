@@ -99,6 +99,7 @@ def detection(
             (object_x1, object_y1), (object_x2, object_y2) = map(lambda p: (int(p[0]), int(p[1])),
                                                                  tracked_object.last_detection.points)
             object_id = tracked_object.id
+            object_classe = tracked_object.label
             currents_id.append(object_id)
 
             # Si l'objet est suivi, nous mettons à jour les positions
@@ -111,7 +112,6 @@ def detection(
 
             # Si l'objet n'a pas encore été suivi, nous créons une nouvelle entrée dans la collection
             if not found:
-                object_classe = tracked_object.label
                 tracked_objects_informations.add(
                     object_id, object_x1, object_y1,
                     object_x2, object_y2, object_classe
@@ -139,7 +139,7 @@ def detection(
 
         # Génération du fichier CSV et de la base de données si demandé
         if base_params["save_in_csv"]:
-            # enregistrement dans le CSV toutes les 1 minutes
+            # enregistrement dans le CSV toutes les 1 minute
             if time.time() - last_csv_save > 60:
                 if new_objects:
                     save_utils.save_csv(list_of_directions, yolov5_paramms)

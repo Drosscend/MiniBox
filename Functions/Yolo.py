@@ -45,7 +45,7 @@ class YOLO:
         @return: Résultats de la détection
         """
         self.model.conf = conf_threshold
-        self.model.iou = iou_threshold
+        self.model.iou = 0.45
         self.model.agnostic = agnostic
         self.model.multi_label = multi_label
         self.model.max_det = max_det
@@ -54,5 +54,6 @@ class YOLO:
         # si aucune classe n'est spécifiée, on utilise toutes les classes
         if classes is not None:
             self.model.classes = classes
+
         detections = self.model(img, size=640)
         return detections
