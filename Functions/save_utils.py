@@ -3,20 +3,27 @@ import logging
 import os
 import sqlite3
 import time
+from datetime import datetime
+from typing import Any
 
 log = logging.getLogger("main")
 
 
-def save_bdd(bdd_name: str, table_name: str, csv_file: str, keep_csv: bool) -> None:
+def save_bdd(bdd_params: dict, yolov5_paramms: dict) -> None:
     """
     Sauvegarde les données du fichier csv dans la base de données SQLite
-    @param bdd_name: nom du fichier de la base de données
-    @param table_name: nom de la table
-    @param csv_file: nom du fichier csv
-    @param keep_csv: booléen pour garder ou non le fichier csv
+    @param bdd_params: dictionnaire contenant les paramètres de la base de données
+    @param yolov5_paramms: dictionnaire contenant les paramètres de YOLOv5
     """
 
     log.info("Sauvegarde des données dans la base de données")
+
+    bdd_name = bdd_params["bdd_name"]
+    table_name = bdd_params["table_name"]
+    output_folder = yolov5_paramms["output_folder"]
+    csv_name = yolov5_paramms["csv_name"]
+    csv_file = os.path.join(output_folder, csv_name)
+    keep_csv = bdd_params["keep_csv"]
 
     # calcul du temps d'execution
     start_time = time.time()
@@ -81,3 +88,41 @@ def save_bdd(bdd_name: str, table_name: str, csv_file: str, keep_csv: bool) -> N
     # attendre 1 seconde pour éviter de sauvegarder plusieurs fois dans la base de données
     time.sleep(1)
     log.info("Sauvegarde terminée")
+
+
+def save_csv(list_of_directions: dict[Any, dict[str, int]], yolov5_paramms) -> None:
+    """
+    Génère un fichier CSV contenant le nombre d'occurence total et par direction
+    @param list_of_directions: Liste des directions des objets détectés par classe
+    @param csv_folder_name: Nom du dossier dans lequel enregistrer le fichier CSV
+    @param csv_file_name: Nom du fichier CSV
+    """
+    csv_folder_name = yolov5_paramms["output_folder"]
+    csv_file_name = yolov5_paramms["csv_name"]
+    # verifie que le dosser csv_folder_name existe et le crée si ce n'est pas le cas
+    if not os.path.exists(csv_folder_name):
+        log.info("Création du dossier {}".format(csv_folder_name))
+        os.makedirs(csv_folder_name)
+
+    date = datetime.now()
+    dateString = date.strftime("%d/%m/%Y %H:%M:%S")
+    # enregistrement des données dans un fichier csv
+    try:
+        path = os.path.join(csv_folder_name, csv_file_name)
+        with open(path, 'a', newline='') as f:
+            writer = csv.writer(f)
+            # si le fichier est vide, on écrit l'entête
+            if os.path.getsize(path) == 0:
+                writer.writerow(["date", "occurence", "top-left", "top-right", "bottom-left", "bottom-right", "classe"])
+            for classe, infos in list_of_directions.items():
+                writer.writerow([
+                    dateString,
+                    infos["total"],
+                    infos["top-left"],
+                    infos["top-right"],
+                    infos["bottom-left"],
+                    infos["bottom-right"],
+                    classe
+                ])
+    except IOError as e:
+        log.warning("Erreur lors de l'écriture dans le fichier CSV: " + str(e))
