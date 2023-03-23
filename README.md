@@ -1,3 +1,4 @@
+![Bannière](/docs/banner.png)
 # <h1 align="center">Projet de mémoire LP APSIO : Mini Box IOT</h1>
 ![GitHub contributors](https://img.shields.io/github/contributors/Drosscend/MiniBox?label=Contributeurs)
 ![GitHub](https://img.shields.io/github/license/Drosscend/MiniBox)
@@ -40,11 +41,6 @@ python --version
 
 Lien pour l'installation de python 3.9.13 : https://www.python.org/downloads/release/python-3913/
 
-Vous devez par ailleurs si vous êtes sur windows autoriser l'installation de paquets non signés. Pour cela, il faut lancer la commande suivante dans un powershell en tant qu'administrateur :
-
-```bash
-Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
-```
 </details>
 
 <details open>
@@ -54,14 +50,34 @@ Dans un terminal, lancer la commande suivante :
 ```bash
 git clone https://github.com/Drosscend/MiniBox  # clone
 cd MiniBox
-# pour les utilisateurs de windows
+```
+Pour les utilisateurs de windows
+```bash
 py -m venv .mémoire # création de l'environnement virtuel
 .mémoire\Scripts\activate # activation de l'environnement virtuel
-# pour les utilisateurs de linux
+```
+Pour les utilisateurs de Linux
+```bash
 python3 -m venv .mémoire # création de l'environnement virtuel
 source .mémoire/bin/activate # activation de l'environnement virtuel
-pip install -r requirements.txt  # installation des dépendances du projet
 ```
+Installation des dépendances du projet
+```bash
+pip install -r requirements.txt
+```
+
+Si vous voulez utilser la carte graphique pour accélérer le calcul, vous devez :
+1. Exécuter la commande suivante :
+```bash
+pip3 install -U t
+orch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu117
+```
+2. Changer la valeur de `device` à `0` dans le fichier `config.ini`
+
+⚠️ Attention vous devez avoir une carte graphique NVIDIA pour pouvoir utiliser CUDA.
+
+Site de PyTorch : https://pytorch.org/get-started/locally/.
+
 </details>
 
 ## <h2 align="center">Lancement</h2>
@@ -75,62 +91,21 @@ python main.py
 ```
 
 Le programme sera lancé avec les paramètres par défaut.
-- source = 0
-- classes de détection = 0 et 1 (personne et vélo)
-- intervalle de détection = 1
-- affichage = False
+- source = 0 (webcam)
+- classes de détection = 1 (vélo)
+- intervalle de détection = 0
+- affichage de la vidéo = False
+- affichage des fps = False
 - débug = False
-
+- enregistrement dans le csv = True
 </details>
+
 <details>
 <summary>Lancement avec paramètres personalisés</summary>
 
 Pour lancer le programme avec des paramètres personnalisés, modifiez le fichier config.ini
-```ini
-[PARAMS]
-# La valeur par défaut est `0` (0 : Webcam, video.mp4 : Video")
-source = 0
-# La valeur par défaut est `1` (vélo)
-classes = 1
-# La valeur par défaut est `1`, si vous voulez augmenter le temps entre chaque prise, augmentez la valeur
-interval = 1
-# La valeur par défaut est `False`, si vous voulez activer l'affichage graphique, mettez `True`
-display_detection = False
-# La valeur par défaut est `False`, si vous voulez activer l'affichage des messages, mettez `True`
-debug = False
 
-[YOLOV5_PARAMS]
-# La valeur par défaut est `yolov5s.pt`
-weights = yolov5s.pt
-# La valeur par défaut est `0.45`
-conf_thres = 0.45
-# La valeur par défaut est `0.45`
-iou_thres = 0.45
-# La valeur par défaut est `False`
-agnostic_nms = False
-# La valeur par défaut est `True`
-multi_label_nms = True
-# La valeur par défaut est `50`
-max_det = 50
-# La valeur par défaut est `True`
-amp = True
-# la valeur par défaut est `OUTPUT`
-output_folder = OUTPUT
-# la valeur par défaut est `data.csv`
-csv_name = data.csv
-
-[BDD_PARAMS]
-# Activer la sauvegarde dans la base de données, la valeur par défaut est `True`
-save_in_bdd = True
-# Nom de la base de données, la valeur par défaut est `detect_save.db`
-bdd_name = detect_save.db
-# Nom de la table, la valeur par défaut est `detect`
-table_name = detect
-# Heure à laquelle les données seront enregistrées, la valeur par défaut est `00:00:00` (Attention la detection sera mise en pause)
-time_to_save = 00:00:00
-# Désactiver la suppression du fichier csv, la valeur par défaut est `False`
-keep_csv = False
-```
+Si vous voulez avoir plusieurs fichiers de configuration créer un nouveau fichier `.ini` en vous basant sur le fichier `config.ini` et lancer le programme avec l'option `-c` ou `--config` suivi du chemin vers le fichier de configuration.
 
 Vous pouvez fournir un fichier de configuration personnalisé en utilisant l'option -c ou --config :
 ```bash
@@ -167,8 +142,8 @@ Pour faire remonter des bugs ou des demandes de fonctionnalités, veuillez consu
 
 ### <h2 align="center">Remerciements</h2>
 
-- [ultralytics](https://github.com/ultralytics/yolov5) pour le code de détection d'objets
-- [abewley](https://github.com/abewley/sort) pour le code de suivi d'objets
+- [Ultralytics](https://github.com/ultralytics/yolov5) Utilisation de YOLOV5 pour la détection d'objets dans une vidéo
+- [Norfair](https://github.com/tryolabs/norfair) Utilisation de Norfair pour le suivi d'objets dans une vidéo
 
 ### <h2 align="center">Contributeurs</h2>
 
@@ -176,4 +151,4 @@ Pour faire remonter des bugs ou des demandes de fonctionnalités, veuillez consu
   <img src = "https://contrib.rocks/image?repo=Drosscend/MiniBox"/>
 </a>
 
-Made with [contributors-img](https://contrib.rocks).
+Réalisé avec [contributors-img](https://contrib.rocks).
