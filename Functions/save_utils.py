@@ -104,8 +104,9 @@ def save_csv(list_of_directions: dict[Any, dict[str, int]], yolov5_paramms) -> N
         log.info("Création du dossier {}".format(csv_folder_name))
         os.makedirs(csv_folder_name)
 
-    date = datetime.now()
-    dateString = date.strftime("%d/%m/%Y %H:%M:%S")
+    # récupération de la date au format international et UTC
+    datestring = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+
     # enregistrement des données dans un fichier csv
     try:
         path = os.path.join(csv_folder_name, csv_file_name)
@@ -116,7 +117,7 @@ def save_csv(list_of_directions: dict[Any, dict[str, int]], yolov5_paramms) -> N
                 writer.writerow(["date", "occurence", "top-left", "top-right", "bottom-left", "bottom-right", "classe"])
             for classe, infos in list_of_directions.items():
                 writer.writerow([
-                    dateString,
+                    datestring,
                     infos["total"],
                     infos["top-left"],
                     infos["top-right"],

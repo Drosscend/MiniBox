@@ -22,7 +22,7 @@ class TestSaveCsv(unittest.TestCase):
             "output_folder": self.csv_folder_name,
             "csv_name": self.csv_file_name,
         }
-        self.date = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+        self.date = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
         save_utils.save_csv(self.list_of_directions, self.params)
 
     def test_createFolder(self):

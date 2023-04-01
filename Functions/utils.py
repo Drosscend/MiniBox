@@ -123,3 +123,26 @@ def get_label_by_name(label_id: int) -> str:
     }
     # retourne le nom de la classe avec la première lettre en majuscule
     return names[label_id].capitalize()
+
+
+def initListOfDirections(classes: list) -> dict:
+    """
+    Initialise la liste des directions pour chaque classe
+    @param classes: Liste des classes
+    @return: Liste des directions
+    """
+    if not classes:
+        raise ValueError("La liste des classes est vide")
+
+    info_for_class = {
+        "total": 0,
+        "top-left": 0,
+        "top-right": 0,
+        "bottom-left": 0,
+        "bottom-right": 0
+    }
+    list_of_directions = {}
+    for classe in classes:
+        list_of_directions[classe] = info_for_class.copy()
+
+    return list_of_directions
