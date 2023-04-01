@@ -28,7 +28,6 @@ def detection(
         list_of_directions: Optional[dict],
         last_csv_save: Optional[float],
         new_objects: Optional[bool],
-        list_of_directions_for_save: Optional[dict],
         bdd_params: dict,
         interval: float,
         display_detection: bool,
@@ -48,7 +47,6 @@ def detection(
     @param list_of_directions: Liste des directions
     @param last_csv_save: Dernière sauvegarde du CSV
     @param new_objects: Nouveaux objets détectés
-    @param list_of_directions_for_save: Liste des directions pour la sauvegarde si la sauvegarde est activée
     @param bdd_params: Paramètres de la base de données à utiliser
     @param interval: Intervalle de temps entre chaque sauvegarde
     @param display_detection: Booléen permettant d'afficher les détections
@@ -144,7 +142,7 @@ def detection(
                 if new_objects:
                     save_utils.save_csv(list_of_directions, yolov5_paramms)
                 # réinitialisation des variables pour la sauvegarde
-                list_of_directions = list_of_directions_for_save.copy()
+                list_of_directions = utils.initListOfDirections(base_params["classes"])
                 new_objects = False
                 last_csv_save = time.time()
 
@@ -259,19 +257,8 @@ def init_detection(
     # Initialisation des variables pour enregistrer les détections dans un CSV si demandé
     if base_params["save_in_csv"]:
         # Initialisation de la liste des positions pour l'enregistrement dans le CSV
-        info_for_class = {
-            "total": 0,
-            "top-left": 0,
-            "top-right": 0,
-            "bottom-left": 0,
-            "bottom-right": 0
-        }
-        list_of_directions = {}
-        for classe in base_params["classes"]:
-            list_of_directions[classe] = info_for_class.copy()
+        list_of_directions = utils.initListOfDirections(base_params["classes"])
         new_objects = False
-        # Copie de la liste pour la sauvegarde
-        list_of_directions_for_save = list_of_directions.copy()
 
         # Initialisation du temps de la dernière sauvegarde du CSV
         last_csv_save = time.time()
@@ -279,7 +266,6 @@ def init_detection(
         list_of_directions = None
         last_csv_save = None
         new_objects = None
-        list_of_directions_for_save = None
 
     # Intitialisation de la barre de progression si la source est un fichier vidéo
     nbFrames = int(video_capture.get(cv2.CAP_PROP_FRAME_COUNT))
@@ -289,7 +275,7 @@ def init_detection(
         progress_bar = None
 
     detection(video_capture, progress_bar, model, yolov5_paramms, base_params, tracker, tracked_objects_informations,
-              list_of_directions, last_csv_save, new_objects, list_of_directions_for_save, bdd_params, interval,
+              list_of_directions, last_csv_save, new_objects, bdd_params, interval,
               display_detection, box_annotator, display_fps, prev_frame_time)
 
     if progress_bar:
