@@ -69,8 +69,7 @@ pip install -r requirements.txt
 Si vous voulez utilser la carte graphique pour accélérer le calcul, vous devez :
 1. Exécuter la commande suivante :
 ```bash
-pip3 install -U t
-orch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu117
+pip3 install -U torch torchvision torchaudio --extra-index-url https://download.pytorch.org/whl/cu117
 ```
 2. Changer la valeur de `device` à `0` dans le fichier `config.ini`
 
