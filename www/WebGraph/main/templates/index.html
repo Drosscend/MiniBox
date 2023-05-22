@@ -20,28 +20,82 @@
                 document.getElementById("chart-container").style.width = 1000 + "px";
             }
 
+            // Header : date,occurence,top-left,top-right,bottom-left,bottom-right,classe
+
+            // Création de 4 graphiques en fonction des directions
+            var date = [];
+            var occurence = [];
+            var top_left = [];
+            var top_right = [];
+            var bottom_left = [];
+            var bottom_right = [];
+            var classe = [];
+
+            {% for line in lines %}
+                date.push("{{line.0}}");
+                occurence.push({{line.1}});
+                top_left.push({{line.2}});
+                top_right.push({{line.3}});
+                bottom_left.push({{line.4}});
+                bottom_right.push({{line.5}});
+                classe.push("{{line.6}}");
+            {% endfor %}
+
+            // Création du graphique
             var ctx = document.getElementById('graphique').getContext('2d');
             chart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: [{% for line in lines %}'{{line.0}}',{% endfor %}], //loop through queryset,
+                    labels: date,
                     datasets: [{
-                        label: 'Nombre de passage en fonction du temps',
-                        data: [{% for line in lines %}{{line.1}},{% endfor %}],
+                        label: 'Top Left',
+                        data: top_left,
+                        fill: false,
                         backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderColor: 'rgba(255, 99, 132, 1)'
+                    },{
+                        label: 'Top Right',
+                        data: top_right,
+                        fill: false,
+                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                        borderColor: 'rgba(54, 162, 235, 1)'
+                    },{
+                        label: 'Bottom Left',
+                        data: bottom_left,
+                        fill: false,
+                        backgroundColor: 'rgba(255, 206, 86, 0.2)',
+                        borderColor: 'rgba(255, 206, 86, 1)'
+                    },{
+                        label: 'Bottom Right',
+                        data: bottom_right,
+                        fill: false,
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)'
                     }]
                 },
                 options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
                     scales: {
-                        y: {
-                            beginAtZero: true
+                        yAxes: [{
+                            ticks: {
+                                beginAtZero: true,
+                                stepSize: 1
+                            }
+                        }]
+                    },
+                    tooltips: {
+                        callbacks: {
+                            label: function(tooltipItem, data) {
+                                var label = data.datasets[tooltipItem.datasetIndex].label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                label += tooltipItem.yLabel;
+                                return label;
+                            }
                         }
-                    },
-                    legend: {
-                        display: false
-                    },
-                    maintainAspectRatio:false
+                    }
                 }
             });
         });
