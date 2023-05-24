@@ -123,6 +123,27 @@ pytest Test/
 
 </details>
 
+
+## <h2 align="center">Lancement du site (framework Django)</h2>
+Le site MiniBox WebGraphique permet de passer dans un formulaire un fichier .csv des données de détection, et d'afficher un graphique grâce à ces données.
+
+Avant de lancer le site, il vous faudra ajouter un fichier nommé **_config.json_** dans le répertoire **_www/WebGraph_**. Ce fichier contiendra votre secret key django et sera structuré comme ci-dessous :
+```json
+{
+    "SECRET_KEY": "votre secret key"
+}
+```
+
+Par la suite, exécutez les commandes suivantes :
+
+```bash
+python www/WebGraph/manage.py migrate
+
+python www/WebGraph/manage.py runserver
+```
+
+Le site est donc lancé en local et vous pouvez l'ouvrir avec l'URL suivante : http://127.0.0.1:8000/
+
 ### <h2 align="center">Equipe</h2>
 
 Etudiants de l'APSIO de l'Université de Toulouse :

@@ -173,5 +173,10 @@ cython_debug/
 custom_config.ini
 OUTPUT
 detect_save.db
+
+# WebGraph settings
+www/WebGraph/config.json
+www/WebGraph/db.sqlite3
+
 *.mp4
 *.csv
