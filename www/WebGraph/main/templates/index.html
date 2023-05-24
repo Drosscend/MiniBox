@@ -1,176 +1,33 @@
 {% extends './bootstrap/index.html' %}
 
 {% block content %}
-
 <script>
     {% include './js/utils.js' %}
-    {% if lines %}
-    // jquery function
-    let chart = undefined;
-    $(document).ready(function () {
-        let option;
-        let i;
-        if (chart !== undefined && chart != null) {
-            chart.destroy();
-        }
-
-        const new_width = {{lines | length}} * 10;
-
-        // Modification de la largeur en fonction des données
-        if (new_width > 1000) {
-            document.getElementById("chart-container").style.width = new_width + "px";
-        } else {
-            document.getElementById("chart-container").style.width = 1000 + "px";
-        }
-
-        // Header : date,occurence,top-left,top-right,bottom-left,bottom-right,classe
-
-        // Création de 4 graphiques en fonction des directions
-        const date = [];
-        const occurence = [];
-        const top_left = [];
-        const top_right = [];
-        const bottom_left = [];
-        const bottom_right = [];
-        const classe = [];
-
-        {% for line in lines %}
-        date.push("{{line.0}}");
-        occurence.push({{ line.1}});
-        top_left.push({{line.2}});
-        top_right.push({{line.3}});
-        bottom_left.push({{line.4}});
-        bottom_right.push({{line.5}});
-        classe.push("{{line.6}}");
-        {%endfor %}
-
-        // Création du graphique
-        const ctx = document.getElementById('graphique').getContext('2d');
-        chart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: date,
-                datasets: [{
-                    label: 'Top Left',
-                    data: top_left,
-                    fill: false,
-                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                    borderColor: 'rgba(255, 99, 132, 1)'
-                }, {
-                    label: 'Top Right',
-                    data: top_right,
-                    fill: false,
-                    backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                    borderColor: 'rgba(54, 162, 235, 1)'
-                }, {
-                    label: 'Bottom Left',
-                    data: bottom_left,
-                    fill: false,
-                    backgroundColor: 'rgba(255, 206, 86, 0.2)',
-                    borderColor: 'rgba(255, 206, 86, 1)'
-                }, {
-                    label: 'Bottom Right',
-                    data: bottom_right,
-                    fill: false,
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    borderColor: 'rgba(75, 192, 192, 1)'
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero: true,
-                            stepSize: 1
-                        }
-                    }]
-                },
-                tooltips: {
-                    callbacks: {
-                        label: function (tooltipItem, data) {
-                            let label = data.datasets[tooltipItem.datasetIndex].label || '';
-                            if (label) label += ': ';
-                            label += tooltipItem.yLabel;
-                            return label;
-                        }
-                    }
-                }
-            }
-        });
-
-        // Récupérer toutes les classes du CSV
-        const class_names = Array.from(new Set(classe));
-
-        // Supprime les valeurs null
-        class_names.splice(class_names.indexOf(''), 1);
-
-        // Mettre à jour le menu déroulant avec les options de classe
-        let classSelect = document.getElementById('class-select');
-        for (i = 0; i < class_names.length; i++) {
-            option = document.createElement('option');
-            option.text = class_names[i] + ' - ' + getName(class_names[i]);
-            option.value = class_names[i];
-            classSelect.appendChild(option);
-        }
-
-        // Gérer les changements de sélection dans le menu déroulant
-        classSelect.addEventListener('change', function () {
-            const selectedClass = classSelect.value;
-
-            // Filtrer les données en fonction de la classe sélectionnée
-            const filteredDate = [];
-            const filteredOccurence = [];
-            const filteredTopLeft = [];
-            const filteredTopRight = [];
-            const filteredBottomLeft = [];
-            const filteredBottomRight = [];
-
-            for (let i = 0; i < classe.length; i++) {
-                if (classe[i] === selectedClass) {
-                    filteredDate.push(date[i]);
-                    filteredOccurence.push(occurence[i]);
-                    filteredTopLeft.push(top_left[i]);
-                    filteredTopRight.push(top_right[i]);
-                    filteredBottomLeft.push(bottom_left[i]);
-                    filteredBottomRight.push(bottom_right[i]);
-                }
-            }
-
-            // Mettre à jour le graphique avec les données filtrées
-            chart.data.labels = filteredDate;
-            chart.data.datasets[0].data = filteredTopLeft;
-            chart.data.datasets[1].data = filteredTopRight;
-            chart.data.datasets[2].data = filteredBottomLeft;
-            chart.data.datasets[3].data = filteredBottomRight;
-            chart.update();
-        });
-    });
-    {%endif %}
+    {% include './js/renderChart.js' %}
 </script>
 
-<div class="row justify-content-center">
+<div class="d-flex justify-content-center align-items-center">
     {% load crispy_forms_tags %}
-    <div class="col-lg-6">
-        <form action="" method="post" enctype="multipart/form-data" class="text-center">
-            {% csrf_token %}
+    <form action="" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="text-center">
             <h2 class="mb-3">Choisissez un fichier CSV</h2>
-            <div class="row gx-4 gx-lg-5 justify-content-center">
-                <div class="col-lg-6">
-                    {{ form.fichier|as_crispy_field }}
-                </div>
-                <div class="col-lg-6 d-flex align-items-center d-flex align-bottom">
-                    <input type="submit" class="btn btn-secondary" value="Envoyer">
-                </div>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                {{ form.fichier|as_crispy_field }}
             </div>
-            {% if error %}
-            <label class="text-danger">{{ error }}</label>
-            {% endif %}
-        </form>
-    </div>
+            <div class="col-lg-4">
+                <button type="submit" class="btn btn-secondary">Envoyer</button>
+            </div>
+        </div>
+        {% if error %}
+        <div class="text-danger text-center mt-3">
+            <label>{{ error }}</label>
+        </div>
+        {% endif %}
+    </form>
 </div>
-
 
 
 {% if lines %}
@@ -183,11 +40,28 @@
             {% endfor %}
         </select>
     </div>
-    <div class="col-5" style="width:1000px; overflow-x: auto;">
-        <div id="chart-container" style="height:400px">
-            <canvas id="graphique"></canvas>
+    <div class="col-3">
+        <div class="form-group">
+            <label for="start-date">Date de début :</label>
+            <input type="date" id="start-date" class="form-control" value="{{ min_date }}" max="{{ max_date }}">
+        </div>
+    </div>
+    <div class="col-3">
+        <div class="form-group">
+            <label for="end-date">Date de fin :</label>
+            <input type="date" id="end-date" class="form-control" value="{{ max_date }}" min="{{ min_date }}">
+        </div>
+    </div>
+
+    <div class="d-flex align-items-center justify-content-center w-100">
+        <div class="col-6" style="width:1000px; overflow-x: auto;">
+            <div id="chart-container" style="height:400px">
+                <canvas id="graphique"></canvas>
+            </div>
         </div>
     </div>
 </div>
+
 {% endif %}
+
 {% endblock %}

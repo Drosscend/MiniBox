@@ -81,6 +81,22 @@ names = {
     79: "toothbrush",
 }
 
+/**
+ * Permet de récupérer le nom d'un objet à partir de son id
+ * @param id Id de l'objet
+ * @returns {string} Nom de l'objet
+ */
 function getName(id) {
     return names[id].charAt(0).toUpperCase() + names[id].slice(1);
+}
+
+/**
+ * Permet de savoir si une date est comprise entre deux autres dates
+ * @param date Date à tester
+ * @param startDate Date de début
+ * @param endDate Date de fin
+ * @returns {boolean} true si la date est comprise entre les deux autres dates, false sinon
+ */
+function isWithinRange(date, startDate, endDate) {
+    return date >= startDate && date <= endDate;
 }
