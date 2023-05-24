@@ -1,4 +1,4 @@
-names = {
+const names = {
     0: "person",
     1: "bicycle",
     2: "car",
