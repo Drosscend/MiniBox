@@ -1,6 +1,13 @@
 # MiniBox 🎯 requirements
 # Usage: pip install -r requirements.txt
 
+
+# WebGraphique
+django==4.1.7
+django-crispy-forms==2.0
+chartjs==1.2
+crispy-bootstrap5
+
 pytest>=7.2.1
 norfair~=2.2.0
 torch>=1.7.0
