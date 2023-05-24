@@ -40,6 +40,8 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+CRISPY_TEMPLATE_PACK = 'bootstrap5'
+
 
 # Application definition
 
@@ -51,8 +53,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'crispy_forms',
+    'crispy_bootstrap5',
     'chartjs',
-    'main'
+    'main',
 ]
 
 MIDDLEWARE = [
