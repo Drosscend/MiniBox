@@ -65,40 +65,34 @@ class TrackedObject:
     """Classe représentant un objet suivi dans une vidéo.
     """
 
-    def __init__(self, obj_id: int, confidence: float, x1: int, y1: int, x2: int, y2: int, classe: int, color: tuple) \
+    def __init__(self, obj_id: int, x1: int, y1: int, x2: int, y2: int, classe: int) \
             -> None:
         """Constructeur de la classe `TrackedObject`.
 
         @param obj_id: identifiant unique de l'objet
-        @param confidence: confiance de l'objet
         @param x1: coordonnée x du point en haut à gauche du rectangle englobant l'objet
         @param y1: coordonnée y du point en haut à gauche du rectangle englobant l'objet
         @param x2: coordonnée x du point en bas à droite du rectangle englobant l'objet
         @param y2: coordonnée y du point en bas à droite du rectangle englobant l'objet
         @param classe: classe de l'objet
-        @param color: couleur de l'objet
         """
         self.obj_id = obj_id
-        self.confidence = confidence
         self.x1 = x1
         self.y1 = y1
         self.x2 = x2
         self.y2 = y2
         self.classe = classe
-        self.color = color
         self.positions = [(x1, y1, x2, y2)]
         self.direction = None
 
-    def update_position(self, confidence: float, x1: int, y1: int, x2: int, y2: int) -> None:
+    def update_position(self, x1: int, y1: int, x2: int, y2: int) -> None:
         """Mise à jour de la position de l'objet.
 
-        @param confidence: confiance de l'objet
         @param x1: coordonnée x du point en haut à gauche du rectangle englobant l'objet
         @param y1: coordonnée y du point en haut à gauche du rectangle englobant l'objet
         @param x2: coordonnée x du point en bas à droite du rectangle englobant l'objet
         @param y2: coordonnée y du point en bas à droite du rectangle englobant l'objet
         """
-        self.confidence = confidence
         self.x1 = x1
         self.y1 = y1
         self.x2 = x2
@@ -113,7 +107,8 @@ class TrackedObject:
         Détermine la direction de l'objet en fonction de ses dernières positions.
         """
         direction = calculate_direction(self.positions)
-        self.direction = direction
+        if direction:
+            self.direction = direction
 
     def __str__(self) -> str:
         """
@@ -121,8 +116,8 @@ class TrackedObject:
         @return: représentation textuelle de l'objet
         """
         direction = self.direction
-        text = f"\n id: {self.obj_id},\n Confidence: {self.confidence},\n positions: {self.x1}, {self.y1}, " \
-               f"{self.x2}, {self.y2},\n classe: {self.classe},\n couleur: {self.color}"
+        text = f"\n id: {self.obj_id},\n positions: {self.x1}, {self.y1}, " \
+               f"{self.x2}, {self.y2},\n classe: {self.classe}"
         if direction:
             text += f",\n direction: {direction}"
         return text
@@ -138,20 +133,18 @@ class TrackedObjects:
         """
         self.tracked_objects = []
 
-    def add(self, obj_id: int, confidence: float, x1: int, y1: int, x2: int, y2: int, classe: int, color: tuple) \
+    def add(self, obj_id: int, x1: int, y1: int, x2: int, y2: int, classe: int) \
             -> None:
         """
         Ajoute un objet à la liste des objets suivis.
         @param obj_id: identifiant de l'objet
-        @param confidence: confiance de l'objet
         @param x1: coordonnée x du point en haut à gauche du rectangle englobant l'objet
         @param y1: coordonnée y du point en haut à gauche du rectangle englobant l'objet
         @param x2: coordonnée x du point en bas à droite du rectangle englobant l'objet
         @param y2: coordonnée y du point en bas à droite du rectangle englobant l'objet
         @param classe: classe de l'objet
-        @param color: couleur de l'objet
         """
-        tracked_object = TrackedObject(obj_id, confidence, x1, y1, x2, y2, classe, color)
+        tracked_object = TrackedObject(obj_id, x1, y1, x2, y2, classe)
         self.tracked_objects.append(tracked_object)
 
     def get(self, obj_id: int) -> Optional[TrackedObject]:

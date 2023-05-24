@@ -167,7 +167,7 @@ cython_debug/
 .fleet/
 
 # yolov5 settings
-yolov5*.pt
+*.pt
 
 # Minibox settings
 custom_config.ini
@@ -177,3 +177,6 @@ detect_save.db
 # WebGraph settings
 www/WebGraph/config.json
 www/WebGraph/db.sqlite3
+
+*.mp4
+*.csv

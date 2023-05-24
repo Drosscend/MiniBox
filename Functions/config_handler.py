@@ -1,5 +1,6 @@
 import configparser
 import logging
+import os
 import re
 
 log = logging.getLogger("main")
@@ -14,9 +15,9 @@ def check_params(config) -> bool:
     # Vérifier que le fichier de configuration est valide
     expected_sections = ['PARAMS', 'YOLOV5_PARAMS', 'BDD_PARAMS']
     expected_options = {
-        'PARAMS': ['source', 'classes', 'interval', 'display_detection', 'debug'],
+        'PARAMS': ['source', 'classes', 'interval', 'display_detection', 'display_fps', 'debug', 'save_in_csv'],
         'YOLOV5_PARAMS': ['weights', 'conf_thres', 'iou_thres', 'agnostic_nms', 'multi_label_nms', 'max_det', 'amp',
-                          'output_folder', 'csv_name'],
+                          'output_folder', 'csv_name', 'device'],
         'BDD_PARAMS': ['save_in_bdd', 'bdd_name', 'table_name', 'time_to_save', 'keep_csv']
     }
 
@@ -41,7 +42,16 @@ def get_base_params(config) -> dict:
     """
     base_params = {}
     try:
-        base_params['source'] = config.getint('PARAMS', 'source')
+        base_params['source'] = config.get('PARAMS', 'source')
+        # transformer la source en entier si c'est un chiffre (pour la webcam)
+        if re.match(r'^\d+$', base_params['source']):
+            base_params['source'] = int(base_params['source'])
+        else:
+            # vérifier que le fichier existe
+            if not os.path.isfile(base_params['source']):
+                log.error("Erreur : le fichier {} n'existe pas, verifier le fichier de configuration"
+                          .format(base_params['source']))
+                exit(1)
     except ValueError:
         log.error("Erreur : la valeur de source doit être un entier, verifier le fichier de configuration")
         exit(1)
@@ -49,7 +59,8 @@ def get_base_params(config) -> dict:
     try:
         base_params['classes'] = [int(x) for x in config.get('PARAMS', 'classes').split(',')]
     except ValueError:
-        log.error("Erreur : la valeur de l'option classes doit être un tableau, verifier le fichier de configuration")
+        log.error("Erreur : la valeur de l'option classes doit être un entier ou tableau, verifier le fichier de "
+                  "configuration")
         exit(1)
 
     try:
@@ -66,9 +77,23 @@ def get_base_params(config) -> dict:
         exit(1)
 
     try:
+        base_params['display_fps'] = config.getboolean('PARAMS', 'display_fps')
+    except ValueError:
+        log.error("Erreur : la valeur de l'option display_fps doit être un boolean, verifier le fichier de "
+                  "configuration")
+        exit(1)
+
+    try:
         base_params['debug'] = config.getboolean('PARAMS', 'debug')
     except ValueError:
         log.error("Erreur : la valeur de l'option debug doit être un boolean, verifier le fichier de configuration")
+        exit(1)
+
+    try:
+        base_params['save_in_csv'] = config.getboolean('PARAMS', 'save_in_csv')
+    except ValueError:
+        log.error(
+            "Erreur : la valeur de l'option save_in_csv doit être un boolean, verifier le fichier de configuration")
         exit(1)
 
     return base_params
@@ -81,7 +106,7 @@ def get_yolov5_params(config) -> dict:
     @return: un dictionnaire contenant les paramètres de yolov5
     """
     yolov5_paramms = {}
-    tab_of_weights = ["yolov5n.pt", "yolov5s.pt", "yolov5m.pt", "yolov5l.pt", "yolov5x.pt"]
+    tab_of_weights = ["yolov5n", "yolov5s", "yolov5m", "yolov5l", "yolov5x"]
     if config.get('YOLOV5_PARAMS', 'weights') in tab_of_weights:
         yolov5_paramms['weights'] = config.get('YOLOV5_PARAMS', 'weights')
     else:
@@ -158,6 +183,17 @@ def get_yolov5_params(config) -> dict:
         log.error("Erreur : la valeur de l'option csv_name doit être un chemin, verifier le fichier de configuration")
         exit(1)
 
+    try:
+        devise = config.get('YOLOV5_PARAMS', 'device')
+        if devise not in ["cpu", "0"]:
+            log.error(
+                "Erreur : la valeur de l'option device doit être cpu ou 0, verifier le fichier de configuration")
+            exit(1)
+        else:
+            yolov5_paramms['device'] = devise
+    except ValueError:
+        log.error("Erreur : la valeur de l'option device doit être cpu ou 0, verifier le fichier de configuration")
+        exit(1)
     return yolov5_paramms
 
 
@@ -231,25 +267,28 @@ def print_config(base_params, yolov5_params, bdd_params) -> None:
     """
     log.info("Source : " + str(base_params["source"]))
     log.info("Classes : " + str(base_params["classes"]))
-    log.info("Intervalle : " + str(base_params["interval"]) + " seconde(s)")
-    log.info("Affichage : " + str(base_params["display_detection"]))
+    log.info("Interval : " + str(base_params["interval"]) + " seconde(s)")
+    log.info("Affichage de la source : " + str(base_params["display_detection"]))
     log.info("Debug : " + str(base_params["debug"]))
+    log.info("Sauvegarde des résultat dans le csv : " + str(base_params["save_in_csv"]))
 
-    log.info("weights : " + str(yolov5_params["weights"]))
-    log.info("conf_thres : " + str(yolov5_params["conf_thres"]))
-    log.info("iou_thres : " + str(yolov5_params["iou_thres"]))
-    log.info("agnostic_nms : " + str(yolov5_params["agnostic_nms"]))
-    log.info("multi_label_nms : " + str(yolov5_params["multi_label_nms"]))
-    log.info("max_det : " + str(yolov5_params["max_det"]))
-    log.info("amp : " + str(yolov5_params["amp"]))
-    log.info("output_folder : " + str(yolov5_params["output_folder"]))
-    log.info("csv_name : " + str(yolov5_params["csv_name"]))
+    log.info("Model à utiliser pour la détection : " + str(yolov5_params["weights"]))
+    log.info("Seuil de confiance : " + str(yolov5_params["conf_thres"]))
+    log.info("Seuil de recouvrement : " + str(yolov5_params["iou_thres"]))
+    log.info("Suppression des doublons agnostic nms : " + str(yolov5_params["agnostic_nms"]))
+    log.info("Suppression des doublons multi label nms : " + str(yolov5_params["multi_label_nms"]))
+    log.info("Nombre de détection maximale : " + str(yolov5_params["max_det"]))
+    log.info("Utilisation de l'accélérateur graphique : " + str(yolov5_params["amp"]))
+    if base_params["save_in_csv"]:
+        log.info("Dossier où le fichier csv sera enregistré : " + str(yolov5_params["output_folder"]))
+        log.info("Nom souhaité pour le fichier csv : " + str(yolov5_params["csv_name"]))
+    log.info("Appareil utilisé pour la détection : " + str(yolov5_params["device"]))
 
     if bdd_params['save_in_bdd']:
-        log.info("bdd_name : " + str(bdd_params["bdd_name"]))
-        log.info("table_name : " + str(bdd_params["table_name"]))
-        log.info("time_to_save : " + str(bdd_params["time_to_save"]))
-        log.info("keep_csv : " + str(bdd_params["keep_csv"]))
+        log.info("Nom de la base de donnée : " + str(bdd_params["bdd_name"]))
+        log.info("Nom de la table : " + str(bdd_params["table_name"]))
+        log.info("Heure à laquelle les résultats seront sauvegardés : " + str(bdd_params["time_to_save"]))
+        log.info("Suppression du csv après l'enregsitremetn dans la base de donnée: " + str(bdd_params["keep_csv"]))
 
 
 def get_config(config_file) -> tuple[dict, dict, dict]:
@@ -266,4 +305,4 @@ def get_config(config_file) -> tuple[dict, dict, dict]:
     yolov5_params = get_yolov5_params(config)
     bdd_params = get_bdd_params(config)
     print_config(base_params, yolov5_params, bdd_params)
-    return (base_params, yolov5_params, bdd_params)
+    return base_params, yolov5_params, bdd_params
