@@ -138,7 +138,6 @@ Par la suite, exécutez les commandes suivantes :
 
 ```bash
 python www/WebGraph/manage.py migrate
-python www/WebGraph/manage.py makemigrations
 
 python www/WebGraph/manage.py runserver
 ```
