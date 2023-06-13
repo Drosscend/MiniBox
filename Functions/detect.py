@@ -227,10 +227,9 @@ def init_detection(
     # Initialisation de la valeur de l'interval de temps entre chaque enregistrement
     interval = base_params["interval"]
 
-    # Intialisation des varibles pour afficher les FPS si demandé
+    # Intialisation des varibles pour afficher les FPS
     display_fps = base_params["display_fps"]
-    if display_fps:
-        prev_frame_time = 0
+    prev_frame_time = 0
 
     # Intialisation des variables et de l'interface pour afficher les détections si demandé
     display_detection = base_params["display_detection"]

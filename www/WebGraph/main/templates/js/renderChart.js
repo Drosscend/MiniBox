@@ -13,7 +13,7 @@ $(document).ready(function () {
 
     // Création de 4 graphiques en fonction des directions
     const date = [];
-    const occurence = [];
+    const occurrence = [];
     const top_left = [];
     const top_right = [];
     const bottom_left = [];
@@ -22,7 +22,7 @@ $(document).ready(function () {
 
     {% for line in lines %}
     date.push("{{line.0}}");
-    occurence.push({{ line.1}});
+    occurrence.push({{ line.1}});
     top_left.push({{line.2}});
     top_right.push({{line.3}});
     bottom_left.push({{line.4}});
@@ -104,7 +104,7 @@ $(document).ready(function () {
 
         // Filtrer les données en fonction de la classe sélectionnée
         const filteredDate = [];
-        const filteredOccurence = [];
+        const filteredOccurrence = [];
         const filteredTopLeft = [];
         const filteredTopRight = [];
         const filteredBottomLeft = [];
@@ -113,7 +113,7 @@ $(document).ready(function () {
         for (let i = 0; i < classe.length; i++) {
             if (classe[i] === selectedClass) {
                 filteredDate.push(date[i]);
-                filteredOccurence.push(occurence[i]);
+                filteredOccurrence.push(occurrence[i]);
                 filteredTopLeft.push(top_left[i]);
                 filteredTopRight.push(top_right[i]);
                 filteredBottomLeft.push(bottom_left[i]);
@@ -155,7 +155,7 @@ $(document).ready(function () {
 
     function updateChart(startDate, endDate) {
         const filteredDate = [];
-        const filteredOccurence = [];
+        const filteredOccurrence = [];
         const filteredTopLeft = [];
         const filteredTopRight = [];
         const filteredBottomLeft = [];
@@ -164,7 +164,7 @@ $(document).ready(function () {
         for (let i = 0; i < date.length; i++) {
             if (isWithinRange(date[i], startDate, endDate)) {
                 filteredDate.push(date[i]);
-                filteredOccurence.push(occurence[i]);
+                filteredOccurrence.push(occurrence[i]);
                 filteredTopLeft.push(top_left[i]);
                 filteredTopRight.push(top_right[i]);
                 filteredBottomLeft.push(bottom_left[i]);

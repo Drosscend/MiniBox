@@ -41,7 +41,7 @@ def save_bdd(bdd_params: dict, yolov5_paramms: dict) -> None:
     try:
         cursor.execute(f"CREATE TABLE IF NOT EXISTS {table_name} ("
                        f"date TEXT, "
-                       f"occurence INTEGER, "
+                       f"occurrence INTEGER, "
                        f"top_left INTEGER, "
                        f"top_right INTEGER, "
                        f"bottom_left INTEGER, "
@@ -92,7 +92,7 @@ def save_bdd(bdd_params: dict, yolov5_paramms: dict) -> None:
 
 def save_csv(list_of_directions: dict[Any, dict[str, int]], yolov5_paramms) -> None:
     """
-    Génère un fichier CSV contenant le nombre d'occurence total et par direction
+    Génère un fichier CSV contenant le nombre d'occurrence total et par direction
     @param list_of_directions: Liste des directions des objets détectés par classe
     @param csv_folder_name: Nom du dossier dans lequel enregistrer le fichier CSV
     @param csv_file_name: Nom du fichier CSV
@@ -114,7 +114,7 @@ def save_csv(list_of_directions: dict[Any, dict[str, int]], yolov5_paramms) -> N
             writer = csv.writer(f)
             # si le fichier est vide, on écrit l'entête
             if os.path.getsize(path) == 0:
-                writer.writerow(["date", "occurence", "top-left", "top-right", "bottom-left", "bottom-right", "classe"])
+                writer.writerow(["date", "occurrence", "top-left", "top-right", "bottom-left", "bottom-right", "classe"])
             for classe, infos in list_of_directions.items():
                 writer.writerow([
                     datestring,
