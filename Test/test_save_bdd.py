@@ -30,7 +30,7 @@ class TestSaveBDD(unittest.TestCase):
         if not os.path.exists(self.csv_folder_name):
             os.makedirs(self.csv_folder_name)
         with open(path, "w") as f:
-            f.write("date,occurence,top_left,top_right,bottom_left,bottom_right,classe\n")
+            f.write("date,occurrence,top_left,top_right,bottom_left,bottom_right,classe\n")
             f.write("2022-01-01,1,2,3,4,5,6\n")
             f.write("2022-01-02,7,8,9,10,11,12\n")
 

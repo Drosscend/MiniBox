@@ -34,7 +34,7 @@ class TestSaveCsv(unittest.TestCase):
     def test_writeFileHeader(self):
         with open(self.csv_folder_name + '/' + self.csv_file_name, 'r') as file:
             lines = file.readlines()
-            self.assertEqual(lines[0], "date,occurence,top-left,top-right,bottom-left,bottom-right,classe\n")
+            self.assertEqual(lines[0], "date,occurrence,top-left,top-right,bottom-left,bottom-right,classe\n")
 
     def test_writeFileContent(self):
         with open(self.csv_folder_name + '/' + self.csv_file_name, 'r') as file:
