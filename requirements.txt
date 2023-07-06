@@ -3,7 +3,7 @@
 
 
 # WebGraphique
-django==4.1.9
+django==4.1.10
 django-crispy-forms==2.0
 chartjs==1.2
 crispy-bootstrap5
